@@ -209,7 +209,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     applicationQuestion: ApplicationQuestion
   ) => {
     const response = await fetch(
-      `/api/applicationQuestions/${applicationQuestion.id}`,
+      `/api/applicationQuestions/${applicationQuestion.pid}`,
       {
         method: "PUT",
         headers: {
@@ -237,19 +237,13 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   const deleteApplicationQuestion = async (
     applicationQuestion: ApplicationQuestion
   ) => {
-    const response = await fetch(
-      `/api/applicationQuestions/${applicationQuestion.id}`,
-      {
-        method: "DELETE",
-      }
-    );
-    const deletedApplicationQuestion: ApplicationQuestion =
-      await response.json();
+    await fetch(`/api/applicationQuestions/${applicationQuestion.pid}`, {
+      method: "DELETE",
+    });
     setFullJob({
       ...fullJob,
       applicationQuestions: fullJob.applicationQuestions.filter(
-        (applicationQuestion) =>
-          applicationQuestion.id !== deletedApplicationQuestion.id
+        (q) => q.id !== applicationQuestion.id
       ),
     });
   };
