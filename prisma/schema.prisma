@@ -14,3 +14,84 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
+enum JobType {
+  fullTime
+  partTime
+  contract
+}
+
+enum JobArrangement {
+  onSite
+  hybrid
+  remote
+}
+
+enum JobStatus {
+  notApplied
+  applied
+  appliedWithdrawn
+  appliedRejected
+  interviewing
+  interviewedWithdrawn
+  interviewedRejected
+  offerReceived
+  offerAccepted
+}
+
+model Job {
+  id                   Int                   @id @default(autoincrement())
+  pid                  String                @unique @default(uuid())
+  title                String
+  company              String
+  location             String
+  type                 JobType?
+  arrangement          JobArrangement?
+  staffingCompany      String
+  description          String
+  postedDate           String?
+  appliedDate          String?
+  status               JobStatus
+  notes                String
+  postedSalary         String
+  desiredSalary        String
+  links                Link[]
+  contacts             Contact[]
+  applicationQuestions ApplicationQuestion[]
+}
+
+model Link {
+  id        Int    @id @default(autoincrement())
+  pid       String @unique @default(uuid())
+  name      String
+  url       String
+  sortOrder Int
+  jobId     Int
+  Job       Job    @relation(fields: [jobId], references: [id])
+}
+
+model Contact {
+  id           Int    @id @default(autoincrement())
+  pid          String @unique @default(uuid())
+  name         String
+  title        String
+  phone        String
+  email        String
+  company      String
+  addressLine1 String
+  addressLine2 String
+  addressLine3 String
+  addressLine4 String
+  sortOrder    Int
+  jobId        Int
+  Job          Job    @relation(fields: [jobId], references: [id])
+}
+
+model ApplicationQuestion {
+  id       Int    @id @default(autoincrement())
+  pid      String @unique @default(uuid())
+  question String
+  answer   String
+  jobId    Int
+  Job      Job    @relation(fields: [jobId], references: [id])
+}
