@@ -29,9 +29,8 @@ export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
       )
     )
       return;
-    const response = await fetch(`/api/jobs/${job.id}`, { method: "DELETE" });
-    const deletedJob: Job = await response.json();
-    setJobsWithLinks(jobsWithLinks.filter((j) => j.id !== deletedJob.id));
+    await fetch(`/api/jobs/${job.pid}`, { method: "DELETE" });
+    setJobsWithLinks(jobsWithLinks.filter((j) => j.id !== job.id));
   };
 
   return (
