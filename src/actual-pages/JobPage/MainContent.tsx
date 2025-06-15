@@ -32,7 +32,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   const [profilePid, setProfilePid] = useState<string>(profiles[0]?.pid ?? "");
 
   const updateJob = async (job: Job) => {
-    const response = await fetch(`/api/jobs/${job.id}`, {
+    const response = await fetch(`/api/jobs/${job.pid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
