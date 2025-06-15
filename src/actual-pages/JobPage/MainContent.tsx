@@ -98,7 +98,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   };
 
   const createLink = async () => {
-    const response = await fetch(`/api/jobs/${fullJob.id}/links`, {
+    const response = await fetch(`/api/jobs/${fullJob.pid}/links`, {
       method: "POST",
     });
     const link: Link = await response.json();
@@ -190,7 +190,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
 
   const createApplicationQuestion = async () => {
     const response = await fetch(
-      `/api/jobs/${fullJob.id}/applicationQuestions`,
+      `/api/jobs/${fullJob.pid}/applicationQuestions`,
       {
         method: "POST",
       }
@@ -317,7 +317,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   };
 
   const createContact = async () => {
-    const response = await fetch(`/api/jobs/${fullJob.id}/contacts`, {
+    const response = await fetch(`/api/jobs/${fullJob.pid}/contacts`, {
       method: "POST",
     });
     const contact: Contact = await response.json();
