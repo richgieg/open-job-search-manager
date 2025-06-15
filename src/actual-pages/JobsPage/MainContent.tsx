@@ -79,7 +79,7 @@ export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
                   }
                 >
                   <TableDataCell>
-                    <NextLink href={`/jobs/${j.id}`}>
+                    <NextLink href={`/jobs/${j.pid}`}>
                       {j.title || t.jobTitlePlaceholder}
                     </NextLink>
                   </TableDataCell>
