@@ -15,6 +15,21 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model Profile {
+  id          Int    @id @default(autoincrement())
+  pid         String @unique @default(uuid())
+  profileName String
+  jobTitle    String
+  name        String
+  location    String
+  phone       String
+  email       String
+  websiteText String
+  websiteLink String
+  summary     String
+  coverLetter String
+}
+
 enum JobType {
   fullTime
   partTime
@@ -58,6 +73,7 @@ model Job {
   links                Link[]
   contacts             Contact[]
   applicationQuestions ApplicationQuestion[]
+  resumes              Resume[]
 }
 
 model Link {
@@ -94,4 +110,27 @@ model ApplicationQuestion {
   answer   String
   jobId    Int
   Job      Job    @relation(fields: [jobId], references: [id])
+}
+
+enum ResumeTemplate {
+  template01
+  template02
+}
+
+model Resume {
+  id              Int            @id @default(autoincrement())
+  pid             String         @unique @default(uuid())
+  resumeName      String
+  name            String
+  location        String
+  phone           String
+  email           String
+  websiteText     String
+  websiteLink     String
+  summary         String
+  coverLetter     String
+  allowPageBreaks Boolean
+  template        ResumeTemplate
+  jobId           Int
+  Job             Job            @relation(fields: [jobId], references: [id])
 }
