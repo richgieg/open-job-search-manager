@@ -104,12 +104,13 @@ model Contact {
 }
 
 model ApplicationQuestion {
-  id       Int    @id @default(autoincrement())
-  pid      String @unique @default(uuid())
-  question String
-  answer   String
-  jobId    Int
-  Job      Job    @relation(fields: [jobId], references: [id])
+  id        Int    @id @default(autoincrement())
+  pid       String @unique @default(uuid())
+  question  String
+  answer    String
+  sortOrder Int
+  jobId     Int
+  Job       Job    @relation(fields: [jobId], references: [id])
 }
 
 enum ResumeTemplate {
