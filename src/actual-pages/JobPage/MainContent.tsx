@@ -321,7 +321,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   };
 
   const duplicateContact = async (contact: Contact) => {
-    const response = await fetch(`/api/contacts/${contact.id}/duplicate`, {
+    const response = await fetch(`/api/contacts/${contact.pid}/duplicate`, {
       method: "POST",
     });
     const duplicatedContact: Contact = await response.json();
