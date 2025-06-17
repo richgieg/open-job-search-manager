@@ -56,16 +56,18 @@ export default makeApiHandler({
             sortOrder: workEntry.sortOrder,
           },
         });
-        for (const bullet of workEntry.bullets) {
-          await tx.workEntryBullet.create({
-            data: {
-              workEntryId: newWorkEntry.id,
-              text: bullet.text,
-              enabled: bullet.enabled,
-              sortOrder: bullet.sortOrder,
-            },
-          });
-        }
+        await Promise.all(
+          workEntry.bullets.map((bullet) =>
+            tx.workEntryBullet.create({
+              data: {
+                workEntryId: newWorkEntry.id,
+                text: bullet.text,
+                enabled: bullet.enabled,
+                sortOrder: bullet.sortOrder,
+              },
+            })
+          )
+        );
       }
       for (const educationEntry of original.educationEntries) {
         const newEducationEntry = await tx.educationEntry.create({
@@ -79,19 +81,21 @@ export default makeApiHandler({
             sortOrder: educationEntry.sortOrder,
           },
         });
-        for (const bullet of educationEntry.bullets) {
-          await tx.educationEntryBullet.create({
-            data: {
-              educationEntryId: newEducationEntry.id,
-              text: bullet.text,
-              enabled: bullet.enabled,
-              sortOrder: bullet.sortOrder,
-            },
-          });
-        }
+        await Promise.all(
+          educationEntry.bullets.map((bullet) =>
+            tx.educationEntryBullet.create({
+              data: {
+                educationEntryId: newEducationEntry.id,
+                text: bullet.text,
+                enabled: bullet.enabled,
+                sortOrder: bullet.sortOrder,
+              },
+            })
+          )
+        );
       }
-      for (const certification of original.certifications) {
-        await tx.certification.create({
+      original.certifications.map((certification) =>
+        tx.certification.create({
           data: {
             profileId: newProfile.id,
             title: certification.title,
@@ -100,8 +104,8 @@ export default makeApiHandler({
             enabled: certification.enabled,
             sortOrder: certification.sortOrder,
           },
-        });
-      }
+        })
+      );
       for (const skillCategory of original.skillCategories) {
         const newSkillCategory = await tx.skillCategory.create({
           data: {
@@ -111,16 +115,18 @@ export default makeApiHandler({
             sortOrder: skillCategory.sortOrder,
           },
         });
-        for (const skill of skillCategory.skills) {
-          await tx.skill.create({
-            data: {
-              skillCategoryId: newSkillCategory.id,
-              text: skill.text,
-              enabled: skill.enabled,
-              sortOrder: skill.sortOrder,
-            },
-          });
-        }
+        await Promise.all(
+          skillCategory.skills.map((skill) =>
+            tx.skill.create({
+              data: {
+                skillCategoryId: newSkillCategory.id,
+                text: skill.text,
+                enabled: skill.enabled,
+                sortOrder: skill.sortOrder,
+              },
+            })
+          )
+        );
       }
       return newProfile;
     });
