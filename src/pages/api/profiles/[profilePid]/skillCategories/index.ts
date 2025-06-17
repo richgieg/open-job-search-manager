@@ -1,0 +1,35 @@
+import type { NextApiResponse } from "next";
+import { Prisma, SkillCategory } from "@/generated/prisma";
+import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+
+export default makeApiHandler({
+  POST: async (req, res: NextApiResponse<SkillCategory>) => {
+    const profilePid = req.query.profilePid as string;
+    const maxSortOrderEntry = await prisma.skillCategory.findFirst({
+      where: { profile: { pid: profilePid } },
+      orderBy: { sortOrder: "desc" },
+    });
+    const sortOrder = (maxSortOrderEntry?.sortOrder ?? -1) + 1;
+    try {
+      const skillCategory = await prisma.skillCategory.create({
+        data: {
+          name: "",
+          enabled: true,
+          sortOrder,
+          profile: {
+            connect: { pid: profilePid },
+          },
+        },
+      });
+      return sendResponse(res, 201, skillCategory);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      ) {
+        return sendError(res, 404);
+      }
+      return sendError(res, 500);
+    }
+  },
+});
