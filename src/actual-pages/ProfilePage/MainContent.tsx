@@ -251,15 +251,12 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const deleteWorkEntry = async (workEntry: WorkEntry) => {
-    const response = await fetch(`/api/workEntries/${workEntry.pid}`, {
+    await fetch(`/api/workEntries/${workEntry.pid}`, {
       method: "DELETE",
     });
-    const deletedWorkEntry: WorkEntry = await response.json();
     setFullProfile({
       ...fullProfile,
-      workEntries: fullProfile.workEntries.filter(
-        (workEntry) => workEntry.id !== deletedWorkEntry.id
-      ),
+      workEntries: fullProfile.workEntries.filter((w) => w.id !== workEntry.id),
     });
   };
 
@@ -371,20 +368,17 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const deleteWorkEntryBullet = async (workEntryBullet: WorkEntryBullet) => {
-    const response = await fetch(
-      `/api/workEntryBullets/${workEntryBullet.pid}`,
-      { method: "DELETE" }
-    );
-    const deletedWorkEntryBullet: WorkEntryBullet = await response.json();
+    await fetch(`/api/workEntryBullets/${workEntryBullet.pid}`, {
+      method: "DELETE",
+    });
     setFullProfile({
       ...fullProfile,
       workEntries: fullProfile.workEntries.map((workEntry) => {
-        if (workEntry.id === deletedWorkEntryBullet.workEntryId) {
+        if (workEntry.id === workEntryBullet.workEntryId) {
           return {
             ...workEntry,
             bullets: workEntry.bullets.filter(
-              (workEntryBullet) =>
-                workEntryBullet.id !== deletedWorkEntryBullet.id
+              (b) => b.id !== workEntryBullet.id
             ),
           };
         } else {
@@ -500,17 +494,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const deleteEducationEntry = async (educationEntry: EducationEntry) => {
-    const response = await fetch(
-      `/api/educationEntries/${educationEntry.pid}`,
-      {
-        method: "DELETE",
-      }
-    );
-    const deletedEducationEntry: EducationEntry = await response.json();
+    await fetch(`/api/educationEntries/${educationEntry.pid}`, {
+      method: "DELETE",
+    });
     setFullProfile({
       ...fullProfile,
       educationEntries: fullProfile.educationEntries.filter(
-        (educationEntry) => educationEntry.id !== deletedEducationEntry.id
+        (e) => e.id !== educationEntry.id
       ),
     });
   };
@@ -639,23 +629,17 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   const deleteEducationEntryBullet = async (
     educationEntryBullet: EducationEntryBullet
   ) => {
-    const response = await fetch(
-      `/api/educationEntryBullets/${educationEntryBullet.pid}`,
-      { method: "DELETE" }
-    );
-    const deletedEducationEntryBullet: EducationEntryBullet =
-      await response.json();
+    await fetch(`/api/educationEntryBullets/${educationEntryBullet.pid}`, {
+      method: "DELETE",
+    });
     setFullProfile({
       ...fullProfile,
       educationEntries: fullProfile.educationEntries.map((educationEntry) => {
-        if (
-          educationEntry.id === deletedEducationEntryBullet.educationEntryId
-        ) {
+        if (educationEntry.id === educationEntryBullet.educationEntryId) {
           return {
             ...educationEntry,
             bullets: educationEntry.bullets.filter(
-              (educationEntryBullet) =>
-                educationEntryBullet.id !== deletedEducationEntryBullet.id
+              (b) => b.id !== educationEntryBullet.id
             ),
           };
         } else {
@@ -770,14 +754,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const deleteCertification = async (certification: Certification) => {
-    const response = await fetch(`/api/certifications/${certification.pid}`, {
+    await fetch(`/api/certifications/${certification.pid}`, {
       method: "DELETE",
     });
-    const deletedCertification: Certification = await response.json();
     setFullProfile({
       ...fullProfile,
       certifications: fullProfile.certifications.filter(
-        (certification) => certification.id !== deletedCertification.id
+        (c) => c.id !== certification.id
       ),
     });
   };
@@ -885,14 +868,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const deleteSkillCategory = async (skillCategory: SkillCategory) => {
-    const response = await fetch(`/api/skillCategories/${skillCategory.pid}`, {
+    await fetch(`/api/skillCategories/${skillCategory.pid}`, {
       method: "DELETE",
     });
-    const deletedSkillCategory: SkillCategory = await response.json();
     setFullProfile({
       ...fullProfile,
       skillCategories: fullProfile.skillCategories.filter(
-        (skillCategory) => skillCategory.id !== deletedSkillCategory.id
+        (s) => s.id !== skillCategory.id
       ),
     });
   };
@@ -1011,19 +993,16 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const deleteSkill = async (skill: Skill) => {
-    const response = await fetch(`/api/skills/${skill.pid}`, {
+    await fetch(`/api/skills/${skill.pid}`, {
       method: "DELETE",
     });
-    const deletedSkill: Skill = await response.json();
     setFullProfile({
       ...fullProfile,
       skillCategories: fullProfile.skillCategories.map((skillCategory) => {
-        if (skillCategory.id === deletedSkill.skillCategoryId) {
+        if (skillCategory.id === skill.skillCategoryId) {
           return {
             ...skillCategory,
-            skills: skillCategory.skills.filter(
-              (skill) => skill.id !== deletedSkill.id
-            ),
+            skills: skillCategory.skills.filter((s) => s.id !== skill.id),
           };
         } else {
           return skillCategory;
