@@ -6,7 +6,7 @@ export default makeApiHandler({
   POST: async (req, res: NextApiResponse<Contact>) => {
     const jobPid = req.query.jobPid as string;
     const maxSortOrderEntry = await prisma.contact.findFirst({
-      where: { Job: { pid: jobPid } },
+      where: { job: { pid: jobPid } },
       orderBy: { sortOrder: "desc" },
     });
     const sortOrder = (maxSortOrderEntry?.sortOrder ?? -1) + 1;
@@ -23,7 +23,7 @@ export default makeApiHandler({
           addressLine3: "",
           addressLine4: "",
           sortOrder,
-          Job: {
+          job: {
             connect: { pid: jobPid },
           },
         },
