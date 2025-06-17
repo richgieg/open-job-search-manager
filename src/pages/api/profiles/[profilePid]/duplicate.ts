@@ -94,19 +94,17 @@ export default makeApiHandler({
           )
         );
       }
-      await Promise.all(
-        original.certifications.map((certification) =>
-          tx.certification.create({
-            data: {
-              profileId: newProfile.id,
-              title: certification.title,
-              issuer: certification.issuer,
-              issueDate: certification.issueDate,
-              enabled: certification.enabled,
-              sortOrder: certification.sortOrder,
-            },
-          })
-        )
+      original.certifications.map((certification) =>
+        tx.certification.create({
+          data: {
+            profileId: newProfile.id,
+            title: certification.title,
+            issuer: certification.issuer,
+            issueDate: certification.issueDate,
+            enabled: certification.enabled,
+            sortOrder: certification.sortOrder,
+          },
+        })
       );
       for (const skillCategory of original.skillCategories) {
         const newSkillCategory = await tx.skillCategory.create({
