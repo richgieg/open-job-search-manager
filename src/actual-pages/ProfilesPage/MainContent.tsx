@@ -20,7 +20,7 @@ export function MainContent({ profiles, setProfiles }: Props) {
   };
 
   const duplicateProfile = async (profile: Profile) => {
-    const response = await fetch(`/api/profiles/${profile.id}/duplicate`, {
+    const response = await fetch(`/api/profiles/${profile.pid}/duplicate`, {
       method: "POST",
     });
     const duplicatedProfile: Profile = await response.json();
@@ -36,11 +36,10 @@ export function MainContent({ profiles, setProfiles }: Props) {
       )
     )
       return;
-    const response = await fetch(`/api/profiles/${profile.id}`, {
+    await fetch(`/api/profiles/${profile.pid}`, {
       method: "DELETE",
     });
-    const deletedProfile: Profile = await response.json();
-    setProfiles(profiles.filter((p) => p.id !== deletedProfile.id));
+    setProfiles(profiles.filter((p) => p.id !== profile.id));
   };
 
   return (
