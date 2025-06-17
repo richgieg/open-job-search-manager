@@ -83,7 +83,7 @@ model Link {
   url       String
   sortOrder Int
   jobId     Int
-  job       Job    @relation(fields: [jobId], references: [id])
+  job       Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
 }
 
 model Contact {
@@ -100,7 +100,7 @@ model Contact {
   addressLine4 String
   sortOrder    Int
   jobId        Int
-  job          Job    @relation(fields: [jobId], references: [id])
+  job          Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
 }
 
 model ApplicationQuestion {
@@ -110,7 +110,7 @@ model ApplicationQuestion {
   answer    String
   sortOrder Int
   jobId     Int
-  job       Job    @relation(fields: [jobId], references: [id])
+  job       Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
 }
 
 enum ResumeTemplate {
@@ -133,5 +133,5 @@ model Resume {
   allowPageBreaks Boolean
   template        ResumeTemplate
   jobId           Int
-  job             Job            @relation(fields: [jobId], references: [id])
+  job             Job            @relation(fields: [jobId], references: [id], onDelete: Cascade)
 }
