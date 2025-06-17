@@ -5,6 +5,11 @@ import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
 export default makeApiHandler({
   POST: async (req, res: NextApiResponse<Contact>) => {
     const jobPid = req.query.jobPid as string;
+    const maxSortOrderEntry = await prisma.contact.findFirst({
+      where: { Job: { pid: jobPid } },
+      orderBy: { sortOrder: "desc" },
+    });
+    const sortOrder = (maxSortOrderEntry?.sortOrder ?? -1) + 1;
     try {
       const contact = await prisma.contact.create({
         data: {
@@ -17,7 +22,7 @@ export default makeApiHandler({
           addressLine2: "",
           addressLine3: "",
           addressLine4: "",
-          sortOrder: 0,
+          sortOrder,
           Job: {
             connect: { pid: jobPid },
           },

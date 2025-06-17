@@ -5,12 +5,17 @@ import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
 export default makeApiHandler({
   POST: async (req, res: NextApiResponse<ApplicationQuestion>) => {
     const jobPid = req.query.jobPid as string;
+    const maxSortOrderEntry = await prisma.applicationQuestion.findFirst({
+      where: { Job: { pid: jobPid } },
+      orderBy: { sortOrder: "desc" },
+    });
+    const sortOrder = (maxSortOrderEntry?.sortOrder ?? -1) + 1;
     try {
       const applicationQuestion = await prisma.applicationQuestion.create({
         data: {
           question: "",
           answer: "",
-          sortOrder: 0,
+          sortOrder,
           Job: {
             connect: { pid: jobPid },
           },
