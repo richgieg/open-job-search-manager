@@ -109,7 +109,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   };
 
   const updateLink = async (link: Link) => {
-    const response = await fetch(`/api/links/${link.id}`, {
+    const response = await fetch(`/api/links/${link.pid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -130,13 +130,12 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   };
 
   const deleteLink = async (link: Link) => {
-    const response = await fetch(`/api/links/${link.id}`, {
+    await fetch(`/api/links/${link.pid}`, {
       method: "DELETE",
     });
-    const deletedLink: Link = await response.json();
     setFullJob({
       ...fullJob,
-      links: fullJob.links.filter((link) => link.id !== deletedLink.id),
+      links: fullJob.links.filter((l) => l.id !== link.id),
     });
   };
 
@@ -333,7 +332,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   };
 
   const updateContact = async (contact: Contact) => {
-    const response = await fetch(`/api/contacts/${contact.id}`, {
+    const response = await fetch(`/api/contacts/${contact.pid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -354,15 +353,12 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   };
 
   const deleteContact = async (contact: Contact) => {
-    const response = await fetch(`/api/contacts/${contact.id}`, {
+    await fetch(`/api/contacts/${contact.pid}`, {
       method: "DELETE",
     });
-    const deletedContact: Contact = await response.json();
     setFullJob({
       ...fullJob,
-      contacts: fullJob.contacts.filter(
-        (contact) => contact.id !== deletedContact.id
-      ),
+      contacts: fullJob.contacts.filter((c) => c.id !== contact.id),
     });
   };
 
