@@ -70,6 +70,7 @@ model Job {
   notes                String
   postedSalary         String
   desiredSalary        String
+  createdAt            DateTime              @default(now())
   links                Link[]
   contacts             Contact[]
   applicationQuestions ApplicationQuestion[]

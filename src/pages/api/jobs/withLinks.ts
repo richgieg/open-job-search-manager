@@ -7,6 +7,7 @@ type JobWithLinks = Job & { links: Link[] };
 export default makeApiHandler({
   GET: async (req, res: NextApiResponse<JobWithLinks[]>) => {
     const jobs = await prisma.job.findMany({
+      orderBy: { createdAt: "asc" },
       include: {
         links: true,
       },
