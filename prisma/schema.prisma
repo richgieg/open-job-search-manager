@@ -14,3 +14,125 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
+model Profile {
+  id          Int    @id @default(autoincrement())
+  pid         String @unique @default(uuid())
+  profileName String
+  jobTitle    String
+  name        String
+  location    String
+  phone       String
+  email       String
+  websiteText String
+  websiteLink String
+  summary     String
+  coverLetter String
+}
+
+enum JobType {
+  fullTime
+  partTime
+  contract
+}
+
+enum JobArrangement {
+  onSite
+  hybrid
+  remote
+}
+
+enum JobStatus {
+  notApplied
+  applied
+  appliedWithdrawn
+  appliedRejected
+  interviewing
+  interviewedWithdrawn
+  interviewedRejected
+  offerReceived
+  offerAccepted
+}
+
+model Job {
+  id                   Int                   @id @default(autoincrement())
+  pid                  String                @unique @default(uuid())
+  title                String
+  company              String
+  location             String
+  type                 JobType?
+  arrangement          JobArrangement?
+  staffingCompany      String
+  description          String
+  postedDate           String?
+  appliedDate          String?
+  status               JobStatus
+  notes                String
+  postedSalary         String
+  desiredSalary        String
+  createdAt            DateTime              @default(now())
+  links                Link[]
+  contacts             Contact[]
+  applicationQuestions ApplicationQuestion[]
+  resumes              Resume[]
+}
+
+model Link {
+  id        Int    @id @default(autoincrement())
+  pid       String @unique @default(uuid())
+  name      String
+  url       String
+  sortOrder Int
+  jobId     Int
+  job       Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model Contact {
+  id           Int    @id @default(autoincrement())
+  pid          String @unique @default(uuid())
+  name         String
+  title        String
+  phone        String
+  email        String
+  company      String
+  addressLine1 String
+  addressLine2 String
+  addressLine3 String
+  addressLine4 String
+  sortOrder    Int
+  jobId        Int
+  job          Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+model ApplicationQuestion {
+  id        Int    @id @default(autoincrement())
+  pid       String @unique @default(uuid())
+  question  String
+  answer    String
+  sortOrder Int
+  jobId     Int
+  job       Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
+
+enum ResumeTemplate {
+  template01
+  template02
+}
+
+model Resume {
+  id              Int            @id @default(autoincrement())
+  pid             String         @unique @default(uuid())
+  resumeName      String
+  name            String
+  location        String
+  phone           String
+  email           String
+  websiteText     String
+  websiteLink     String
+  summary         String
+  coverLetter     String
+  allowPageBreaks Boolean
+  template        ResumeTemplate
+  jobId           Int
+  job             Job            @relation(fields: [jobId], references: [id], onDelete: Cascade)
+}
