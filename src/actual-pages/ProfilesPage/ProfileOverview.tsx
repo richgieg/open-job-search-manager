@@ -17,7 +17,7 @@ export function ProfileOverview({
 }: Props) {
   return (
     <div className="flex gap-2">
-      <Link href={`/profiles/${profile.id}`}>
+      <Link href={`/profiles/${profile.pid}`}>
         {profile.profileName || t.profileNamePlaceholder}
       </Link>
       <DuplicateButton
