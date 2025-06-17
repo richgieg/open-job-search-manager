@@ -21,9 +21,9 @@ export default makeApiHandler({
     const fullJob = await prisma.job.findUnique({
       where: { pid: jobPid },
       include: {
-        applicationQuestions: true,
-        contacts: true,
-        links: true,
+        applicationQuestions: { orderBy: { sortOrder: "asc" } },
+        contacts: { orderBy: { sortOrder: "asc" } },
+        links: { orderBy: { sortOrder: "asc" } },
         resumes: true,
       },
     });

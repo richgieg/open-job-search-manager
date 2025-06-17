@@ -150,13 +150,13 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       fullJob.links.push(fullJob.links.shift()!);
     }
-    const orderedIds = fullJob.links.map((item) => item.id);
-    await fetch(`/api/jobs/${fullJob.id}/links/order`, {
+    const orderedPids = fullJob.links.map((item) => item.pid);
+    await fetch(`/api/jobs/${fullJob.pid}/links/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullJob({
       ...fullJob,
@@ -174,13 +174,13 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       fullJob.links.unshift(fullJob.links.pop()!);
     }
-    const orderedIds = fullJob.links.map((item) => item.id);
-    await fetch(`/api/jobs/${fullJob.id}/links/order`, {
+    const orderedPids = fullJob.links.map((item) => item.pid);
+    await fetch(`/api/jobs/${fullJob.pid}/links/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullJob({
       ...fullJob,
@@ -265,13 +265,13 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       fullJob.applicationQuestions.push(fullJob.applicationQuestions.shift()!);
     }
-    const orderedIds = fullJob.applicationQuestions.map((item) => item.id);
-    await fetch(`/api/jobs/${fullJob.id}/applicationQuestions/order`, {
+    const orderedPids = fullJob.applicationQuestions.map((item) => item.pid);
+    await fetch(`/api/jobs/${fullJob.pid}/applicationQuestions/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullJob({
       ...fullJob,
@@ -296,13 +296,13 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       fullJob.applicationQuestions.unshift(fullJob.applicationQuestions.pop()!);
     }
-    const orderedIds = fullJob.applicationQuestions.map((item) => item.id);
-    await fetch(`/api/jobs/${fullJob.id}/applicationQuestions/order`, {
+    const orderedPids = fullJob.applicationQuestions.map((item) => item.pid);
+    await fetch(`/api/jobs/${fullJob.pid}/applicationQuestions/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullJob({
       ...fullJob,
@@ -373,13 +373,13 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       fullJob.contacts.push(fullJob.contacts.shift()!);
     }
-    const orderedIds = fullJob.contacts.map((item) => item.id);
-    await fetch(`/api/jobs/${fullJob.id}/contacts/order`, {
+    const orderedPids = fullJob.contacts.map((item) => item.pid);
+    await fetch(`/api/jobs/${fullJob.pid}/contacts/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullJob({
       ...fullJob,
@@ -397,13 +397,13 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       fullJob.contacts.unshift(fullJob.contacts.pop()!);
     }
-    const orderedIds = fullJob.contacts.map((item) => item.id);
-    await fetch(`/api/jobs/${fullJob.id}/contacts/order`, {
+    const orderedPids = fullJob.contacts.map((item) => item.pid);
+    await fetch(`/api/jobs/${fullJob.pid}/contacts/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullJob({
       ...fullJob,
