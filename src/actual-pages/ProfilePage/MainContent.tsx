@@ -192,7 +192,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const updateProfile = async (profile: Profile) => {
-    const response = await fetch(`/api/profiles/${profile.id}`, {
+    const response = await fetch(`/api/profiles/${profile.pid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -208,7 +208,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
 
   const createWorkEntry = async () => {
     const response = await fetch(
-      `/api/profiles/${fullProfile.id}/workEntries`,
+      `/api/profiles/${fullProfile.pid}/workEntries`,
       {
         method: "POST",
       }
@@ -227,7 +227,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const updateWorkEntry = async (workEntry: WorkEntry) => {
-    const response = await fetch(`/api/workEntries/${workEntry.id}`, {
+    const response = await fetch(`/api/workEntries/${workEntry.pid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -251,7 +251,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const deleteWorkEntry = async (workEntry: WorkEntry) => {
-    const response = await fetch(`/api/workEntries/${workEntry.id}`, {
+    const response = await fetch(`/api/workEntries/${workEntry.pid}`, {
       method: "DELETE",
     });
     const deletedWorkEntry: WorkEntry = await response.json();
@@ -276,13 +276,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       fullProfile.workEntries.push(fullProfile.workEntries.shift()!);
     }
-    const orderedIds = fullProfile.workEntries.map((item) => item.id);
-    await fetch(`/api/profiles/${fullProfile.id}/workEntries/order`, {
+    const orderedPids = fullProfile.workEntries.map((item) => item.pid);
+    await fetch(`/api/profiles/${fullProfile.pid}/workEntries/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
@@ -302,13 +302,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       fullProfile.workEntries.unshift(fullProfile.workEntries.pop()!);
     }
-    const orderedIds = fullProfile.workEntries.map((item) => item.id);
-    await fetch(`/api/profiles/${fullProfile.id}/workEntries/order`, {
+    const orderedPids = fullProfile.workEntries.map((item) => item.pid);
+    await fetch(`/api/profiles/${fullProfile.pid}/workEntries/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
@@ -339,7 +339,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
 
   const updateWorkEntryBullet = async (workEntryBullet: WorkEntryBullet) => {
     const response = await fetch(
-      `/api/workEntryBullets/${workEntryBullet.id}`,
+      `/api/workEntryBullets/${workEntryBullet.pid}`,
       {
         method: "PUT",
         headers: {
@@ -372,7 +372,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
 
   const deleteWorkEntryBullet = async (workEntryBullet: WorkEntryBullet) => {
     const response = await fetch(
-      `/api/workEntryBullets/${workEntryBullet.id}`,
+      `/api/workEntryBullets/${workEntryBullet.pid}`,
       { method: "DELETE" }
     );
     const deletedWorkEntryBullet: WorkEntryBullet = await response.json();
@@ -410,13 +410,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       bullets.push(bullets.shift()!);
     }
-    const orderedIds = bullets.map((item) => item.id);
-    await fetch(`/api/workEntries/${workEntry.id}/bullets/order`, {
+    const orderedPids = bullets.map((item) => item.pid);
+    await fetch(`/api/workEntries/${workEntry.pid}/bullets/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
@@ -439,13 +439,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       bullets.unshift(bullets.pop()!);
     }
-    const orderedIds = bullets.map((item) => item.id);
-    await fetch(`/api/workEntries/${workEntry.id}/bullets/order`, {
+    const orderedPids = bullets.map((item) => item.pid);
+    await fetch(`/api/workEntries/${workEntry.pid}/bullets/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
@@ -454,7 +454,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
 
   const createEducationEntry = async () => {
     const response = await fetch(
-      `/api/profiles/${fullProfile.id}/educationEntries`,
+      `/api/profiles/${fullProfile.pid}/educationEntries`,
       {
         method: "POST",
       }
@@ -473,13 +473,16 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const updateEducationEntry = async (educationEntry: EducationEntry) => {
-    const response = await fetch(`/api/educationEntries/${educationEntry.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(educationEntry),
-    });
+    const response = await fetch(
+      `/api/educationEntries/${educationEntry.pid}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(educationEntry),
+      }
+    );
     const updatedEducationEntry: EducationEntry = await response.json();
     setFullProfile({
       ...fullProfile,
@@ -497,9 +500,12 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const deleteEducationEntry = async (educationEntry: EducationEntry) => {
-    const response = await fetch(`/api/educationEntries/${educationEntry.id}`, {
-      method: "DELETE",
-    });
+    const response = await fetch(
+      `/api/educationEntries/${educationEntry.pid}`,
+      {
+        method: "DELETE",
+      }
+    );
     const deletedEducationEntry: EducationEntry = await response.json();
     setFullProfile({
       ...fullProfile,
@@ -525,13 +531,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       fullProfile.educationEntries.push(fullProfile.educationEntries.shift()!);
     }
-    const orderedIds = fullProfile.educationEntries.map((item) => item.id);
-    await fetch(`/api/profiles/${fullProfile.id}/educationEntries/order`, {
+    const orderedPids = fullProfile.educationEntries.map((item) => item.pid);
+    await fetch(`/api/profiles/${fullProfile.pid}/educationEntries/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
@@ -554,13 +560,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       fullProfile.educationEntries.unshift(fullProfile.educationEntries.pop()!);
     }
-    const orderedIds = fullProfile.educationEntries.map((item) => item.id);
-    await fetch(`/api/profiles/${fullProfile.id}/educationEntries/order`, {
+    const orderedPids = fullProfile.educationEntries.map((item) => item.pid);
+    await fetch(`/api/profiles/${fullProfile.pid}/educationEntries/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
@@ -596,7 +602,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     educationEntryBullet: EducationEntryBullet
   ) => {
     const response = await fetch(
-      `/api/educationEntryBullets/${educationEntryBullet.id}`,
+      `/api/educationEntryBullets/${educationEntryBullet.pid}`,
       {
         method: "PUT",
         headers: {
@@ -634,7 +640,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     educationEntryBullet: EducationEntryBullet
   ) => {
     const response = await fetch(
-      `/api/educationEntryBullets/${educationEntryBullet.id}`,
+      `/api/educationEntryBullets/${educationEntryBullet.pid}`,
       { method: "DELETE" }
     );
     const deletedEducationEntryBullet: EducationEntryBullet =
@@ -679,13 +685,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       bullets.push(bullets.shift()!);
     }
-    const orderedIds = bullets.map((item) => item.id);
-    await fetch(`/api/educationEntries/${educationEntry.id}/bullets/order`, {
+    const orderedPids = bullets.map((item) => item.pid);
+    await fetch(`/api/educationEntries/${educationEntry.pid}/bullets/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
@@ -712,13 +718,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       bullets.unshift(bullets.pop()!);
     }
-    const orderedIds = bullets.map((item) => item.id);
-    await fetch(`/api/educationEntries/${educationEntry.id}/bullets/order`, {
+    const orderedPids = bullets.map((item) => item.pid);
+    await fetch(`/api/educationEntries/${educationEntry.pid}/bullets/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
@@ -727,7 +733,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
 
   const createCertification = async () => {
     const response = await fetch(
-      `/api/profiles/${fullProfile.id}/certifications`,
+      `/api/profiles/${fullProfile.pid}/certifications`,
       {
         method: "POST",
       }
@@ -740,7 +746,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const updateCertification = async (certification: Certification) => {
-    const response = await fetch(`/api/certifications/${certification.id}`, {
+    const response = await fetch(`/api/certifications/${certification.pid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -764,7 +770,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const deleteCertification = async (certification: Certification) => {
-    const response = await fetch(`/api/certifications/${certification.id}`, {
+    const response = await fetch(`/api/certifications/${certification.pid}`, {
       method: "DELETE",
     });
     const deletedCertification: Certification = await response.json();
@@ -792,13 +798,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       fullProfile.certifications.push(fullProfile.certifications.shift()!);
     }
-    const orderedIds = fullProfile.certifications.map((item) => item.id);
-    await fetch(`/api/profiles/${fullProfile.id}/certifications/order`, {
+    const orderedPids = fullProfile.certifications.map((item) => item.pid);
+    await fetch(`/api/profiles/${fullProfile.pid}/certifications/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
@@ -821,13 +827,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       fullProfile.certifications.unshift(fullProfile.certifications.pop()!);
     }
-    const orderedIds = fullProfile.certifications.map((item) => item.id);
-    await fetch(`/api/profiles/${fullProfile.id}/certifications/order`, {
+    const orderedPids = fullProfile.certifications.map((item) => item.pid);
+    await fetch(`/api/profiles/${fullProfile.pid}/certifications/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
@@ -836,7 +842,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
 
   const createSkillCategory = async () => {
     const response = await fetch(
-      `/api/profiles/${fullProfile.id}/skillCategories`,
+      `/api/profiles/${fullProfile.pid}/skillCategories`,
       {
         method: "POST",
       }
@@ -855,7 +861,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const updateSkillCategory = async (skillCategory: SkillCategory) => {
-    const response = await fetch(`/api/skillCategories/${skillCategory.id}`, {
+    const response = await fetch(`/api/skillCategories/${skillCategory.pid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -879,7 +885,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const deleteSkillCategory = async (skillCategory: SkillCategory) => {
-    const response = await fetch(`/api/skillCategories/${skillCategory.id}`, {
+    const response = await fetch(`/api/skillCategories/${skillCategory.pid}`, {
       method: "DELETE",
     });
     const deletedSkillCategory: SkillCategory = await response.json();
@@ -907,13 +913,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       fullProfile.skillCategories.push(fullProfile.skillCategories.shift()!);
     }
-    const orderedIds = fullProfile.skillCategories.map((item) => item.id);
-    await fetch(`/api/profiles/${fullProfile.id}/skillCategories/order`, {
+    const orderedPids = fullProfile.skillCategories.map((item) => item.pid);
+    await fetch(`/api/profiles/${fullProfile.pid}/skillCategories/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
@@ -936,13 +942,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       fullProfile.skillCategories.unshift(fullProfile.skillCategories.pop()!);
     }
-    const orderedIds = fullProfile.skillCategories.map((item) => item.id);
-    await fetch(`/api/profiles/${fullProfile.id}/skillCategories/order`, {
+    const orderedPids = fullProfile.skillCategories.map((item) => item.pid);
+    await fetch(`/api/profiles/${fullProfile.pid}/skillCategories/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
@@ -975,7 +981,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const updateSkill = async (skill: Skill) => {
-    const response = await fetch(`/api/skills/${skill.id}`, {
+    const response = await fetch(`/api/skills/${skill.pid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -1005,7 +1011,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const deleteSkill = async (skill: Skill) => {
-    const response = await fetch(`/api/skills/${skill.id}`, {
+    const response = await fetch(`/api/skills/${skill.pid}`, {
       method: "DELETE",
     });
     const deletedSkill: Skill = await response.json();
@@ -1039,13 +1045,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       skills.push(skills.shift()!);
     }
-    const orderedIds = skills.map((item) => item.id);
-    await fetch(`/api/skillCategories/${skillCategory.id}/skills/order`, {
+    const orderedPids = skills.map((item) => item.pid);
+    await fetch(`/api/skillCategories/${skillCategory.pid}/skills/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
@@ -1065,13 +1071,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       skills.unshift(skills.pop()!);
     }
-    const orderedIds = skills.map((item) => item.id);
-    await fetch(`/api/skillCategories/${skillCategory.id}/skills/order`, {
+    const orderedPids = skills.map((item) => item.pid);
+    await fetch(`/api/skillCategories/${skillCategory.pid}/skills/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullProfile({
       ...fullProfile,
