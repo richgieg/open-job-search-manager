@@ -7,6 +7,7 @@ import {
   Contact,
   Job,
   Link,
+  Profile,
   Resume,
   ResumeCertification,
   ResumeEducationEntry,
@@ -24,6 +25,8 @@ type FullResume = Resume & {
   })[];
   certifications: ResumeCertification[];
   skillCategories: (ResumeSkillCategory & { skills: ResumeSkill[] })[];
+  profile: Profile | null;
+  job: Job;
 };
 
 type FullJob = Job & {
@@ -35,34 +38,34 @@ type FullJob = Job & {
 
 export function ResumePage() {
   const router = useRouter();
-  const [resumeId, setResumeId] = useState<string | null>(null);
+  const [resumePid, setResumePid] = useState<string | null>(null);
   const [fullResume, setFullResume] = useState<FullResume | null>(null);
   const [fullJob, setFullJob] = useState<FullJob | null>(null);
 
   useEffect(() => {
     if (!router.isReady) return;
-    setResumeId(router.query.resumeId as string);
+    setResumePid(router.query.resumePid as string);
   }, [router]);
 
   useEffect(() => {
-    if (!resumeId) return;
+    if (!resumePid) return;
     const fetchFullResume = async () => {
-      const response = await fetch(`/api/resumes/${resumeId}/full`);
+      const response = await fetch(`/api/resumes/${resumePid}/full`);
       const responseData = await response.json();
       setFullResume(responseData);
     };
     fetchFullResume();
-  }, [resumeId]);
+  }, [resumePid]);
 
   useEffect(() => {
-    if (!fullResume?.jobId) return;
+    if (fullResume?.job.pid === undefined) return;
     const fetchFullJob = async () => {
-      const response = await fetch(`/api/jobs/${fullResume.jobId}/full`);
+      const response = await fetch(`/api/jobs/${fullResume.job.pid}/full`);
       const responseData = await response.json();
       setFullJob(responseData);
     };
     fetchFullJob();
-  }, [fullResume?.jobId]);
+  }, [fullResume?.job.pid]);
 
   return (
     <>

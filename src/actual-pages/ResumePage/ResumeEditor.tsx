@@ -3,13 +3,17 @@ import { LongTextEditor } from "@/components/LongTextEditor";
 import { SaveButton } from "@/components/SaveButton";
 import { TextEditor } from "@/components/TextEditor";
 import { RESUME_TEMPLATES } from "@/constants";
-import { Resume } from "@/generated/prisma";
+import { Profile, Resume } from "@/generated/prisma";
 import { t } from "@/translate";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 
+type ResumeWithProfile = Resume & {
+  profile: Profile | null;
+};
+
 type Props = {
-  resume: Resume;
+  resume: ResumeWithProfile;
   updateResume: (resume: Resume) => Promise<void>;
   generateSummaryPrompt: () => Promise<void>;
   generateCoverLetterPrompt: () => Promise<void>;
@@ -60,7 +64,13 @@ export function ResumeEditor({
     <form onSubmit={handleSubmit} className="my-6 flex flex-wrap gap-4">
       <div className="w-full">
         Profile:{" "}
-        <Link href={`/profiles/${resume.profileId}`}>{resume.profileId}</Link>
+        {resume.profile ? (
+          <Link href={`/profiles/${resume.profile.pid}`}>
+            {resume.profile.pid}
+          </Link>
+        ) : (
+          "(deleted)"
+        )}
       </div>
       <TextEditor
         label="Resume Name"

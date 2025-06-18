@@ -54,8 +54,8 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        jobId: fullJob.id,
-        profileId: profilePid,
+        jobPid: fullJob.pid,
+        profilePid,
       }),
     });
     const resume: Resume = await response.json();

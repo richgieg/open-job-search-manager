@@ -14,6 +14,7 @@ import {
   Contact,
   Job,
   Link,
+  Profile,
   Resume,
   ResumeCertification,
   ResumeEducationEntry,
@@ -31,6 +32,8 @@ type FullResume = Resume & {
   })[];
   certifications: ResumeCertification[];
   skillCategories: (ResumeSkillCategory & { skills: ResumeSkill[] })[];
+  profile: Profile | null;
+  job: Job;
 };
 
 type FullJob = Job & {

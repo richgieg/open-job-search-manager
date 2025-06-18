@@ -1,4 +1,6 @@
 import {
+  Job,
+  Profile,
   Resume,
   ResumeCertification,
   ResumeEducationEntry,
@@ -18,6 +20,8 @@ type FullResume = Resume & {
   })[];
   certifications: ResumeCertification[];
   skillCategories: (ResumeSkillCategory & { skills: ResumeSkill[] })[];
+  profile: Profile | null;
+  job: Job;
 };
 
 export default makeApiHandler({
@@ -39,6 +43,8 @@ export default makeApiHandler({
           orderBy: { sortOrder: "asc" },
           include: { skills: { orderBy: { sortOrder: "asc" } } },
         },
+        profile: true,
+        job: true,
       },
     });
     if (!fullResume) {
