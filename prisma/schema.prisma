@@ -34,6 +34,8 @@ model Profile {
   certifications   Certification[]
   skillCategories  SkillCategory[]
   resumes          Resume[]
+
+  @@index([userId])
 }
 
 model WorkEntry {
@@ -166,6 +168,8 @@ model Job {
   contacts             Contact[]
   applicationQuestions ApplicationQuestion[]
   resumes              Resume[]
+
+  @@index([userId])
 }
 
 model Link {
