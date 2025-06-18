@@ -1115,7 +1115,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
 
   return (
     <div className="px-8 pb-28">
-      <NextLink href={`/api/resumes/${fullResume.id}/downloadResume`}>
+      <NextLink href={`/api/resumes/${fullResume.pid}/downloadResume`}>
         DOWNLOAD RESUME
       </NextLink>
       {fullJob.contacts.length > 0 && (
@@ -1138,23 +1138,23 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         <>
           <NextLink
             href={`/api/resumes/${
-              fullResume.id
-            }/downloadCoverLetter?contactId=${selectedContactPid}&timezoneOffset=${new Date().getTimezoneOffset()}`}
+              fullResume.pid
+            }/downloadCoverLetter?contactPid=${selectedContactPid}&timezoneOffset=${new Date().getTimezoneOffset()}`}
           >
             DOWNLOAD COVER LETTER
           </NextLink>
           <br />
           <NextLink
             href={`/api/resumes/${
-              fullResume.id
-            }/downloadCoverLetter?contactId=${selectedContactPid}&timezoneOffset=${new Date().getTimezoneOffset()}&includeResume=true`}
+              fullResume.pid
+            }/downloadCoverLetter?contactPid=${selectedContactPid}&timezoneOffset=${new Date().getTimezoneOffset()}&includeResume=true`}
           >
             DOWNLOAD COVER LETTER WITH RESUME
           </NextLink>
         </>
       )}
       <br />
-      <NextLink href={`/resumes/${fullResume.id}/application`} target="_blank">
+      <NextLink href={`/resumes/${fullResume.pid}/application`} target="_blank">
         APPLICATION
       </NextLink>
       <SectionHeading text="Basic Info" />
