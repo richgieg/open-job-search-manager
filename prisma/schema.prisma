@@ -18,6 +18,7 @@ datasource db {
 model Profile {
   id               Int              @id @default(autoincrement())
   pid              String           @unique @default(uuid())
+  userId           String // Supabase UUID
   profileName      String
   jobTitle         String
   name             String
@@ -146,6 +147,7 @@ enum JobStatus {
 model Job {
   id                   Int                   @id @default(autoincrement())
   pid                  String                @unique @default(uuid())
+  userId               String // Supabase UUID
   title                String
   company              String
   location             String
