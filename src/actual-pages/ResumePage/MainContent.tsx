@@ -213,7 +213,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const updateResume = async (resume: Resume) => {
-    const response = await fetch(`/api/resumes/${resume.id}`, {
+    const response = await fetch(`/api/resumes/${resume.pid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -245,7 +245,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const updateWorkEntry = async (workEntry: ResumeWorkEntry) => {
-    const response = await fetch(`/api/resumeWorkEntries/${workEntry.id}`, {
+    const response = await fetch(`/api/resumeWorkEntries/${workEntry.pid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -294,13 +294,13 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       fullResume.workEntries.push(fullResume.workEntries.shift()!);
     }
-    const orderedIds = fullResume.workEntries.map((item) => item.id);
-    await fetch(`/api/resumes/${fullResume.id}/workEntries/order`, {
+    const orderedPids = fullResume.workEntries.map((item) => item.pid);
+    await fetch(`/api/resumes/${fullResume.pid}/workEntries/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullResume({
       ...fullResume,
@@ -320,13 +320,13 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       fullResume.workEntries.unshift(fullResume.workEntries.pop()!);
     }
-    const orderedIds = fullResume.workEntries.map((item) => item.id);
-    await fetch(`/api/resumes/${fullResume.id}/workEntries/order`, {
+    const orderedPids = fullResume.workEntries.map((item) => item.pid);
+    await fetch(`/api/resumes/${fullResume.pid}/workEntries/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ orderedIds }),
+      body: JSON.stringify({ orderedPids }),
     });
     setFullResume({
       ...fullResume,
