@@ -34,6 +34,7 @@ export default makeProtectedApiHandler({
     const duplicated = await prisma.$transaction(async (tx) => {
       const newProfile = await tx.profile.create({
         data: {
+          userId: original.userId,
           profileName: original.profileName,
           jobTitle: original.jobTitle,
           name: original.name,

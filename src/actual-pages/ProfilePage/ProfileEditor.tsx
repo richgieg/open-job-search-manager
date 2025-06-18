@@ -33,6 +33,7 @@ export function ProfileEditor({
     await updateProfile({
       id: profile.id,
       pid: profile.pid,
+      userId: profile.userId,
       profileName,
       jobTitle,
       name,

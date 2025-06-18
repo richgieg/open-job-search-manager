@@ -33,6 +33,7 @@ export function JobEditor({ job, updateJob }: Props) {
     await updateJob({
       id: job.id,
       pid: job.pid,
+      userId: job.userId,
       createdAt: job.createdAt,
       title,
       company,

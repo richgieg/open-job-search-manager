@@ -11,6 +11,7 @@ export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<Profile>) => {
     const profile = await prisma.profile.create({
       data: {
+        userId: user.id,
         profileName: "",
         jobTitle: "",
         name: "",
