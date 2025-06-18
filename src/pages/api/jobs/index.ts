@@ -6,6 +6,7 @@ export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<Job>) => {
     const organization = await prisma.job.create({
       data: {
+        userId: user.id,
         title: "",
         company: "",
         location: "",

@@ -38,7 +38,7 @@
     "migrate:prod": "dotenv -e .env.prod -- prisma migrate deploy"
   },
   "dependencies": {
-    "@prisma/client": "^6.9.0",
+    "@prisma/client": "^6.10.1",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.0",
     "docx": "^9.5.1",
@@ -55,7 +55,7 @@
     "dotenv-cli": "^8.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.3",
-    "prisma": "^6.9.0",
+    "prisma": "^6.10.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
