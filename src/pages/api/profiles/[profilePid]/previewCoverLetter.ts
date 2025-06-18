@@ -1,5 +1,5 @@
 import { Contact, ResumeTemplate } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import { makeApiHandler, prisma, sendError } from "@/lib";
 import { NextApiResponse } from "next";
 import {
   template01_coverLetter,
@@ -80,6 +80,6 @@ export default makeApiHandler({
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     );
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-    return sendResponse(res, 200, buffer);
+    res.status(200).send(buffer);
   },
 });
