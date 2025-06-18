@@ -1,10 +1,12 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { sendError } from "./sendError";
 import { getAuthenticatedUser } from "./supabase/api";
+import { User } from "@supabase/supabase-js";
 
 type Method = "GET" | "POST" | "PUT" | "DELETE";
 
 type MethodHandler = (
+  user: User,
   req: NextApiRequest,
   res: NextApiResponse
 ) => void | Promise<void>;
@@ -25,7 +27,7 @@ export function makeProtectedApiHandler(
       return sendError(res, 401);
     }
     try {
-      return methodHandler(req, res);
+      return methodHandler(user, req, res);
     } catch {
       return sendError(res, 500);
     }
