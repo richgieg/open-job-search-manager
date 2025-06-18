@@ -1078,14 +1078,14 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
         </select>
       </label>
       <Link
-        href={`/api/profiles/${fullProfile.id}/previewResume?template=${previewTemplate}`}
+        href={`/api/profiles/${fullProfile.pid}/previewResume?template=${previewTemplate}`}
       >
         PREVIEW RESUME
       </Link>
       <br />
       <Link
         href={`/api/profiles/${
-          fullProfile.id
+          fullProfile.pid
         }/previewCoverLetter?template=${previewTemplate}&timezoneOffset=${new Date().getTimezoneOffset()}`}
       >
         PREVIEW COVER LETTER
