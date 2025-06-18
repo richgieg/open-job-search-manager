@@ -1,9 +1,14 @@
 import type { NextApiResponse } from "next";
 import { Prisma, ResumeWorkEntryBullet } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 
-export default makeApiHandler({
-  POST: async (req, res: NextApiResponse<ResumeWorkEntryBullet>) => {
+export default makeProtectedApiHandler({
+  POST: async (user, req, res: NextApiResponse<ResumeWorkEntryBullet>) => {
     const workEntryPid = req.query.workEntryPid as string;
     const maxSortOrderEntry = await prisma.resumeWorkEntryBullet.findFirst({
       where: { workEntry: { pid: workEntryPid } },

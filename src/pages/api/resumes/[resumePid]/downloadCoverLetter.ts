@@ -1,4 +1,4 @@
-import { makeApiHandler, prisma, sendError } from "@/lib";
+import { makeProtectedApiHandler, prisma, sendError } from "@/lib";
 import { NextApiResponse } from "next";
 import {
   template01_coverLetter,
@@ -9,8 +9,8 @@ import {
   template02_resume,
 } from "@/templates";
 
-export default makeApiHandler({
-  GET: async (req, res: NextApiResponse<Buffer<ArrayBufferLike>>) => {
+export default makeProtectedApiHandler({
+  GET: async (user, req, res: NextApiResponse<Buffer<ArrayBufferLike>>) => {
     const resumePid = req.query.resumePid as string;
     const fullResume = await prisma.resume.findUnique({
       where: { pid: resumePid },

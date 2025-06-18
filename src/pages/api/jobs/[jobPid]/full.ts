@@ -5,7 +5,12 @@ import {
   Link,
   Resume,
 } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 import { NextApiResponse } from "next";
 
 type FullJob = Job & {
@@ -15,8 +20,8 @@ type FullJob = Job & {
   applicationQuestions: ApplicationQuestion[];
 };
 
-export default makeApiHandler({
-  GET: async (req, res: NextApiResponse<FullJob>) => {
+export default makeProtectedApiHandler({
+  GET: async (user, req, res: NextApiResponse<FullJob>) => {
     const jobPid = req.query.jobPid as string;
     const fullJob = await prisma.job.findUnique({
       where: { pid: jobPid },

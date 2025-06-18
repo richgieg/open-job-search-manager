@@ -10,7 +10,12 @@ import {
   ResumeWorkEntry,
   ResumeWorkEntryBullet,
 } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 import { NextApiResponse } from "next";
 
 type FullResume = Resume & {
@@ -24,8 +29,8 @@ type FullResume = Resume & {
   job: Job;
 };
 
-export default makeApiHandler({
-  GET: async (req, res: NextApiResponse<FullResume>) => {
+export default makeProtectedApiHandler({
+  GET: async (user, req, res: NextApiResponse<FullResume>) => {
     const resumePid = req.query.resumePid as string;
     const fullResume = await prisma.resume.findUnique({
       where: { pid: resumePid },

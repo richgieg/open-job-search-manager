@@ -1,9 +1,14 @@
 import { Link, Prisma } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 import { NextApiResponse } from "next";
 
-export default makeApiHandler({
-  PUT: async (req, res: NextApiResponse<Link>) => {
+export default makeProtectedApiHandler({
+  PUT: async (user, req, res: NextApiResponse<Link>) => {
     const linkPid = req.query.linkPid as string;
     try {
       const link = await prisma.link.update({
@@ -22,7 +27,7 @@ export default makeApiHandler({
     }
   },
 
-  DELETE: async (req, res: NextApiResponse<void>) => {
+  DELETE: async (user, req, res: NextApiResponse<void>) => {
     const linkPid = req.query.linkPid as string;
     try {
       await prisma.link.delete({

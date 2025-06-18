@@ -1,9 +1,14 @@
 import { Prisma, WorkEntryBullet } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 import { NextApiResponse } from "next";
 
-export default makeApiHandler({
-  PUT: async (req, res: NextApiResponse<WorkEntryBullet>) => {
+export default makeProtectedApiHandler({
+  PUT: async (user, req, res: NextApiResponse<WorkEntryBullet>) => {
     const workEntryBulletPid = req.query.workEntryBulletPid as string;
     try {
       const workEntryBullet = await prisma.workEntryBullet.update({
@@ -22,7 +27,7 @@ export default makeApiHandler({
     }
   },
 
-  DELETE: async (req, res: NextApiResponse<void>) => {
+  DELETE: async (user, req, res: NextApiResponse<void>) => {
     const workEntryBulletPid = req.query.workEntryBulletPid as string;
     try {
       await prisma.workEntryBullet.delete({

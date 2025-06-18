@@ -1,9 +1,14 @@
 import type { NextApiResponse } from "next";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 import { Job, Prisma } from "@/generated/prisma";
 
-export default makeApiHandler({
-  PUT: async (req, res: NextApiResponse<Job>) => {
+export default makeProtectedApiHandler({
+  PUT: async (user, req, res: NextApiResponse<Job>) => {
     const jobPid = req.query.jobPid as string;
     try {
       const job = await prisma.job.update({
@@ -22,7 +27,7 @@ export default makeApiHandler({
     }
   },
 
-  DELETE: async (req, res: NextApiResponse<void>) => {
+  DELETE: async (user, req, res: NextApiResponse<void>) => {
     const jobPid = req.query.jobPid as string;
     try {
       await prisma.job.delete({

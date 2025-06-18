@@ -1,9 +1,14 @@
 import { Prisma, Resume } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 import { NextApiResponse } from "next";
 
-export default makeApiHandler({
-  PUT: async (req, res: NextApiResponse<Resume>) => {
+export default makeProtectedApiHandler({
+  PUT: async (user, req, res: NextApiResponse<Resume>) => {
     const resumePid = req.query.resumePid as string;
     try {
       const resume = await prisma.resume.update({
@@ -22,7 +27,7 @@ export default makeApiHandler({
     }
   },
 
-  DELETE: async (req, res: NextApiResponse<void>) => {
+  DELETE: async (user, req, res: NextApiResponse<void>) => {
     const resumePid = req.query.resumePid as string;
     try {
       await prisma.resume.delete({

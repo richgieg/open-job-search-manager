@@ -1,9 +1,14 @@
 import { Prisma, ResumeCertification } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 import { NextApiResponse } from "next";
 
-export default makeApiHandler({
-  PUT: async (req, res: NextApiResponse<ResumeCertification>) => {
+export default makeProtectedApiHandler({
+  PUT: async (user, req, res: NextApiResponse<ResumeCertification>) => {
     const certificationPid = req.query.certificationPid as string;
     try {
       const certification = await prisma.resumeCertification.update({
@@ -22,7 +27,7 @@ export default makeApiHandler({
     }
   },
 
-  DELETE: async (req, res: NextApiResponse<void>) => {
+  DELETE: async (user, req, res: NextApiResponse<void>) => {
     const certificationPid = req.query.certificationPid as string;
     try {
       await prisma.resumeCertification.delete({

@@ -1,9 +1,14 @@
 import type { NextApiResponse } from "next";
 import { EducationEntry, Prisma } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 
-export default makeApiHandler({
-  POST: async (req, res: NextApiResponse<EducationEntry>) => {
+export default makeProtectedApiHandler({
+  POST: async (user, req, res: NextApiResponse<EducationEntry>) => {
     const profilePid = req.query.profilePid as string;
     const maxSortOrderEntry = await prisma.educationEntry.findFirst({
       where: { profile: { pid: profilePid } },

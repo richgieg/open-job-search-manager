@@ -1,9 +1,9 @@
 import type { NextApiResponse } from "next";
 import { Job } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendResponse } from "@/lib";
+import { makeProtectedApiHandler, prisma, sendResponse } from "@/lib";
 
-export default makeApiHandler({
-  POST: async (req, res: NextApiResponse<Job>) => {
+export default makeProtectedApiHandler({
+  POST: async (user, req, res: NextApiResponse<Job>) => {
     const organization = await prisma.job.create({
       data: {
         title: "",

@@ -1,9 +1,14 @@
 import { Prisma, ResumeEducationEntry } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 import { NextApiResponse } from "next";
 
-export default makeApiHandler({
-  PUT: async (req, res: NextApiResponse<ResumeEducationEntry>) => {
+export default makeProtectedApiHandler({
+  PUT: async (user, req, res: NextApiResponse<ResumeEducationEntry>) => {
     const educationEntryPid = req.query.educationEntryPid as string;
     try {
       const educationEntry = await prisma.resumeEducationEntry.update({
@@ -22,7 +27,7 @@ export default makeApiHandler({
     }
   },
 
-  DELETE: async (req, res: NextApiResponse<void>) => {
+  DELETE: async (user, req, res: NextApiResponse<void>) => {
     const educationEntryPid = req.query.educationEntryPid as string;
     try {
       await prisma.resumeEducationEntry.delete({

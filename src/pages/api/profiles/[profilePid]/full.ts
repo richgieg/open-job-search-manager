@@ -8,7 +8,12 @@ import {
   WorkEntry,
   WorkEntryBullet,
 } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 import { NextApiResponse } from "next";
 
 type FullProfile = Profile & {
@@ -18,8 +23,8 @@ type FullProfile = Profile & {
   skillCategories: (SkillCategory & { skills: Skill[] })[];
 };
 
-export default makeApiHandler({
-  GET: async (req, res: NextApiResponse<FullProfile>) => {
+export default makeProtectedApiHandler({
+  GET: async (user, req, res: NextApiResponse<FullProfile>) => {
     const profilePid = req.query.profilePid as string;
     const fullProfile = await prisma.profile.findUnique({
       where: { pid: profilePid },

@@ -1,9 +1,14 @@
 import type { NextApiResponse } from "next";
 import { Prisma, ResumeSkill } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 
-export default makeApiHandler({
-  POST: async (req, res: NextApiResponse<ResumeSkill>) => {
+export default makeProtectedApiHandler({
+  POST: async (user, req, res: NextApiResponse<ResumeSkill>) => {
     const skillCategoryPid = req.query.skillCategoryPid as string;
     const maxSortOrderEntry = await prisma.resumeSkill.findFirst({
       where: { skillCategory: { pid: skillCategoryPid } },

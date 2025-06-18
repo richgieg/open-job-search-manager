@@ -1,8 +1,8 @@
 import type { NextApiResponse } from "next";
-import { makeApiHandler, prisma, sendResponse } from "@/lib";
+import { makeProtectedApiHandler, prisma, sendResponse } from "@/lib";
 
-export default makeApiHandler({
-  PUT: async (req, res: NextApiResponse<void>) => {
+export default makeProtectedApiHandler({
+  PUT: async (user, req, res: NextApiResponse<void>) => {
     const workEntryPid = req.query.workEntryPid as string;
     const orderedPids = req.body.orderedPids as string[];
     await prisma.$transaction(
