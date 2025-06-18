@@ -54,8 +54,8 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        jobId: fullJob.id,
-        profileId: profilePid,
+        jobPid: fullJob.pid,
+        profilePid,
       }),
     });
     const resume: Resume = await response.json();
@@ -66,7 +66,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   };
 
   const duplicateResume = async (resume: Resume) => {
-    const response = await fetch(`/api/resumes/${resume.id}/duplicate`, {
+    const response = await fetch(`/api/resumes/${resume.pid}/duplicate`, {
       method: "POST",
     });
     const duplicatedResume: Resume = await response.json();
@@ -85,15 +85,12 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       )
     )
       return;
-    const response = await fetch(`/api/resumes/${resume.id}`, {
+    await fetch(`/api/resumes/${resume.pid}`, {
       method: "DELETE",
     });
-    const deletedResume: Resume = await response.json();
     setFullJob({
       ...fullJob,
-      resumes: fullJob.resumes.filter(
-        (resume) => resume.id !== deletedResume.id
-      ),
+      resumes: fullJob.resumes.filter((r) => r.id !== resume.id),
     });
   };
 

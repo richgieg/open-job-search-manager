@@ -1,7 +1,5 @@
-import { RESUME_TEMPLATES } from "@/constants";
-import { t } from "@/translate";
+import { ResumeEditor } from "./ResumeEditor";
 import React, { useState } from "react";
-import { ProfileEditor } from "./ProfileEditor";
 import { WorkEntryEditor } from "./WorkEntryEditor";
 import { WorkEntryBulletEditor } from "./WorkEntryBulletEditor";
 import { EducationEntryEditor } from "./EducationEntryEditor";
@@ -10,48 +8,68 @@ import { CertificationEditor } from "./CertificationEditor";
 import { SkillCategoryEditor } from "./SkillCategoryEditor";
 import { SkillEditor } from "./SkillEditor";
 import { SectionHeading } from "@/components/SectionHeading";
-import Link from "next/link";
+import NextLink from "next/link";
 import {
-  Certification,
-  EducationEntry,
-  EducationEntryBullet,
+  ApplicationQuestion,
+  Contact,
+  Job,
+  Link,
   Profile,
-  ResumeTemplate,
-  Skill,
-  SkillCategory,
-  WorkEntry,
-  WorkEntryBullet,
+  Resume,
+  ResumeCertification,
+  ResumeEducationEntry,
+  ResumeEducationEntryBullet,
+  ResumeSkill,
+  ResumeSkillCategory,
+  ResumeWorkEntry,
+  ResumeWorkEntryBullet,
 } from "@/generated/prisma";
 
-type FullProfile = Profile & {
-  workEntries: (WorkEntry & { bullets: WorkEntryBullet[] })[];
-  educationEntries: (EducationEntry & { bullets: EducationEntryBullet[] })[];
-  certifications: Certification[];
-  skillCategories: (SkillCategory & { skills: Skill[] })[];
+type FullResume = Resume & {
+  workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
+  educationEntries: (ResumeEducationEntry & {
+    bullets: ResumeEducationEntryBullet[];
+  })[];
+  certifications: ResumeCertification[];
+  skillCategories: (ResumeSkillCategory & { skills: ResumeSkill[] })[];
+  profile: Profile | null;
+  job: Job;
+};
+
+type FullJob = Job & {
+  resumes: Resume[];
+  links: Link[];
+  contacts: Contact[];
+  applicationQuestions: ApplicationQuestion[];
 };
 
 type Props = {
-  fullProfile: FullProfile;
-  setFullProfile: (fullProfile: FullProfile) => void;
+  fullResume: FullResume;
+  setFullResume: (fullResume: FullResume) => void;
+  fullJob: FullJob;
 };
 
-export function MainContent({ fullProfile, setFullProfile }: Props) {
-  const [previewTemplate, setPreviewTemplate] =
-    useState<ResumeTemplate>("template01");
+export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
+  const [selectedContactPid, setSelectedContactPid] = useState<string>(
+    fullJob.contacts[0]?.pid ?? ""
+  );
 
   const generateSummaryPrompt = async () => {
     const lines = [];
+    lines.push("I am seeking employment in the following role:\n");
+    lines.push(`Job Title: ${fullJob.title}`);
+    lines.push(`Company: ${fullJob.company}`);
+    lines.push("Job Description:\n");
+    lines.push("---");
+    lines.push(`${fullJob.description}`);
+    lines.push("---\n\n");
 
     lines.push(
-      `I am seeking employment in the following role: ${fullProfile.jobTitle}\n`
-    );
-
-    lines.push(
-      "The following is my resume. Please generate a one-paragraph professional summary based on the following information.\n"
+      "Here is my resume. Please generate a one-paragraph professional summary based on the information in my resume, highlighting how my experience and education best fits with the job title and job description, and mentioning how I'm excited to join this company.\n"
     );
 
     lines.push("Work History:\n");
-    const workEntries = fullProfile.workEntries.filter(
+    const workEntries = fullResume.workEntries.filter(
       (workEntry) => workEntry.enabled
     );
     for (const workEntry of workEntries) {
@@ -71,7 +89,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     }
 
     lines.push("Education:\n");
-    const educationEntries = fullProfile.educationEntries.filter(
+    const educationEntries = fullResume.educationEntries.filter(
       (educationEntry) => educationEntry.enabled
     );
     for (const educationEntry of educationEntries) {
@@ -87,7 +105,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     }
 
     lines.push("Certifications:\n");
-    const certifications = fullProfile.certifications.filter(
+    const certifications = fullResume.certifications.filter(
       (certification) => certification.enabled
     );
     for (const certification of certifications) {
@@ -98,7 +116,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     }
 
     lines.push("Skills Organized by Category:\n");
-    const skillCategories = fullProfile.skillCategories.filter(
+    const skillCategories = fullResume.skillCategories.filter(
       (skillCategory) => skillCategory.enabled
     );
     for (const skillCategory of skillCategories) {
@@ -117,17 +135,20 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
 
   const generateCoverLetterPrompt = async () => {
     const lines = [];
+    lines.push("I am seeking employment in the following role:\n");
+    lines.push(`Job Title: ${fullJob.title}`);
+    lines.push(`Company: ${fullJob.company}`);
+    lines.push("Job Description:\n");
+    lines.push("---");
+    lines.push(`${fullJob.description}`);
+    lines.push("---\n\n");
 
     lines.push(
-      `I am seeking employment in the following role: ${fullProfile.jobTitle}\n`
-    );
-
-    lines.push(
-      `The following is my resume. Please generate a three-paragraph cover letter based on the following information. Please only include the paragraphs and do not include the opening "Dear" line or a signature.\n`
+      "Here is my resume. Please generate a three-paragraph cover letter based on the information in my resume, highlighting how my experience and education best fits with the job title and job description, and mentioning how I'm excited to join this company.\n"
     );
 
     lines.push("Work History:\n");
-    const workEntries = fullProfile.workEntries.filter(
+    const workEntries = fullResume.workEntries.filter(
       (workEntry) => workEntry.enabled
     );
     for (const workEntry of workEntries) {
@@ -147,7 +168,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     }
 
     lines.push("Education:\n");
-    const educationEntries = fullProfile.educationEntries.filter(
+    const educationEntries = fullResume.educationEntries.filter(
       (educationEntry) => educationEntry.enabled
     );
     for (const educationEntry of educationEntries) {
@@ -163,7 +184,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     }
 
     lines.push("Certifications:\n");
-    const certifications = fullProfile.certifications.filter(
+    const certifications = fullResume.certifications.filter(
       (certification) => certification.enabled
     );
     for (const certification of certifications) {
@@ -174,7 +195,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     }
 
     lines.push("Skills Organized by Category:\n");
-    const skillCategories = fullProfile.skillCategories.filter(
+    const skillCategories = fullResume.skillCategories.filter(
       (skillCategory) => skillCategory.enabled
     );
     for (const skillCategory of skillCategories) {
@@ -191,33 +212,30 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     alert("Cover letter prompt has been copied to the clipboard!");
   };
 
-  const updateProfile = async (profile: Profile) => {
-    const response = await fetch(`/api/profiles/${profile.pid}`, {
+  const updateResume = async (resume: Resume) => {
+    const response = await fetch(`/api/resumes/${resume.pid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(profile),
+      body: JSON.stringify(resume),
     });
-    const updatedProfile: Profile = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      ...updatedProfile,
+    const updatedResume: Resume = await response.json();
+    setFullResume({
+      ...fullResume,
+      ...updatedResume,
     });
   };
 
   const createWorkEntry = async () => {
-    const response = await fetch(
-      `/api/profiles/${fullProfile.pid}/workEntries`,
-      {
-        method: "POST",
-      }
-    );
-    const workEntry: WorkEntry = await response.json();
-    setFullProfile({
-      ...fullProfile,
+    const response = await fetch(`/api/resumes/${fullResume.id}/workEntries`, {
+      method: "POST",
+    });
+    const workEntry: ResumeWorkEntry = await response.json();
+    setFullResume({
+      ...fullResume,
       workEntries: [
-        ...fullProfile.workEntries,
+        ...fullResume.workEntries,
         {
           ...workEntry,
           bullets: [],
@@ -226,18 +244,18 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
   };
 
-  const updateWorkEntry = async (workEntry: WorkEntry) => {
-    const response = await fetch(`/api/workEntries/${workEntry.pid}`, {
+  const updateWorkEntry = async (workEntry: ResumeWorkEntry) => {
+    const response = await fetch(`/api/resumeWorkEntries/${workEntry.pid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(workEntry),
     });
-    const updatedWorkEntry: WorkEntry = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      workEntries: fullProfile.workEntries.map((workEntry) => {
+    const updatedWorkEntry: ResumeWorkEntry = await response.json();
+    setFullResume({
+      ...fullResume,
+      workEntries: fullResume.workEntries.map((workEntry) => {
         if (workEntry.id === updatedWorkEntry.id) {
           return {
             ...workEntry,
@@ -250,77 +268,83 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
   };
 
-  const deleteWorkEntry = async (workEntry: WorkEntry) => {
-    await fetch(`/api/workEntries/${workEntry.pid}`, {
+  const deleteWorkEntry = async (workEntry: ResumeWorkEntry) => {
+    const response = await fetch(`/api/resumeWorkEntries/${workEntry.id}`, {
       method: "DELETE",
     });
-    setFullProfile({
-      ...fullProfile,
-      workEntries: fullProfile.workEntries.filter((w) => w.id !== workEntry.id),
+    const deletedWorkEntry: ResumeWorkEntry = await response.json();
+    setFullResume({
+      ...fullResume,
+      workEntries: fullResume.workEntries.filter(
+        (workEntry) => workEntry.id !== deletedWorkEntry.id
+      ),
     });
   };
 
-  const moveWorkEntryUp = async (workEntry: WorkEntry) => {
-    const index = fullProfile.workEntries.findIndex(
+  const moveWorkEntryUp = async (workEntry: ResumeWorkEntry) => {
+    const index = fullResume.workEntries.findIndex(
       (item) => item.id === workEntry.id
     );
     if (index > 0) {
       const swapIndex = index - 1;
-      [fullProfile.workEntries[index], fullProfile.workEntries[swapIndex]] = [
-        fullProfile.workEntries[swapIndex],
-        fullProfile.workEntries[index],
+      [fullResume.workEntries[index], fullResume.workEntries[swapIndex]] = [
+        fullResume.workEntries[swapIndex],
+        fullResume.workEntries[index],
       ];
     } else {
-      fullProfile.workEntries.push(fullProfile.workEntries.shift()!);
+      fullResume.workEntries.push(fullResume.workEntries.shift()!);
     }
-    const orderedPids = fullProfile.workEntries.map((item) => item.pid);
-    await fetch(`/api/profiles/${fullProfile.pid}/workEntries/order`, {
+    const orderedPids = fullResume.workEntries.map((item) => item.pid);
+    await fetch(`/api/resumes/${fullResume.pid}/workEntries/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
+    setFullResume({
+      ...fullResume,
     });
   };
 
-  const moveWorkEntryDown = async (workEntry: WorkEntry) => {
-    const index = fullProfile.workEntries.findIndex(
+  const moveWorkEntryDown = async (workEntry: ResumeWorkEntry) => {
+    const index = fullResume.workEntries.findIndex(
       (item) => item.id === workEntry.id
     );
-    if (index < fullProfile.workEntries.length - 1) {
+    if (index < fullResume.workEntries.length - 1) {
       const swapIndex = index + 1;
-      [fullProfile.workEntries[index], fullProfile.workEntries[swapIndex]] = [
-        fullProfile.workEntries[swapIndex],
-        fullProfile.workEntries[index],
+      [fullResume.workEntries[index], fullResume.workEntries[swapIndex]] = [
+        fullResume.workEntries[swapIndex],
+        fullResume.workEntries[index],
       ];
     } else {
-      fullProfile.workEntries.unshift(fullProfile.workEntries.pop()!);
+      fullResume.workEntries.unshift(fullResume.workEntries.pop()!);
     }
-    const orderedPids = fullProfile.workEntries.map((item) => item.pid);
-    await fetch(`/api/profiles/${fullProfile.pid}/workEntries/order`, {
+    const orderedPids = fullResume.workEntries.map((item) => item.pid);
+    await fetch(`/api/resumes/${fullResume.pid}/workEntries/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
+    setFullResume({
+      ...fullResume,
     });
   };
 
   const createWorkEntryBullet = async (workEntryPid: string) => {
-    const response = await fetch(`/api/workEntries/${workEntryPid}/bullets`, {
-      method: "POST",
-    });
-    const workEntryBullet: WorkEntryBullet = await response.json();
-    setFullProfile({
-      ...fullProfile,
+    const response = await fetch(
+      `/api/resumeWorkEntries/${workEntryPid}/bullets`,
+      {
+        method: "POST",
+      }
+    );
+    const workEntryBullet: ResumeWorkEntryBullet = await response.json();
+    setFullResume({
+      ...fullResume,
       workEntries: [
-        ...fullProfile.workEntries.map((workEntry) => {
+        ...fullResume.workEntries.map((workEntry) => {
           if (workEntry.pid === workEntryPid) {
             return {
               ...workEntry,
@@ -334,9 +358,11 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
   };
 
-  const updateWorkEntryBullet = async (workEntryBullet: WorkEntryBullet) => {
+  const updateWorkEntryBullet = async (
+    workEntryBullet: ResumeWorkEntryBullet
+  ) => {
     const response = await fetch(
-      `/api/workEntryBullets/${workEntryBullet.pid}`,
+      `/api/resumeWorkEntryBullets/${workEntryBullet.pid}`,
       {
         method: "PUT",
         headers: {
@@ -345,10 +371,10 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
         body: JSON.stringify(workEntryBullet),
       }
     );
-    const updatedWorkEntryBullet: WorkEntryBullet = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      workEntries: fullProfile.workEntries.map((workEntry) => {
+    const updatedWorkEntryBullet: ResumeWorkEntryBullet = await response.json();
+    setFullResume({
+      ...fullResume,
+      workEntries: fullResume.workEntries.map((workEntry) => {
         if (workEntry.id === updatedWorkEntryBullet.workEntryId) {
           return {
             ...workEntry,
@@ -367,13 +393,15 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
   };
 
-  const deleteWorkEntryBullet = async (workEntryBullet: WorkEntryBullet) => {
-    await fetch(`/api/workEntryBullets/${workEntryBullet.pid}`, {
+  const deleteWorkEntryBullet = async (
+    workEntryBullet: ResumeWorkEntryBullet
+  ) => {
+    await fetch(`/api/resumeWorkEntryBullets/${workEntryBullet.pid}`, {
       method: "DELETE",
     });
-    setFullProfile({
-      ...fullProfile,
-      workEntries: fullProfile.workEntries.map((workEntry) => {
+    setFullResume({
+      ...fullResume,
+      workEntries: fullResume.workEntries.map((workEntry) => {
         if (workEntry.id === workEntryBullet.workEntryId) {
           return {
             ...workEntry,
@@ -388,8 +416,10 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
   };
 
-  const moveWorkEntryBulletUp = async (workEntryBullet: WorkEntryBullet) => {
-    const workEntry = fullProfile.workEntries.find(
+  const moveWorkEntryBulletUp = async (
+    workEntryBullet: ResumeWorkEntryBullet
+  ) => {
+    const workEntry = fullResume.workEntries.find(
       (item) => item.id === workEntryBullet.workEntryId
     );
     if (!workEntry) return;
@@ -405,20 +435,22 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       bullets.push(bullets.shift()!);
     }
     const orderedPids = bullets.map((item) => item.pid);
-    await fetch(`/api/workEntries/${workEntry.pid}/bullets/order`, {
+    await fetch(`/api/resumeWorkEntries/${workEntry.pid}/bullets/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
+    setFullResume({
+      ...fullResume,
     });
   };
 
-  const moveWorkEntryBulletDown = async (workEntryBullet: WorkEntryBullet) => {
-    const workEntry = fullProfile.workEntries.find(
+  const moveWorkEntryBulletDown = async (
+    workEntryBullet: ResumeWorkEntryBullet
+  ) => {
+    const workEntry = fullResume.workEntries.find(
       (item) => item.id === workEntryBullet.workEntryId
     );
     if (!workEntry) return;
@@ -434,30 +466,30 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       bullets.unshift(bullets.pop()!);
     }
     const orderedPids = bullets.map((item) => item.pid);
-    await fetch(`/api/workEntries/${workEntry.pid}/bullets/order`, {
+    await fetch(`/api/resumeWorkEntries/${workEntry.pid}/bullets/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
+    setFullResume({
+      ...fullResume,
     });
   };
 
   const createEducationEntry = async () => {
     const response = await fetch(
-      `/api/profiles/${fullProfile.pid}/educationEntries`,
+      `/api/resumes/${fullResume.pid}/educationEntries`,
       {
         method: "POST",
       }
     );
-    const educationEntry: EducationEntry = await response.json();
-    setFullProfile({
-      ...fullProfile,
+    const educationEntry: ResumeEducationEntry = await response.json();
+    setFullResume({
+      ...fullResume,
       educationEntries: [
-        ...fullProfile.educationEntries,
+        ...fullResume.educationEntries,
         {
           ...educationEntry,
           bullets: [],
@@ -466,9 +498,9 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
   };
 
-  const updateEducationEntry = async (educationEntry: EducationEntry) => {
+  const updateEducationEntry = async (educationEntry: ResumeEducationEntry) => {
     const response = await fetch(
-      `/api/educationEntries/${educationEntry.pid}`,
+      `/api/resumeEducationEntries/${educationEntry.pid}`,
       {
         method: "PUT",
         headers: {
@@ -477,10 +509,10 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
         body: JSON.stringify(educationEntry),
       }
     );
-    const updatedEducationEntry: EducationEntry = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      educationEntries: fullProfile.educationEntries.map((educationEntry) => {
+    const updatedEducationEntry: ResumeEducationEntry = await response.json();
+    setFullResume({
+      ...fullResume,
+      educationEntries: fullResume.educationEntries.map((educationEntry) => {
         if (educationEntry.id === updatedEducationEntry.id) {
           return {
             ...educationEntry,
@@ -493,88 +525,91 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
   };
 
-  const deleteEducationEntry = async (educationEntry: EducationEntry) => {
-    await fetch(`/api/educationEntries/${educationEntry.pid}`, {
+  const deleteEducationEntry = async (educationEntry: ResumeEducationEntry) => {
+    await fetch(`/api/resumeEducationEntries/${educationEntry.pid}`, {
       method: "DELETE",
     });
-    setFullProfile({
-      ...fullProfile,
-      educationEntries: fullProfile.educationEntries.filter(
+    setFullResume({
+      ...fullResume,
+      educationEntries: fullResume.educationEntries.filter(
         (e) => e.id !== educationEntry.id
       ),
     });
   };
 
-  const moveEducationEntryUp = async (educationEntry: EducationEntry) => {
-    const index = fullProfile.educationEntries.findIndex(
+  const moveEducationEntryUp = async (educationEntry: ResumeEducationEntry) => {
+    const index = fullResume.educationEntries.findIndex(
       (item) => item.id === educationEntry.id
     );
     if (index > 0) {
       const swapIndex = index - 1;
       [
-        fullProfile.educationEntries[index],
-        fullProfile.educationEntries[swapIndex],
+        fullResume.educationEntries[index],
+        fullResume.educationEntries[swapIndex],
       ] = [
-        fullProfile.educationEntries[swapIndex],
-        fullProfile.educationEntries[index],
+        fullResume.educationEntries[swapIndex],
+        fullResume.educationEntries[index],
       ];
     } else {
-      fullProfile.educationEntries.push(fullProfile.educationEntries.shift()!);
+      fullResume.educationEntries.push(fullResume.educationEntries.shift()!);
     }
-    const orderedPids = fullProfile.educationEntries.map((item) => item.pid);
-    await fetch(`/api/profiles/${fullProfile.pid}/educationEntries/order`, {
+    const orderedPids = fullResume.educationEntries.map((item) => item.pid);
+    await fetch(`/api/resumes/${fullResume.pid}/educationEntries/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
+    setFullResume({
+      ...fullResume,
     });
   };
 
-  const moveEducationEntryDown = async (educationEntry: EducationEntry) => {
-    const index = fullProfile.educationEntries.findIndex(
+  const moveEducationEntryDown = async (
+    educationEntry: ResumeEducationEntry
+  ) => {
+    const index = fullResume.educationEntries.findIndex(
       (item) => item.id === educationEntry.id
     );
-    if (index < fullProfile.educationEntries.length - 1) {
+    if (index < fullResume.educationEntries.length - 1) {
       const swapIndex = index + 1;
       [
-        fullProfile.educationEntries[index],
-        fullProfile.educationEntries[swapIndex],
+        fullResume.educationEntries[index],
+        fullResume.educationEntries[swapIndex],
       ] = [
-        fullProfile.educationEntries[swapIndex],
-        fullProfile.educationEntries[index],
+        fullResume.educationEntries[swapIndex],
+        fullResume.educationEntries[index],
       ];
     } else {
-      fullProfile.educationEntries.unshift(fullProfile.educationEntries.pop()!);
+      fullResume.educationEntries.unshift(fullResume.educationEntries.pop()!);
     }
-    const orderedPids = fullProfile.educationEntries.map((item) => item.pid);
-    await fetch(`/api/profiles/${fullProfile.pid}/educationEntries/order`, {
+    const orderedPids = fullResume.educationEntries.map((item) => item.pid);
+    await fetch(`/api/resumes/${fullResume.pid}/educationEntries/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
+    setFullResume({
+      ...fullResume,
     });
   };
 
   const createEducationEntryBullet = async (educationEntryPid: string) => {
     const response = await fetch(
-      `/api/educationEntries/${educationEntryPid}/bullets`,
+      `/api/resumeEducationEntries/${educationEntryPid}/bullets`,
       {
         method: "POST",
       }
     );
-    const educationEntryBullet: EducationEntryBullet = await response.json();
-    setFullProfile({
-      ...fullProfile,
+    const educationEntryBullet: ResumeEducationEntryBullet =
+      await response.json();
+    setFullResume({
+      ...fullResume,
       educationEntries: [
-        ...fullProfile.educationEntries.map((educationEntry) => {
+        ...fullResume.educationEntries.map((educationEntry) => {
           if (educationEntry.pid === educationEntryPid) {
             return {
               ...educationEntry,
@@ -589,10 +624,10 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const updateEducationEntryBullet = async (
-    educationEntryBullet: EducationEntryBullet
+    educationEntryBullet: ResumeEducationEntryBullet
   ) => {
     const response = await fetch(
-      `/api/educationEntryBullets/${educationEntryBullet.pid}`,
+      `/api/resumeEducationEntryBullets/${educationEntryBullet.pid}`,
       {
         method: "PUT",
         headers: {
@@ -601,11 +636,11 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
         body: JSON.stringify(educationEntryBullet),
       }
     );
-    const updatedEducationEntryBullet: EducationEntryBullet =
+    const updatedEducationEntryBullet: ResumeEducationEntryBullet =
       await response.json();
-    setFullProfile({
-      ...fullProfile,
-      educationEntries: fullProfile.educationEntries.map((educationEntry) => {
+    setFullResume({
+      ...fullResume,
+      educationEntries: fullResume.educationEntries.map((educationEntry) => {
         if (
           educationEntry.id === updatedEducationEntryBullet.educationEntryId
         ) {
@@ -627,14 +662,15 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const deleteEducationEntryBullet = async (
-    educationEntryBullet: EducationEntryBullet
+    educationEntryBullet: ResumeEducationEntryBullet
   ) => {
-    await fetch(`/api/educationEntryBullets/${educationEntryBullet.pid}`, {
-      method: "DELETE",
-    });
-    setFullProfile({
-      ...fullProfile,
-      educationEntries: fullProfile.educationEntries.map((educationEntry) => {
+    await fetch(
+      `/api/resumeEducationEntryBullets/${educationEntryBullet.pid}`,
+      { method: "DELETE" }
+    );
+    setFullResume({
+      ...fullResume,
+      educationEntries: fullResume.educationEntries.map((educationEntry) => {
         if (educationEntry.id === educationEntryBullet.educationEntryId) {
           return {
             ...educationEntry,
@@ -650,9 +686,9 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const moveEducationEntryBulletUp = async (
-    educationEntryBullet: EducationEntryBullet
+    educationEntryBullet: ResumeEducationEntryBullet
   ) => {
-    const educationEntry = fullProfile.educationEntries.find(
+    const educationEntry = fullResume.educationEntries.find(
       (item) => item.id === educationEntryBullet.educationEntryId
     );
     if (!educationEntry) return;
@@ -670,22 +706,25 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       bullets.push(bullets.shift()!);
     }
     const orderedPids = bullets.map((item) => item.pid);
-    await fetch(`/api/educationEntries/${educationEntry.pid}/bullets/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
-    setFullProfile({
-      ...fullProfile,
+    await fetch(
+      `/api/resumeEducationEntries/${educationEntry.pid}/bullets/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    setFullResume({
+      ...fullResume,
     });
   };
 
   const moveEducationEntryBulletDown = async (
-    educationEntryBullet: EducationEntryBullet
+    educationEntryBullet: ResumeEducationEntryBullet
   ) => {
-    const educationEntry = fullProfile.educationEntries.find(
+    const educationEntry = fullResume.educationEntries.find(
       (item) => item.id === educationEntryBullet.educationEntryId
     );
     if (!educationEntry) return;
@@ -703,44 +742,50 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       bullets.unshift(bullets.pop()!);
     }
     const orderedPids = bullets.map((item) => item.pid);
-    await fetch(`/api/educationEntries/${educationEntry.pid}/bullets/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
-    setFullProfile({
-      ...fullProfile,
+    await fetch(
+      `/api/resumeEducationEntries/${educationEntry.pid}/bullets/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    setFullResume({
+      ...fullResume,
     });
   };
 
   const createCertification = async () => {
     const response = await fetch(
-      `/api/profiles/${fullProfile.pid}/certifications`,
+      `/api/resumes/${fullResume.pid}/certifications`,
       {
         method: "POST",
       }
     );
-    const certification: Certification = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      certifications: [...fullProfile.certifications, certification],
+    const certification: ResumeCertification = await response.json();
+    setFullResume({
+      ...fullResume,
+      certifications: [...fullResume.certifications, certification],
     });
   };
 
-  const updateCertification = async (certification: Certification) => {
-    const response = await fetch(`/api/certifications/${certification.pid}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(certification),
-    });
-    const updatedCertification: Certification = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      certifications: fullProfile.certifications.map((certification) => {
+  const updateCertification = async (certification: ResumeCertification) => {
+    const response = await fetch(
+      `/api/resumeCertifications/${certification.pid}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(certification),
+      }
+    );
+    const updatedCertification: ResumeCertification = await response.json();
+    setFullResume({
+      ...fullResume,
+      certifications: fullResume.certifications.map((certification) => {
         if (certification.id === updatedCertification.id) {
           return {
             ...certification,
@@ -753,88 +798,84 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
   };
 
-  const deleteCertification = async (certification: Certification) => {
-    await fetch(`/api/certifications/${certification.pid}`, {
+  const deleteCertification = async (certification: ResumeCertification) => {
+    await fetch(`/api/resumeCertifications/${certification.pid}`, {
       method: "DELETE",
     });
-    setFullProfile({
-      ...fullProfile,
-      certifications: fullProfile.certifications.filter(
+    setFullResume({
+      ...fullResume,
+      certifications: fullResume.certifications.filter(
         (c) => c.id !== certification.id
       ),
     });
   };
 
-  const moveCertificationUp = async (certification: Certification) => {
-    const index = fullProfile.certifications.findIndex(
+  const moveCertificationUp = async (certification: ResumeCertification) => {
+    const index = fullResume.certifications.findIndex(
       (item) => item.id === certification.id
     );
     if (index > 0) {
       const swapIndex = index - 1;
-      [
-        fullProfile.certifications[index],
-        fullProfile.certifications[swapIndex],
-      ] = [
-        fullProfile.certifications[swapIndex],
-        fullProfile.certifications[index],
-      ];
+      [fullResume.certifications[index], fullResume.certifications[swapIndex]] =
+        [
+          fullResume.certifications[swapIndex],
+          fullResume.certifications[index],
+        ];
     } else {
-      fullProfile.certifications.push(fullProfile.certifications.shift()!);
+      fullResume.certifications.push(fullResume.certifications.shift()!);
     }
-    const orderedPids = fullProfile.certifications.map((item) => item.pid);
-    await fetch(`/api/profiles/${fullProfile.pid}/certifications/order`, {
+    const orderedPids = fullResume.certifications.map((item) => item.pid);
+    await fetch(`/api/resumes/${fullResume.pid}/certifications/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
+    setFullResume({
+      ...fullResume,
     });
   };
 
-  const moveCertificationDown = async (certification: Certification) => {
-    const index = fullProfile.certifications.findIndex(
+  const moveCertificationDown = async (certification: ResumeCertification) => {
+    const index = fullResume.certifications.findIndex(
       (item) => item.id === certification.id
     );
-    if (index < fullProfile.certifications.length - 1) {
+    if (index < fullResume.certifications.length - 1) {
       const swapIndex = index + 1;
-      [
-        fullProfile.certifications[index],
-        fullProfile.certifications[swapIndex],
-      ] = [
-        fullProfile.certifications[swapIndex],
-        fullProfile.certifications[index],
-      ];
+      [fullResume.certifications[index], fullResume.certifications[swapIndex]] =
+        [
+          fullResume.certifications[swapIndex],
+          fullResume.certifications[index],
+        ];
     } else {
-      fullProfile.certifications.unshift(fullProfile.certifications.pop()!);
+      fullResume.certifications.unshift(fullResume.certifications.pop()!);
     }
-    const orderedPids = fullProfile.certifications.map((item) => item.pid);
-    await fetch(`/api/profiles/${fullProfile.pid}/certifications/order`, {
+    const orderedPids = fullResume.certifications.map((item) => item.pid);
+    await fetch(`/api/resumes/${fullResume.pid}/certifications/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
+    setFullResume({
+      ...fullResume,
     });
   };
 
   const createSkillCategory = async () => {
     const response = await fetch(
-      `/api/profiles/${fullProfile.pid}/skillCategories`,
+      `/api/resumes/${fullResume.pid}/skillCategories`,
       {
         method: "POST",
       }
     );
-    const skillCategory: SkillCategory = await response.json();
-    setFullProfile({
-      ...fullProfile,
+    const skillCategory: ResumeSkillCategory = await response.json();
+    setFullResume({
+      ...fullResume,
       skillCategories: [
-        ...fullProfile.skillCategories,
+        ...fullResume.skillCategories,
         {
           ...skillCategory,
           skills: [],
@@ -843,18 +884,21 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
   };
 
-  const updateSkillCategory = async (skillCategory: SkillCategory) => {
-    const response = await fetch(`/api/skillCategories/${skillCategory.pid}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(skillCategory),
-    });
-    const updatedSkillCategory: SkillCategory = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      skillCategories: fullProfile.skillCategories.map((skillCategory) => {
+  const updateSkillCategory = async (skillCategory: ResumeSkillCategory) => {
+    const response = await fetch(
+      `/api/resumeSkillCategories/${skillCategory.pid}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(skillCategory),
+      }
+    );
+    const updatedSkillCategory: ResumeSkillCategory = await response.json();
+    setFullResume({
+      ...fullResume,
+      skillCategories: fullResume.skillCategories.map((skillCategory) => {
         if (skillCategory.id === updatedSkillCategory.id) {
           return {
             ...skillCategory,
@@ -867,88 +911,88 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
   };
 
-  const deleteSkillCategory = async (skillCategory: SkillCategory) => {
-    await fetch(`/api/skillCategories/${skillCategory.pid}`, {
+  const deleteSkillCategory = async (skillCategory: ResumeSkillCategory) => {
+    await fetch(`/api/resumeSkillCategories/${skillCategory.pid}`, {
       method: "DELETE",
     });
-    setFullProfile({
-      ...fullProfile,
-      skillCategories: fullProfile.skillCategories.filter(
+    setFullResume({
+      ...fullResume,
+      skillCategories: fullResume.skillCategories.filter(
         (s) => s.id !== skillCategory.id
       ),
     });
   };
 
-  const moveSkillCategoryUp = async (skillCategory: SkillCategory) => {
-    const index = fullProfile.skillCategories.findIndex(
+  const moveSkillCategoryUp = async (skillCategory: ResumeSkillCategory) => {
+    const index = fullResume.skillCategories.findIndex(
       (item) => item.id === skillCategory.id
     );
     if (index > 0) {
       const swapIndex = index - 1;
       [
-        fullProfile.skillCategories[index],
-        fullProfile.skillCategories[swapIndex],
+        fullResume.skillCategories[index],
+        fullResume.skillCategories[swapIndex],
       ] = [
-        fullProfile.skillCategories[swapIndex],
-        fullProfile.skillCategories[index],
+        fullResume.skillCategories[swapIndex],
+        fullResume.skillCategories[index],
       ];
     } else {
-      fullProfile.skillCategories.push(fullProfile.skillCategories.shift()!);
+      fullResume.skillCategories.push(fullResume.skillCategories.shift()!);
     }
-    const orderedPids = fullProfile.skillCategories.map((item) => item.pid);
-    await fetch(`/api/profiles/${fullProfile.pid}/skillCategories/order`, {
+    const orderedPids = fullResume.skillCategories.map((item) => item.pid);
+    await fetch(`/api/resumes/${fullResume.pid}/skillCategories/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
+    setFullResume({
+      ...fullResume,
     });
   };
 
-  const moveSkillCategoryDown = async (skillCategory: SkillCategory) => {
-    const index = fullProfile.skillCategories.findIndex(
+  const moveSkillCategoryDown = async (skillCategory: ResumeSkillCategory) => {
+    const index = fullResume.skillCategories.findIndex(
       (item) => item.id === skillCategory.id
     );
-    if (index < fullProfile.skillCategories.length - 1) {
+    if (index < fullResume.skillCategories.length - 1) {
       const swapIndex = index + 1;
       [
-        fullProfile.skillCategories[index],
-        fullProfile.skillCategories[swapIndex],
+        fullResume.skillCategories[index],
+        fullResume.skillCategories[swapIndex],
       ] = [
-        fullProfile.skillCategories[swapIndex],
-        fullProfile.skillCategories[index],
+        fullResume.skillCategories[swapIndex],
+        fullResume.skillCategories[index],
       ];
     } else {
-      fullProfile.skillCategories.unshift(fullProfile.skillCategories.pop()!);
+      fullResume.skillCategories.unshift(fullResume.skillCategories.pop()!);
     }
-    const orderedPids = fullProfile.skillCategories.map((item) => item.pid);
-    await fetch(`/api/profiles/${fullProfile.pid}/skillCategories/order`, {
+    const orderedPids = fullResume.skillCategories.map((item) => item.pid);
+    await fetch(`/api/resumes/${fullResume.pid}/skillCategories/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
+    setFullResume({
+      ...fullResume,
     });
   };
 
   const createSkill = async (skillCategoryPid: string) => {
     const response = await fetch(
-      `/api/skillCategories/${skillCategoryPid}/skills`,
+      `/api/resumeSkillCategories/${skillCategoryPid}/skills`,
       {
         method: "POST",
       }
     );
-    const skill: Skill = await response.json();
-    setFullProfile({
-      ...fullProfile,
+    const skill: ResumeSkill = await response.json();
+    setFullResume({
+      ...fullResume,
       skillCategories: [
-        ...fullProfile.skillCategories.map((skillCategory) => {
+        ...fullResume.skillCategories.map((skillCategory) => {
           if (skillCategory.pid === skillCategoryPid) {
             return {
               ...skillCategory,
@@ -962,18 +1006,18 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
   };
 
-  const updateSkill = async (skill: Skill) => {
-    const response = await fetch(`/api/skills/${skill.pid}`, {
+  const updateSkill = async (skill: ResumeSkill) => {
+    const response = await fetch(`/api/resumeSkills/${skill.pid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(skill),
     });
-    const updatedSkill: Skill = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      skillCategories: fullProfile.skillCategories.map((skillCategory) => {
+    const updatedSkill: ResumeSkill = await response.json();
+    setFullResume({
+      ...fullResume,
+      skillCategories: fullResume.skillCategories.map((skillCategory) => {
         if (skillCategory.id === updatedSkill.skillCategoryId) {
           return {
             ...skillCategory,
@@ -992,13 +1036,13 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
   };
 
-  const deleteSkill = async (skill: Skill) => {
-    await fetch(`/api/skills/${skill.pid}`, {
+  const deleteSkill = async (skill: ResumeSkill) => {
+    await fetch(`/api/resumeSkills/${skill.pid}`, {
       method: "DELETE",
     });
-    setFullProfile({
-      ...fullProfile,
-      skillCategories: fullProfile.skillCategories.map((skillCategory) => {
+    setFullResume({
+      ...fullResume,
+      skillCategories: fullResume.skillCategories.map((skillCategory) => {
         if (skillCategory.id === skill.skillCategoryId) {
           return {
             ...skillCategory,
@@ -1011,8 +1055,8 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
   };
 
-  const moveSkillUp = async (skill: Skill) => {
-    const skillCategory = fullProfile.skillCategories.find(
+  const moveSkillUp = async (skill: ResumeSkill) => {
+    const skillCategory = fullResume.skillCategories.find(
       (item) => item.id === skill.skillCategoryId
     );
     if (!skillCategory) return;
@@ -1025,20 +1069,23 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       skills.push(skills.shift()!);
     }
     const orderedPids = skills.map((item) => item.pid);
-    await fetch(`/api/skillCategories/${skillCategory.pid}/skills/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
-    setFullProfile({
-      ...fullProfile,
+    await fetch(
+      `/api/resumeSkillCategories/${skillCategory.pid}/skills/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    setFullResume({
+      ...fullResume,
     });
   };
 
-  const moveSkillDown = async (skill: Skill) => {
-    const skillCategory = fullProfile.skillCategories.find(
+  const moveSkillDown = async (skill: ResumeSkill) => {
+    const skillCategory = fullResume.skillCategories.find(
       (item) => item.id === skill.skillCategoryId
     );
     if (!skillCategory) return;
@@ -1051,55 +1098,75 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       skills.unshift(skills.pop()!);
     }
     const orderedPids = skills.map((item) => item.pid);
-    await fetch(`/api/skillCategories/${skillCategory.pid}/skills/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
-    setFullProfile({
-      ...fullProfile,
+    await fetch(
+      `/api/resumeSkillCategories/${skillCategory.pid}/skills/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    setFullResume({
+      ...fullResume,
     });
   };
 
   return (
     <div className="px-8 pb-28">
-      <label className="block">
-        <select
-          value={previewTemplate}
-          onChange={(e) => setPreviewTemplate(e.target.value as ResumeTemplate)}
-        >
-          {RESUME_TEMPLATES.map((resumeTemplate) => (
-            <option key={resumeTemplate} value={resumeTemplate}>
-              {t.resumeTemplates[resumeTemplate]}
-            </option>
-          ))}
-        </select>
-      </label>
-      <Link
-        href={`/api/profiles/${fullProfile.pid}/previewResume?template=${previewTemplate}`}
-      >
-        PREVIEW RESUME
-      </Link>
+      <NextLink href={`/api/resumes/${fullResume.pid}/downloadResume`}>
+        DOWNLOAD RESUME
+      </NextLink>
+      {fullJob.contacts.length > 0 && (
+        <>
+          <br />
+          <select
+            value={selectedContactPid}
+            onChange={(e) => setSelectedContactPid(e.target.value)}
+          >
+            {fullJob.contacts.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          <br />
+        </>
+      )}
+      {selectedContactPid && (
+        <>
+          <NextLink
+            href={`/api/resumes/${
+              fullResume.pid
+            }/downloadCoverLetter?contactPid=${selectedContactPid}&timezoneOffset=${new Date().getTimezoneOffset()}`}
+          >
+            DOWNLOAD COVER LETTER
+          </NextLink>
+          <br />
+          <NextLink
+            href={`/api/resumes/${
+              fullResume.pid
+            }/downloadCoverLetter?contactPid=${selectedContactPid}&timezoneOffset=${new Date().getTimezoneOffset()}&includeResume=true`}
+          >
+            DOWNLOAD COVER LETTER WITH RESUME
+          </NextLink>
+        </>
+      )}
       <br />
-      <Link
-        href={`/api/profiles/${
-          fullProfile.pid
-        }/previewCoverLetter?template=${previewTemplate}&timezoneOffset=${new Date().getTimezoneOffset()}`}
-      >
-        PREVIEW COVER LETTER
-      </Link>
+      <NextLink href={`/resumes/${fullResume.pid}/application`} target="_blank">
+        APPLICATION
+      </NextLink>
       <SectionHeading text="Basic Info" />
-      <ProfileEditor
-        profile={fullProfile}
-        updateProfile={updateProfile}
+      <ResumeEditor
+        resume={fullResume}
+        updateResume={updateResume}
         generateSummaryPrompt={generateSummaryPrompt}
         generateCoverLetterPrompt={generateCoverLetterPrompt}
       />
       <SectionHeading text="Skills" />
       <div className="mt-6 flex flex-col gap-12">
-        {fullProfile.skillCategories.map((skillCategory) => (
+        {fullResume.skillCategories.map((skillCategory) => (
           <div key={skillCategory.id} className="flex flex-col gap-6">
             <SkillCategoryEditor
               skillCategory={skillCategory}
@@ -1134,7 +1201,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       <button onClick={createSkillCategory}>New Skill Category</button>
       <SectionHeading text="Work Experience" />
       <div className="mt-6 flex flex-col gap-12">
-        {fullProfile.workEntries.map((workEntry) => (
+        {fullResume.workEntries.map((workEntry) => (
           <div key={workEntry.id} className="flex flex-col gap-6">
             <WorkEntryEditor
               workEntry={workEntry}
@@ -1169,7 +1236,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       <button onClick={createWorkEntry}>New Work</button>
       <SectionHeading text="Education" />
       <div className="mt-6 flex flex-col gap-12">
-        {fullProfile.educationEntries.map((educationEntry) => (
+        {fullResume.educationEntries.map((educationEntry) => (
           <div key={educationEntry.id} className="flex flex-col gap-6">
             <EducationEntryEditor
               educationEntry={educationEntry}
@@ -1206,9 +1273,9 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       <button onClick={createEducationEntry}>New Education</button>
       <SectionHeading text="Certifications" />
       <div className="mt-6 flex flex-col gap-6">
-        {fullProfile.certifications.length > 0 && (
+        {fullResume.certifications.length > 0 && (
           <div className="flex flex-col gap-4">
-            {fullProfile.certifications.map((certification) => (
+            {fullResume.certifications.map((certification) => (
               <CertificationEditor
                 key={certification.id}
                 certification={certification}

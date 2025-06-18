@@ -17,7 +17,7 @@ export function ResumeOverview({
 }: Props) {
   return (
     <div className="flex gap-2">
-      <Link href={`/resumes/${resume.id}`}>
+      <Link href={`/resumes/${resume.pid}`}>
         {resume.resumeName || t.resumeNamePlaceholder}
       </Link>
       <DuplicateButton

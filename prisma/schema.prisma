@@ -32,6 +32,7 @@ model Profile {
   educationEntries EducationEntry[]
   certifications   Certification[]
   skillCategories  SkillCategory[]
+  resumes          Resume[]
 }
 
 model WorkEntry {
@@ -208,19 +209,109 @@ enum ResumeTemplate {
 }
 
 model Resume {
-  id              Int            @id @default(autoincrement())
-  pid             String         @unique @default(uuid())
-  resumeName      String
-  name            String
-  location        String
-  phone           String
-  email           String
-  websiteText     String
-  websiteLink     String
-  summary         String
-  coverLetter     String
-  allowPageBreaks Boolean
-  template        ResumeTemplate
-  jobId           Int
-  job             Job            @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  id               Int                    @id @default(autoincrement())
+  pid              String                 @unique @default(uuid())
+  resumeName       String
+  name             String
+  location         String
+  phone            String
+  email            String
+  websiteText      String
+  websiteLink      String
+  summary          String
+  coverLetter      String
+  allowPageBreaks  Boolean
+  template         ResumeTemplate
+  jobId            Int
+  profileId        Int?
+  job              Job                    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  profile          Profile?               @relation(fields: [profileId], references: [id], onDelete: SetNull)
+  workEntries      ResumeWorkEntry[]
+  educationEntries ResumeEducationEntry[]
+  certifications   ResumeCertification[]
+  skillCategories  ResumeSkillCategory[]
+}
+
+model ResumeWorkEntry {
+  id              Int                     @id @default(autoincrement())
+  pid             String                  @unique @default(uuid())
+  companyName     String
+  companyLocation String
+  title           String
+  type            JobType
+  arrangement     JobArrangement
+  startDate       String
+  endDate         String?
+  enabled         Boolean
+  sortOrder       Int
+  resumeId        Int
+  resume          Resume                  @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  bullets         ResumeWorkEntryBullet[]
+}
+
+model ResumeWorkEntryBullet {
+  id          Int             @id @default(autoincrement())
+  pid         String          @unique @default(uuid())
+  text        String
+  enabled     Boolean
+  sortOrder   Int
+  workEntryId Int
+  workEntry   ResumeWorkEntry @relation(fields: [workEntryId], references: [id], onDelete: Cascade)
+}
+
+model ResumeEducationEntry {
+  id             Int                          @id @default(autoincrement())
+  pid            String                       @unique @default(uuid())
+  schoolName     String
+  schoolLocation String
+  title          String
+  graduationDate String
+  enabled        Boolean
+  sortOrder      Int
+  resumeId       Int
+  resume         Resume                       @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  bullets        ResumeEducationEntryBullet[]
+}
+
+model ResumeEducationEntryBullet {
+  id               Int                  @id @default(autoincrement())
+  pid              String               @unique @default(uuid())
+  text             String
+  enabled          Boolean
+  sortOrder        Int
+  educationEntryId Int
+  educationEntry   ResumeEducationEntry @relation(fields: [educationEntryId], references: [id], onDelete: Cascade)
+}
+
+model ResumeCertification {
+  id        Int     @id @default(autoincrement())
+  pid       String  @unique @default(uuid())
+  title     String
+  issuer    String
+  issueDate String
+  enabled   Boolean
+  sortOrder Int
+  resumeId  Int
+  resume    Resume  @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+}
+
+model ResumeSkillCategory {
+  id        Int           @id @default(autoincrement())
+  pid       String        @unique @default(uuid())
+  name      String
+  enabled   Boolean
+  sortOrder Int
+  resumeId  Int
+  resume    Resume        @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  skills    ResumeSkill[]
+}
+
+model ResumeSkill {
+  id              Int                 @id @default(autoincrement())
+  pid             String              @unique @default(uuid())
+  text            String
+  enabled         Boolean
+  sortOrder       Int
+  skillCategoryId Int
+  skillCategory   ResumeSkillCategory @relation(fields: [skillCategoryId], references: [id], onDelete: Cascade)
 }
