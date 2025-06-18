@@ -27,3 +27,17 @@ export function createClient(req: NextApiRequest, res: NextApiResponse) {
 
   return supabase;
 }
+
+export async function getAuthenticatedUser(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const supabase = createClient(req, res);
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) return null;
+  return user;
+}
