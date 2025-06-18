@@ -1,14 +1,11 @@
-export const JOB_TYPES = ["fullTime", "partTime", "contract"] as const;
-export const JOB_ARRANGEMENTS = ["onSite", "hybrid", "remote"] as const;
-export const JOB_STATUSES = [
-  "notApplied",
-  "applied",
-  "appliedWithdrawn",
-  "appliedRejected",
-  "interviewing",
-  "interviewedWithdrawn",
-  "interviewedRejected",
-  "offerReceived",
-  "offerAccepted",
-] as const;
-export const RESUME_TEMPLATES = ["template01", "template02"] as const;
+import {
+  JobArrangement,
+  JobStatus,
+  JobType,
+  ResumeTemplate,
+} from "./generated/prisma";
+
+export const JOB_TYPES = [...Object.values(JobType)] as const;
+export const JOB_ARRANGEMENTS = [...Object.values(JobArrangement)] as const;
+export const JOB_STATUSES = [...Object.values(JobStatus)] as const;
+export const RESUME_TEMPLATES = [...Object.values(ResumeTemplate)] as const;
