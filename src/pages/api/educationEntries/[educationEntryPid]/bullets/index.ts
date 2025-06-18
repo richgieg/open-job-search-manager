@@ -1,9 +1,14 @@
 import type { NextApiResponse } from "next";
 import { EducationEntryBullet, Prisma } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 
-export default makeApiHandler({
-  POST: async (req, res: NextApiResponse<EducationEntryBullet>) => {
+export default makeProtectedApiHandler({
+  POST: async (user, req, res: NextApiResponse<EducationEntryBullet>) => {
     const educationEntryPid = req.query.educationEntryPid as string;
     const maxSortOrderEntry = await prisma.educationEntryBullet.findFirst({
       where: { educationEntry: { pid: educationEntryPid } },

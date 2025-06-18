@@ -1,9 +1,14 @@
 import { Resume } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 import { NextApiResponse } from "next";
 
-export default makeApiHandler({
-  POST: async (req, res: NextApiResponse<Resume>) => {
+export default makeProtectedApiHandler({
+  POST: async (user, req, res: NextApiResponse<Resume>) => {
     const resumePid = req.query.resumePid as string;
     const original = await prisma.resume.findUnique({
       where: { pid: resumePid },

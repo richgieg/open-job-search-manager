@@ -1,11 +1,11 @@
 import type { NextApiResponse } from "next";
 import { Job, Link } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendResponse } from "@/lib";
+import { makeProtectedApiHandler, prisma, sendResponse } from "@/lib";
 
 type JobWithLinks = Job & { links: Link[] };
 
-export default makeApiHandler({
-  GET: async (req, res: NextApiResponse<JobWithLinks[]>) => {
+export default makeProtectedApiHandler({
+  GET: async (user, req, res: NextApiResponse<JobWithLinks[]>) => {
     const jobs = await prisma.job.findMany({
       orderBy: { createdAt: "asc" },
       include: {

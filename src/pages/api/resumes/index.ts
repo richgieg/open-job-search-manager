@@ -1,9 +1,14 @@
 import type { NextApiResponse } from "next";
 import { Resume } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 
-export default makeApiHandler({
-  POST: async (req, res: NextApiResponse<Resume>) => {
+export default makeProtectedApiHandler({
+  POST: async (user, req, res: NextApiResponse<Resume>) => {
     const jobPid = req.body.jobPid as string;
     const profilePid = req.body.profilePid as string;
     const fullProfile = await prisma.profile.findUnique({

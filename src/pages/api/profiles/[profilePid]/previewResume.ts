@@ -1,5 +1,5 @@
 import { ResumeTemplate } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError } from "@/lib";
+import { makeProtectedApiHandler, prisma, sendError } from "@/lib";
 import { NextApiResponse } from "next";
 import {
   template01_makeDocument,
@@ -8,8 +8,8 @@ import {
   template02_resume,
 } from "@/templates";
 
-export default makeApiHandler({
-  GET: async (req, res: NextApiResponse<Buffer<ArrayBufferLike>>) => {
+export default makeProtectedApiHandler({
+  GET: async (user, req, res: NextApiResponse<Buffer<ArrayBufferLike>>) => {
     const profilePid = req.query.profilePid as string;
     const template = req.query.template as ResumeTemplate;
     const fullProfile = await prisma.profile.findUnique({

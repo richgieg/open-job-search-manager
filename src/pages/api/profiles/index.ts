@@ -1,14 +1,14 @@
 import type { NextApiResponse } from "next";
 import { Profile } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendResponse } from "@/lib";
+import { makeProtectedApiHandler, prisma, sendResponse } from "@/lib";
 
-export default makeApiHandler({
-  GET: async (req, res: NextApiResponse<Profile[]>) => {
+export default makeProtectedApiHandler({
+  GET: async (user, req, res: NextApiResponse<Profile[]>) => {
     const profiles = await prisma.profile.findMany();
     return sendResponse(res, 200, profiles);
   },
 
-  POST: async (req, res: NextApiResponse<Profile>) => {
+  POST: async (user, req, res: NextApiResponse<Profile>) => {
     const profile = await prisma.profile.create({
       data: {
         profileName: "",

@@ -1,9 +1,14 @@
 import { ApplicationQuestion, Prisma } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 import { NextApiResponse } from "next";
 
-export default makeApiHandler({
-  PUT: async (req, res: NextApiResponse<ApplicationQuestion>) => {
+export default makeProtectedApiHandler({
+  PUT: async (user, req, res: NextApiResponse<ApplicationQuestion>) => {
     const applicationQuestionPid = req.query.applicationQuestionPid as string;
     try {
       const instructor = await prisma.applicationQuestion.update({
@@ -22,7 +27,7 @@ export default makeApiHandler({
     }
   },
 
-  DELETE: async (req, res: NextApiResponse<void>) => {
+  DELETE: async (user, req, res: NextApiResponse<void>) => {
     const applicationQuestionPid = req.query.applicationQuestionPid as string;
     try {
       await prisma.applicationQuestion.delete({

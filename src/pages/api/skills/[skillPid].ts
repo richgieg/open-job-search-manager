@@ -1,9 +1,14 @@
 import { Prisma, Skill } from "@/generated/prisma";
-import { makeApiHandler, prisma, sendError, sendResponse } from "@/lib";
+import {
+  makeProtectedApiHandler,
+  prisma,
+  sendError,
+  sendResponse,
+} from "@/lib";
 import { NextApiResponse } from "next";
 
-export default makeApiHandler({
-  PUT: async (req, res: NextApiResponse<Skill>) => {
+export default makeProtectedApiHandler({
+  PUT: async (user, req, res: NextApiResponse<Skill>) => {
     const skillPid = req.query.skillPid as string;
     try {
       const skill = await prisma.skill.update({
@@ -22,7 +27,7 @@ export default makeApiHandler({
     }
   },
 
-  DELETE: async (req, res: NextApiResponse<void>) => {
+  DELETE: async (user, req, res: NextApiResponse<void>) => {
     const skillPid = req.query.skillPid as string;
     try {
       await prisma.skill.delete({
