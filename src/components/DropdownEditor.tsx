@@ -27,7 +27,9 @@ export function DropdownEditor<T extends string | null>({
           value !== originalValue && "border-orange-400"
         }`}
         value={value ?? ""}
-        onChange={(e) => setValue(e.target.value as T)}
+        onChange={(e) =>
+          setValue((e.target.value ? e.target.value : null) as T)
+        }
       >
         {includeEmptyOption && <option value=""></option>}
         {options.map((o) => (
