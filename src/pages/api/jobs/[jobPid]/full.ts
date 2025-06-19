@@ -11,6 +11,7 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema } from "@/schemas";
 import { NextApiResponse } from "next";
 
 type FullJob = Job & {
@@ -22,9 +23,12 @@ type FullJob = Job & {
 
 export default makeProtectedApiHandler({
   GET: async (user, req, res: NextApiResponse<FullJob>) => {
-    const jobPid = req.query.jobPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.jobPid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     const fullJob = await prisma.job.findUnique({
-      where: { pid: jobPid, userId: user.id },
+      where: { pid: validatedPid.data, userId: user.id },
       include: {
         applicationQuestions: { orderBy: { sortOrder: "asc" } },
         contacts: { orderBy: { sortOrder: "asc" } },

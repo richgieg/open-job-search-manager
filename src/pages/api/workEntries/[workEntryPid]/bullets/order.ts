@@ -6,18 +6,31 @@ import {
   sendResponse,
 } from "@/lib";
 import { Prisma } from "@/generated/prisma";
+import { z } from "zod";
+import { pidSchema } from "@/schemas";
+
+const updateSchema = z.object({
+  orderedPids: z.array(pidSchema),
+});
 
 export default makeProtectedApiHandler({
   PUT: async (user, req, res: NextApiResponse<void>) => {
-    const workEntryPid = req.query.workEntryPid as string;
-    const orderedPids = req.body.orderedPids as string[];
+    const validatedPid = pidSchema.safeParse(req.query.workEntryPid);
+    const validatedBody = updateSchema.safeParse(req.body);
+    if (!validatedPid.success || !validatedBody.success) {
+      return sendError(res, 400);
+    }
+    const { orderedPids } = validatedBody.data;
     try {
       await prisma.$transaction(
         orderedPids.map((pid, index) =>
           prisma.workEntryBullet.update({
             where: {
               pid,
-              workEntry: { pid: workEntryPid, profile: { userId: user.id } },
+              workEntry: {
+                pid: validatedPid.data,
+                profile: { userId: user.id },
+              },
             },
             data: { sortOrder: index },
           })

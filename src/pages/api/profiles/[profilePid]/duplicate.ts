@@ -5,13 +5,17 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema } from "@/schemas";
 import { NextApiResponse } from "next";
 
 export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<Profile>) => {
-    const profilePid = req.query.profilePid as string;
+    const validatedPid = pidSchema.safeParse(req.query.profilePid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     const original = await prisma.profile.findUnique({
-      where: { pid: profilePid, userId: user.id },
+      where: { pid: validatedPid.data, userId: user.id },
       include: {
         workEntries: {
           orderBy: { sortOrder: "asc" },

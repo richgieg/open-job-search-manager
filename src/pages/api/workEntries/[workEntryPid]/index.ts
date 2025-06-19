@@ -5,15 +5,32 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { jobArrangementSchema, jobTypeSchema, pidSchema } from "@/schemas";
 import { NextApiResponse } from "next";
+import { z } from "zod";
+
+const updateSchema = z.object({
+  companyName: z.string().optional(),
+  companyLocation: z.string().optional(),
+  title: z.string().optional(),
+  type: jobTypeSchema.optional(),
+  arrangement: jobArrangementSchema.optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().nullable().optional(),
+  enabled: z.boolean().optional(),
+});
 
 export default makeProtectedApiHandler({
   PUT: async (user, req, res: NextApiResponse<WorkEntry>) => {
-    const workEntryPid = req.query.workEntryPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.workEntryPid);
+    const validatedBody = updateSchema.safeParse(req.body);
+    if (!validatedPid.success || !validatedBody.success) {
+      return sendError(res, 400);
+    }
     try {
       const workEntry = await prisma.workEntry.update({
-        where: { pid: workEntryPid, profile: { userId: user.id } },
-        data: req.body,
+        where: { pid: validatedPid.data, profile: { userId: user.id } },
+        data: validatedBody.data,
       });
       return res.status(200).json(workEntry);
     } catch (error) {
@@ -28,10 +45,13 @@ export default makeProtectedApiHandler({
   },
 
   DELETE: async (user, req, res: NextApiResponse<void>) => {
-    const workEntryPid = req.query.workEntryPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.workEntryPid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     try {
       await prisma.workEntry.delete({
-        where: { pid: workEntryPid, profile: { userId: user.id } },
+        where: { pid: validatedPid.data, profile: { userId: user.id } },
       });
       return sendResponse(res, 204);
     } catch (error) {

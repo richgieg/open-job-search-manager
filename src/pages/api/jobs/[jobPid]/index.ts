@@ -6,14 +6,41 @@ import {
   sendResponse,
 } from "@/lib";
 import { Job, Prisma } from "@/generated/prisma";
+import { z } from "zod";
+import {
+  jobArrangementSchema,
+  jobStatusSchema,
+  jobTypeSchema,
+  pidSchema,
+} from "@/schemas";
+
+const updateSchema = z.object({
+  title: z.string().optional(),
+  company: z.string().optional(),
+  location: z.string().optional(),
+  type: jobTypeSchema.nullable().optional(),
+  arrangement: jobArrangementSchema.nullable().optional(),
+  staffingCompany: z.string().optional(),
+  description: z.string().optional(),
+  postedDate: z.string().nullable().optional(),
+  appliedDate: z.string().nullable().optional(),
+  status: jobStatusSchema.optional(),
+  notes: z.string().optional(),
+  postedSalary: z.string().optional(),
+  desiredSalary: z.string().optional(),
+});
 
 export default makeProtectedApiHandler({
   PUT: async (user, req, res: NextApiResponse<Job>) => {
-    const jobPid = req.query.jobPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.jobPid);
+    const validatedBody = updateSchema.safeParse(req.body);
+    if (!validatedPid.success || !validatedBody.success) {
+      return sendError(res, 400);
+    }
     try {
       const job = await prisma.job.update({
-        where: { pid: jobPid, userId: user.id },
-        data: req.body,
+        where: { pid: validatedPid.data, userId: user.id },
+        data: validatedBody.data,
       });
       return res.status(200).json(job);
     } catch (error) {
@@ -28,10 +55,13 @@ export default makeProtectedApiHandler({
   },
 
   DELETE: async (user, req, res: NextApiResponse<void>) => {
-    const jobPid = req.query.jobPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.jobPid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     try {
       await prisma.job.delete({
-        where: { pid: jobPid, userId: user.id },
+        where: { pid: validatedPid.data, userId: user.id },
       });
       return sendResponse(res, 204);
     } catch (error) {

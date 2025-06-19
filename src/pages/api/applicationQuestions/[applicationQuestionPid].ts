@@ -5,15 +5,26 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema } from "@/schemas";
 import { NextApiResponse } from "next";
+import { z } from "zod";
+
+const updateSchema = z.object({
+  question: z.string().optional(),
+  answer: z.string().optional(),
+});
 
 export default makeProtectedApiHandler({
   PUT: async (user, req, res: NextApiResponse<ApplicationQuestion>) => {
-    const applicationQuestionPid = req.query.applicationQuestionPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.applicationQuestionPid);
+    const validatedBody = updateSchema.safeParse(req.body);
+    if (!validatedPid.success || !validatedBody.success) {
+      return sendError(res, 400);
+    }
     try {
       const applicationQuestion = await prisma.applicationQuestion.update({
-        where: { pid: applicationQuestionPid, job: { userId: user.id } },
-        data: req.body,
+        where: { pid: validatedPid.data, job: { userId: user.id } },
+        data: validatedBody.data,
       });
       return res.status(200).json(applicationQuestion);
     } catch (error) {
@@ -28,10 +39,13 @@ export default makeProtectedApiHandler({
   },
 
   DELETE: async (user, req, res: NextApiResponse<void>) => {
-    const applicationQuestionPid = req.query.applicationQuestionPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.applicationQuestionPid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     try {
       await prisma.applicationQuestion.delete({
-        where: { pid: applicationQuestionPid, job: { userId: user.id } },
+        where: { pid: validatedPid.data, job: { userId: user.id } },
       });
       return sendResponse(res, 204);
     } catch (error) {

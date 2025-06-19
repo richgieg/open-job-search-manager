@@ -5,13 +5,17 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema } from "@/schemas";
 import { NextApiResponse } from "next";
 
 export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<Resume>) => {
-    const resumePid = req.query.resumePid as string;
+    const validatedPid = pidSchema.safeParse(req.query.resumePid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     const original = await prisma.resume.findUnique({
-      where: { pid: resumePid, job: { userId: user.id } },
+      where: { pid: validatedPid.data, job: { userId: user.id } },
       include: {
         workEntries: {
           orderBy: { sortOrder: "asc" },

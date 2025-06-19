@@ -6,12 +6,16 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema } from "@/schemas";
 
 export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<Link>) => {
-    const jobPid = req.query.jobPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.jobPid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     const maxSortOrderEntry = await prisma.link.findFirst({
-      where: { job: { pid: jobPid, userId: user.id } },
+      where: { job: { pid: validatedPid.data, userId: user.id } },
       orderBy: { sortOrder: "desc" },
     });
     const sortOrder = (maxSortOrderEntry?.sortOrder ?? -1) + 1;
@@ -22,7 +26,7 @@ export default makeProtectedApiHandler({
           url: "",
           sortOrder,
           job: {
-            connect: { pid: jobPid, userId: user.id },
+            connect: { pid: validatedPid.data, userId: user.id },
           },
         },
       });

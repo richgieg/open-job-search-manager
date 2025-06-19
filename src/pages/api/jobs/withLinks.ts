@@ -13,6 +13,6 @@ export default makeProtectedApiHandler({
         links: true,
       },
     });
-    return sendResponse(res, 201, jobs);
+    return sendResponse(res, 200, jobs);
   },
 });

@@ -8,12 +8,24 @@ import {
   template02_makeDocument,
   template02_resume,
 } from "@/templates";
+import { pidSchema } from "@/schemas";
+import { z } from "zod";
+
+const querySchema = z.object({
+  contactPid: pidSchema,
+  timezoneOffset: z.coerce.number().int(),
+  includeResume: z.boolean(),
+});
 
 export default makeProtectedApiHandler({
   GET: async (user, req, res: NextApiResponse<Buffer<ArrayBufferLike>>) => {
-    const resumePid = req.query.resumePid as string;
+    const validatedPid = pidSchema.safeParse(req.query.resumePid);
+    const validatedQuery = querySchema.safeParse(req.query);
+    if (!validatedPid.success || !validatedQuery.success) {
+      return sendError(res, 400);
+    }
     const fullResume = await prisma.resume.findUnique({
-      where: { pid: resumePid, job: { userId: user.id } },
+      where: { pid: validatedPid.data, job: { userId: user.id } },
       include: {
         workEntries: {
           orderBy: { sortOrder: "asc" },
@@ -35,15 +47,13 @@ export default makeProtectedApiHandler({
     if (!fullResume) {
       return sendError(res, 404);
     }
-    const contactPid = req.query.contactPid as string;
+    const { contactPid, timezoneOffset, includeResume } = validatedQuery.data;
     const contact = await prisma.contact.findUnique({
       where: { pid: contactPid },
     });
     if (!contact) {
       return sendError(res, 404);
     }
-    const timezoneOffset = Number(req.query.timezoneOffset as string);
-    const includeResume = req.query.includeResume;
 
     let makeCoverLetter;
     let makeResume;

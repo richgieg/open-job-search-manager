@@ -5,15 +5,28 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema } from "@/schemas";
 import { NextApiResponse } from "next";
+import { z } from "zod";
+
+const updateSchema = z.object({
+  title: z.string().optional(),
+  issuer: z.string().optional(),
+  issueDate: z.string().optional(),
+  enabled: z.boolean().optional(),
+});
 
 export default makeProtectedApiHandler({
   PUT: async (user, req, res: NextApiResponse<Certification>) => {
-    const certificationPid = req.query.certificationPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.certificationPid);
+    const validatedBody = updateSchema.safeParse(req.body);
+    if (!validatedPid.success || !validatedBody.success) {
+      return sendError(res, 400);
+    }
     try {
       const certification = await prisma.certification.update({
-        where: { pid: certificationPid, profile: { userId: user.id } },
-        data: req.body,
+        where: { pid: validatedPid.data, profile: { userId: user.id } },
+        data: validatedBody.data,
       });
       return res.status(200).json(certification);
     } catch (error) {
@@ -28,10 +41,13 @@ export default makeProtectedApiHandler({
   },
 
   DELETE: async (user, req, res: NextApiResponse<void>) => {
-    const certificationPid = req.query.certificationPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.certificationPid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     try {
       await prisma.certification.delete({
-        where: { pid: certificationPid, profile: { userId: user.id } },
+        where: { pid: validatedPid.data, profile: { userId: user.id } },
       });
       return sendResponse(res, 204);
     } catch (error) {

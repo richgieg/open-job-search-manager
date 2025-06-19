@@ -6,11 +6,21 @@ import {
   sendResponse,
 } from "@/lib";
 import { Prisma } from "@/generated/prisma";
+import { z } from "zod";
+import { pidSchema } from "@/schemas";
+
+const updateSchema = z.object({
+  orderedPids: z.array(pidSchema),
+});
 
 export default makeProtectedApiHandler({
   PUT: async (user, req, res: NextApiResponse<void>) => {
-    const skillCategoryPid = req.query.skillCategoryPid as string;
-    const orderedPids = req.body.orderedPids as string[];
+    const validatedPid = pidSchema.safeParse(req.query.skillCategoryPid);
+    const validatedBody = updateSchema.safeParse(req.body);
+    if (!validatedPid.success || !validatedBody.success) {
+      return sendError(res, 400);
+    }
+    const { orderedPids } = validatedBody.data;
     try {
       await prisma.$transaction(
         orderedPids.map((pid, index) =>
@@ -18,7 +28,7 @@ export default makeProtectedApiHandler({
             where: {
               pid,
               skillCategory: {
-                pid: skillCategoryPid,
+                pid: validatedPid.data,
                 resume: { job: { userId: user.id } },
               },
             },
