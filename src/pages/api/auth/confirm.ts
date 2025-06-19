@@ -1,5 +1,3 @@
-import { type EmailOtpType } from "@supabase/supabase-js";
-
 import { createClient } from "@/lib/supabase/api";
 import { makeApiHandler } from "@/lib";
 
@@ -11,23 +9,19 @@ export default makeApiHandler({
   GET: async (req, res) => {
     const queryParams = req.query;
     const token_hash = stringOrFirstString(queryParams.token_hash);
-    const type = stringOrFirstString(queryParams.type);
-
     let next = "/error";
-
-    if (token_hash && type) {
+    if (token_hash) {
       const supabase = createClient(req, res);
       const { error } = await supabase.auth.verifyOtp({
-        type: type as EmailOtpType,
+        type: "email",
         token_hash,
       });
       if (error) {
         console.error(error);
       } else {
-        next = stringOrFirstString(queryParams.next) || "/";
+        next = "/";
       }
     }
-
     res.redirect(next);
   },
 });
