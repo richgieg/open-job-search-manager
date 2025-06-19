@@ -12,7 +12,7 @@ export default makeProtectedApiHandler({
     const workEntryPid = req.query.workEntryPid as string;
     try {
       const workEntry = await prisma.resumeWorkEntry.update({
-        where: { pid: workEntryPid },
+        where: { pid: workEntryPid, resume: { job: { userId: user.id } } },
         data: req.body,
       });
       return res.status(200).json(workEntry);
@@ -31,7 +31,7 @@ export default makeProtectedApiHandler({
     const workEntryPid = req.query.workEntryPid as string;
     try {
       await prisma.resumeWorkEntry.delete({
-        where: { pid: workEntryPid },
+        where: { pid: workEntryPid, resume: { job: { userId: user.id } } },
       });
       return sendResponse(res, 204);
     } catch (error) {

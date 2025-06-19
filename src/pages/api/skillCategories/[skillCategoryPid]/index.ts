@@ -12,7 +12,7 @@ export default makeProtectedApiHandler({
     const skillCategoryPid = req.query.skillCategoryPid as string;
     try {
       const skillCategory = await prisma.skillCategory.update({
-        where: { pid: skillCategoryPid },
+        where: { pid: skillCategoryPid, profile: { userId: user.id } },
         data: req.body,
       });
       return res.status(200).json(skillCategory);
@@ -31,7 +31,7 @@ export default makeProtectedApiHandler({
     const skillCategoryPid = req.query.skillCategoryPid as string;
     try {
       await prisma.skillCategory.delete({
-        where: { pid: skillCategoryPid },
+        where: { pid: skillCategoryPid, profile: { userId: user.id } },
       });
       return sendResponse(res, 204);
     } catch (error) {

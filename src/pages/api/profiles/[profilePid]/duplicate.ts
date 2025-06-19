@@ -11,7 +11,7 @@ export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<Profile>) => {
     const profilePid = req.query.profilePid as string;
     const original = await prisma.profile.findUnique({
-      where: { pid: profilePid },
+      where: { pid: profilePid, userId: user.id },
       include: {
         workEntries: {
           orderBy: { sortOrder: "asc" },

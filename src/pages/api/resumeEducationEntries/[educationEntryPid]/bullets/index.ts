@@ -12,7 +12,12 @@ export default makeProtectedApiHandler({
     const educationEntryPid = req.query.educationEntryPid as string;
     const maxSortOrderEntry = await prisma.resumeEducationEntryBullet.findFirst(
       {
-        where: { educationEntry: { pid: educationEntryPid } },
+        where: {
+          educationEntry: {
+            pid: educationEntryPid,
+            resume: { job: { userId: user.id } },
+          },
+        },
         orderBy: { sortOrder: "desc" },
       }
     );
@@ -25,7 +30,10 @@ export default makeProtectedApiHandler({
             enabled: true,
             sortOrder,
             educationEntry: {
-              connect: { pid: educationEntryPid },
+              connect: {
+                pid: educationEntryPid,
+                resume: { job: { userId: user.id } },
+              },
             },
           },
         });

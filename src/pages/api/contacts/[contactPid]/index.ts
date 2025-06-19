@@ -12,7 +12,7 @@ export default makeProtectedApiHandler({
     const contactPid = req.query.contactPid as string;
     try {
       const contact = await prisma.contact.update({
-        where: { pid: contactPid },
+        where: { pid: contactPid, job: { userId: user.id } },
         data: req.body,
       });
       return res.status(200).json(contact);
@@ -31,7 +31,7 @@ export default makeProtectedApiHandler({
     const contactPid = req.query.contactPid as string;
     try {
       await prisma.contact.delete({
-        where: { pid: contactPid },
+        where: { pid: contactPid, job: { userId: user.id } },
       });
       return sendResponse(res, 204);
     } catch (error) {

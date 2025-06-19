@@ -12,7 +12,7 @@ export default makeProtectedApiHandler({
     const profilePid = req.query.profilePid as string;
     try {
       const profile = await prisma.profile.update({
-        where: { pid: profilePid },
+        where: { pid: profilePid, userId: user.id },
         data: req.body,
       });
       return res.status(200).json(profile);
@@ -31,7 +31,7 @@ export default makeProtectedApiHandler({
     const profilePid = req.query.profilePid as string;
     try {
       await prisma.profile.delete({
-        where: { pid: profilePid },
+        where: { pid: profilePid, userId: user.id },
       });
       return sendResponse(res, 204);
     } catch (error) {

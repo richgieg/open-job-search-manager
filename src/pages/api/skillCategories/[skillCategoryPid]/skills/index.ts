@@ -11,7 +11,9 @@ export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<Skill>) => {
     const skillCategoryPid = req.query.skillCategoryPid as string;
     const maxSortOrderEntry = await prisma.skill.findFirst({
-      where: { skillCategory: { pid: skillCategoryPid } },
+      where: {
+        skillCategory: { pid: skillCategoryPid, profile: { userId: user.id } },
+      },
       orderBy: { sortOrder: "desc" },
     });
     const sortOrder = (maxSortOrderEntry?.sortOrder ?? -1) + 1;
@@ -22,7 +24,7 @@ export default makeProtectedApiHandler({
           enabled: true,
           sortOrder,
           skillCategory: {
-            connect: { pid: skillCategoryPid },
+            connect: { pid: skillCategoryPid, profile: { userId: user.id } },
           },
         },
       });

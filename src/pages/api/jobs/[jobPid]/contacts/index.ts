@@ -11,7 +11,7 @@ export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<Contact>) => {
     const jobPid = req.query.jobPid as string;
     const maxSortOrderEntry = await prisma.contact.findFirst({
-      where: { job: { pid: jobPid } },
+      where: { job: { pid: jobPid, userId: user.id } },
       orderBy: { sortOrder: "desc" },
     });
     const sortOrder = (maxSortOrderEntry?.sortOrder ?? -1) + 1;
@@ -29,7 +29,7 @@ export default makeProtectedApiHandler({
           addressLine4: "",
           sortOrder,
           job: {
-            connect: { pid: jobPid },
+            connect: { pid: jobPid, userId: user.id },
           },
         },
       });
