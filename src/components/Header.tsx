@@ -14,7 +14,7 @@ export function Header() {
       router.push("/");
     };
     return (
-      <header className="flex w-full gap-8">
+      <header className="flex w-full gap-8 p-8">
         <Link href="/">Home</Link>
         <Link href="/profiles">Profiles</Link>
         <Link href="/jobs">Jobs</Link>
@@ -23,11 +23,13 @@ export function Header() {
         </div>
       </header>
     );
-  } else {
+  } else if (user === null) {
     return (
-      <header className="text-right">
+      <header className="text-right p-8">
         <Link href="/login">Sign In</Link>
       </header>
     );
+  } else {
+    return <></>;
   }
 }
