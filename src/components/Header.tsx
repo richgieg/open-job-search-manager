@@ -26,10 +26,10 @@ export function Header() {
   } else if (user === null) {
     return (
       <header className="text-right p-8">
-        <Link href="/login">Sign In</Link>
+        <Link href="/signin">Sign In</Link>
       </header>
     );
   } else {
-    return <></>;
+    return <header className="p-8">&nbsp;</header>;
   }
 }
