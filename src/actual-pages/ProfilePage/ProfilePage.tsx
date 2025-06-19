@@ -12,6 +12,8 @@ import {
   WorkEntry,
   WorkEntryBullet,
 } from "@/generated/prisma";
+import Head from "next/head";
+import { t } from "@/translate";
 
 type FullProfile = Profile & {
   workEntries: (WorkEntry & { bullets: WorkEntryBullet[] })[];
@@ -42,6 +44,17 @@ export function ProfilePage() {
 
   return (
     <>
+      <Head>
+        {fullProfile && (
+          <title>
+            {fullProfile.profileName || t.profileNamePlaceholder} Profile -{" "}
+            {"Open Job Search Manager"}
+          </title>
+        )}
+        {!fullProfile && (
+          <title>Loading Profile... - Open Job Search Manager</title>
+        )}
+      </Head>
       <Header />
       {fullProfile && (
         <MainContent

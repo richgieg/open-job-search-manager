@@ -3,6 +3,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { TextInput } from "@/components/TextInput";
 import { useUser } from "@/contexts/UserContext";
 import { createClient } from "@/lib/supabase/component";
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { FormEvent, useEffect, useRef, useState } from "react";
@@ -39,7 +40,10 @@ export function SignInPage() {
   };
 
   return (
-    <div>
+    <>
+      <Head>
+        <title>Sign In - Open Job Search Manager</title>
+      </Head>
       <Header />
       <form
         className="flex flex-col gap-4 w-96 mx-auto"
@@ -73,6 +77,6 @@ export function SignInPage() {
           </div>
         )}
       </form>
-    </div>
+    </>
   );
 }

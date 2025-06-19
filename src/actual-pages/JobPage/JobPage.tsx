@@ -10,6 +10,8 @@ import {
   Profile,
   Resume,
 } from "@/generated/prisma";
+import Head from "next/head";
+import { t } from "@/translate";
 
 type FullJob = Job & {
   resumes: Resume[];
@@ -50,6 +52,16 @@ export function JobPage() {
 
   return (
     <>
+      <Head>
+        {fullJob && (
+          <title>
+            {fullJob.title || t.jobTitlePlaceholder}{" "}
+            {fullJob.company ? `at ${fullJob.company}` : ""} -{" "}
+            {"Open Job Search Manager"}
+          </title>
+        )}
+        {!fullJob && <title>Loading Job... - Open Job Search Manager</title>}
+      </Head>
       <Header />
       {fullJob && profiles && (
         <MainContent
