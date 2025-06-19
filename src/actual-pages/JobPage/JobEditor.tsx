@@ -116,7 +116,7 @@ export function JobEditor({ job, updateJob }: Props) {
         translations={t.jobStatus}
       />
       <TextEditor
-        label="Salary"
+        label="Posted Salary"
         value={postedSalary}
         setValue={setPostedSalary}
         originalValue={job.postedSalary}
