@@ -17,6 +17,8 @@ import {
   ResumeWorkEntry,
   ResumeWorkEntryBullet,
 } from "@/generated/prisma";
+import Head from "next/head";
+import { t } from "@/translate";
 
 type FullResume = Resume & {
   workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
@@ -69,6 +71,19 @@ export function ResumePage() {
 
   return (
     <>
+      <Head>
+        {fullResume && (
+          <title>
+            {fullResume.resumeName || t.resumeNamePlaceholder} -{" "}
+            {fullResume.job.title || t.jobTitlePlaceholder}{" "}
+            {fullResume.job.company ? `at ${fullResume.job.company}` : ""} -{" "}
+            {"Jobs - Open Job Search Manager"}
+          </title>
+        )}
+        {!fullResume && (
+          <title>Loading Resume... - Open Job Search Manager</title>
+        )}
+      </Head>
       <Header />
       {fullResume && fullJob && (
         <MainContent

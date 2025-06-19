@@ -3,7 +3,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { Job, Link } from "@/generated/prisma";
 import { t } from "@/translate";
 import NextLink from "next/link";
-import React, { FormEvent, ReactNode, useCallback } from "react";
+import React, { FormEvent, ReactNode } from "react";
 
 type JobWithLinks = Job & { links: Link[] };
 
@@ -19,7 +19,7 @@ export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
       method: "POST",
     });
     const job: Job = await response.json();
-    setJobsWithLinks([...jobsWithLinks, { ...job, links: [] }]);
+    setJobsWithLinks([{ ...job, links: [] }, ...jobsWithLinks]);
   };
 
   const deleteJob = async (job: Job) => {
@@ -36,7 +36,9 @@ export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
   return (
     <div className="px-8 pb-28">
       <SectionHeading text="Jobs" />
-      <ScrollToBottomButton />
+      <form onSubmit={createJob} className="mt-6">
+        <button type="submit">New Job</button>
+      </form>
       <div className="mt-6 flex flex-col gap-6">
         {jobsWithLinks.length > 0 && (
           <table className="table-auto border border-collapse border-gray-300 text-sm">
@@ -119,9 +121,6 @@ export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
             </tbody>
           </table>
         )}
-        <form onSubmit={createJob}>
-          <button type="submit">New Job</button>
-        </form>
       </div>
     </div>
   );
@@ -146,15 +145,4 @@ function TableDataCell({ children, className }: TableCellProps) {
       {children}
     </td>
   );
-}
-
-function ScrollToBottomButton() {
-  const scrollToBottom = useCallback(() => {
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: "smooth",
-    });
-  }, []);
-
-  return <button onClick={scrollToBottom}>Scroll to Bottom</button>;
 }

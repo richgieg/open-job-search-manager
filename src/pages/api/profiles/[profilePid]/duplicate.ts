@@ -39,7 +39,7 @@ export default makeProtectedApiHandler({
       const newProfile = await tx.profile.create({
         data: {
           userId: original.userId,
-          profileName: original.profileName,
+          profileName: `${original.profileName} (Copy)`,
           jobTitle: original.jobTitle,
           name: original.name,
           location: original.location,

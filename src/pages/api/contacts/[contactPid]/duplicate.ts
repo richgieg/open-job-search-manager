@@ -23,6 +23,7 @@ export default makeProtectedApiHandler({
     const contact = await prisma.contact.create({
       data: {
         ...original,
+        name: `${original.name} (Copy)`,
         id: undefined,
         pid: undefined,
       },
