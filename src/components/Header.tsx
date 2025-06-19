@@ -1,14 +1,12 @@
+import { useUser } from "@/contexts/UserContext";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-type Props = {
-  email?: string;
-};
-
-export function Header({ email }: Props) {
+export function Header() {
+  const user = useUser();
   const router = useRouter();
 
-  if (email) {
+  if (user) {
     const logOut = async () => {
       const res = await fetch("/api/logout", {
         method: "POST",
@@ -26,7 +24,7 @@ export function Header({ email }: Props) {
         <Link href="/profiles">Profiles</Link>
         <Link href="/jobs">Jobs</Link>
         <div className="ml-auto">
-          {email} | <button onClick={logOut}>Log Out</button>
+          {user.email} | <button onClick={logOut}>Log Out</button>
         </div>
       </div>
     );
