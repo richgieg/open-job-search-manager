@@ -1,40 +1,35 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useUser } from "@/contexts/UserContext";
+import { createClient } from "@/lib/supabase/component";
 
-type Props = {
-  email?: string;
-};
-
-export function Header({ email }: Props) {
+export function Header() {
+  const user = useUser();
   const router = useRouter();
 
-  if (email) {
+  if (user) {
     const logOut = async () => {
-      const res = await fetch("/api/logout", {
-        method: "POST",
-      });
-
-      if (res.ok) {
-        router.push("/");
-      } else {
-        alert("Could not log out!");
-      }
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      router.push("/");
     };
     return (
-      <div className="flex w-full gap-8">
-        <Link href="/dashboard">Dashboard</Link>
+      <header className="flex w-full gap-8 p-8">
+        <Link href="/">Home</Link>
         <Link href="/profiles">Profiles</Link>
         <Link href="/jobs">Jobs</Link>
         <div className="ml-auto">
-          {email} | <button onClick={logOut}>Log Out</button>
+          {user.email} | <button onClick={logOut}>Sign Out</button>
         </div>
-      </div>
+      </header>
+    );
+  } else if (user === null) {
+    return (
+      <header className="text-right p-8">
+        <Link href="/login">Sign In</Link>
+      </header>
     );
   } else {
-    return (
-      <div className="text-right">
-        <Link href="/login">Log In</Link>
-      </div>
-    );
+    return <></>;
   }
 }
