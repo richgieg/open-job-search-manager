@@ -8,18 +8,22 @@ export function HomePage() {
       <Head>
         <title>Open Job Search Manager – Under Construction</title>
       </Head>
-      <div className="flex flex-col h-dvh">
+      <div className="relative">
         <Header></Header>
         <div
           style={{
+            position: "absolute",
+            top: "0",
+            width: "100%",
+            height: "100dvh",
             display: "flex",
-            flexGrow: "1",
             alignItems: "center",
             justifyContent: "center",
             flexDirection: "column",
             fontFamily: "sans-serif",
             textAlign: "center",
             padding: "1rem",
+            pointerEvents: "none",
           }}
         >
           <Image
@@ -45,6 +49,7 @@ export function HomePage() {
               fontSize: "1rem",
               color: "#0070f3",
               textDecoration: "none",
+              pointerEvents: "initial",
             }}
           >
             View on GitHub →
