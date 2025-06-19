@@ -3,7 +3,8 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { Job, Link } from "@/generated/prisma";
 import { t } from "@/translate";
 import NextLink from "next/link";
-import React, { FormEvent, ReactNode, useCallback } from "react";
+import React, { FormEvent, ReactNode } from "react";
+import { ScrollToBottomButton } from "./ScrollToBottomButton";
 
 type JobWithLinks = Job & { links: Link[] };
 
@@ -146,15 +147,4 @@ function TableDataCell({ children, className }: TableCellProps) {
       {children}
     </td>
   );
-}
-
-function ScrollToBottomButton() {
-  const scrollToBottom = useCallback(() => {
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: "smooth",
-    });
-  }, []);
-
-  return <button onClick={scrollToBottom}>Scroll to Bottom</button>;
 }
