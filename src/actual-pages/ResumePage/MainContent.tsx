@@ -228,7 +228,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const createWorkEntry = async () => {
-    const response = await fetch(`/api/resumes/${fullResume.id}/workEntries`, {
+    const response = await fetch(`/api/resumes/${fullResume.pid}/workEntries`, {
       method: "POST",
     });
     const workEntry: ResumeWorkEntry = await response.json();
@@ -269,15 +269,12 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const deleteWorkEntry = async (workEntry: ResumeWorkEntry) => {
-    const response = await fetch(`/api/resumeWorkEntries/${workEntry.id}`, {
+    await fetch(`/api/resumeWorkEntries/${workEntry.pid}`, {
       method: "DELETE",
     });
-    const deletedWorkEntry: ResumeWorkEntry = await response.json();
     setFullResume({
       ...fullResume,
-      workEntries: fullResume.workEntries.filter(
-        (workEntry) => workEntry.id !== deletedWorkEntry.id
-      ),
+      workEntries: fullResume.workEntries.filter((w) => w.id !== workEntry.id),
     });
   };
 
