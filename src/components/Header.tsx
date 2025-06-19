@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useUser } from "@/contexts/UserContext";
+import { createClient } from "@/lib/supabase/component";
 
 export function Header() {
   const user = useUser();
@@ -8,15 +9,9 @@ export function Header() {
 
   if (user) {
     const logOut = async () => {
-      const res = await fetch("/api/logout", {
-        method: "POST",
-      });
-
-      if (res.ok) {
-        router.push("/");
-      } else {
-        alert("Could not log out!");
-      }
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      router.push("/");
     };
     return (
       <header className="flex w-full gap-8">
@@ -24,14 +19,14 @@ export function Header() {
         <Link href="/profiles">Profiles</Link>
         <Link href="/jobs">Jobs</Link>
         <div className="ml-auto">
-          {user.email} | <button onClick={logOut}>Log Out</button>
+          {user.email} | <button onClick={logOut}>Sign Out</button>
         </div>
       </header>
     );
   } else {
     return (
       <header className="text-right">
-        <Link href="/login">Log In</Link>
+        <Link href="/login">Sign In</Link>
       </header>
     );
   }
