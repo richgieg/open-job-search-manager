@@ -16,7 +16,7 @@ const updateSchema = z.object({
   type: jobTypeSchema.optional(),
   arrangement: jobArrangementSchema.optional(),
   startDate: z.string().optional(),
-  endDate: z.string().optional(),
+  endDate: z.string().nullable().optional(),
   enabled: z.boolean().optional(),
 });
 
