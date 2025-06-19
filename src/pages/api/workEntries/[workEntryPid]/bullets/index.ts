@@ -11,7 +11,7 @@ export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<WorkEntryBullet>) => {
     const workEntryPid = req.query.workEntryPid as string;
     const maxSortOrderEntry = await prisma.workEntryBullet.findFirst({
-      where: { workEntry: { pid: workEntryPid } },
+      where: { workEntry: { pid: workEntryPid, profile: { userId: user.id } } },
       orderBy: { sortOrder: "desc" },
     });
     const sortOrder = (maxSortOrderEntry?.sortOrder ?? -1) + 1;
@@ -22,7 +22,7 @@ export default makeProtectedApiHandler({
           enabled: true,
           sortOrder,
           workEntry: {
-            connect: { pid: workEntryPid },
+            connect: { pid: workEntryPid, profile: { userId: user.id } },
           },
         },
       });

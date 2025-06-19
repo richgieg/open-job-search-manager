@@ -11,11 +11,11 @@ export default makeProtectedApiHandler({
   PUT: async (user, req, res: NextApiResponse<ApplicationQuestion>) => {
     const applicationQuestionPid = req.query.applicationQuestionPid as string;
     try {
-      const instructor = await prisma.applicationQuestion.update({
-        where: { pid: applicationQuestionPid },
+      const applicationQuestion = await prisma.applicationQuestion.update({
+        where: { pid: applicationQuestionPid, job: { userId: user.id } },
         data: req.body,
       });
-      return res.status(200).json(instructor);
+      return res.status(200).json(applicationQuestion);
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -31,7 +31,7 @@ export default makeProtectedApiHandler({
     const applicationQuestionPid = req.query.applicationQuestionPid as string;
     try {
       await prisma.applicationQuestion.delete({
-        where: { pid: applicationQuestionPid },
+        where: { pid: applicationQuestionPid, job: { userId: user.id } },
       });
       return sendResponse(res, 204);
     } catch (error) {

@@ -12,7 +12,10 @@ export default makeProtectedApiHandler({
     const certificationPid = req.query.certificationPid as string;
     try {
       const certification = await prisma.resumeCertification.update({
-        where: { pid: certificationPid },
+        where: {
+          pid: certificationPid,
+          resume: { job: { userId: user.id } },
+        },
         data: req.body,
       });
       return res.status(200).json(certification);
@@ -31,7 +34,10 @@ export default makeProtectedApiHandler({
     const certificationPid = req.query.certificationPid as string;
     try {
       await prisma.resumeCertification.delete({
-        where: { pid: certificationPid },
+        where: {
+          pid: certificationPid,
+          resume: { job: { userId: user.id } },
+        },
       });
       return sendResponse(res, 204);
     } catch (error) {

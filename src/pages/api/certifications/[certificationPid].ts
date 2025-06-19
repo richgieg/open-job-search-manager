@@ -12,7 +12,7 @@ export default makeProtectedApiHandler({
     const certificationPid = req.query.certificationPid as string;
     try {
       const certification = await prisma.certification.update({
-        where: { pid: certificationPid },
+        where: { pid: certificationPid, profile: { userId: user.id } },
         data: req.body,
       });
       return res.status(200).json(certification);
@@ -31,7 +31,7 @@ export default makeProtectedApiHandler({
     const certificationPid = req.query.certificationPid as string;
     try {
       await prisma.certification.delete({
-        where: { pid: certificationPid },
+        where: { pid: certificationPid, profile: { userId: user.id } },
       });
       return sendResponse(res, 204);
     } catch (error) {

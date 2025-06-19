@@ -13,7 +13,7 @@ export default makeProtectedApiHandler({
     const profilePid = req.query.profilePid as string;
     const template = req.query.template as ResumeTemplate;
     const fullProfile = await prisma.profile.findUnique({
-      where: { pid: profilePid },
+      where: { pid: profilePid, userId: user.id },
       include: {
         workEntries: {
           orderBy: { sortOrder: "asc" },

@@ -11,7 +11,7 @@ export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<Contact>) => {
     const contactPid = req.query.contactPid as string;
     const original = await prisma.contact.findUnique({
-      where: { pid: contactPid },
+      where: { pid: contactPid, job: { userId: user.id } },
     });
     if (!original) {
       return sendError(res, 404);

@@ -11,7 +11,12 @@ export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<ResumeSkill>) => {
     const skillCategoryPid = req.query.skillCategoryPid as string;
     const maxSortOrderEntry = await prisma.resumeSkill.findFirst({
-      where: { skillCategory: { pid: skillCategoryPid } },
+      where: {
+        skillCategory: {
+          pid: skillCategoryPid,
+          resume: { job: { userId: user.id } },
+        },
+      },
       orderBy: { sortOrder: "desc" },
     });
     const sortOrder = (maxSortOrderEntry?.sortOrder ?? -1) + 1;
@@ -22,7 +27,10 @@ export default makeProtectedApiHandler({
           enabled: true,
           sortOrder,
           skillCategory: {
-            connect: { pid: skillCategoryPid },
+            connect: {
+              pid: skillCategoryPid,
+              resume: { job: { userId: user.id } },
+            },
           },
         },
       });

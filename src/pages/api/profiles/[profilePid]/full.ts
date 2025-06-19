@@ -27,7 +27,7 @@ export default makeProtectedApiHandler({
   GET: async (user, req, res: NextApiResponse<FullProfile>) => {
     const profilePid = req.query.profilePid as string;
     const fullProfile = await prisma.profile.findUnique({
-      where: { pid: profilePid },
+      where: { pid: profilePid, userId: user.id },
       include: {
         workEntries: {
           orderBy: { sortOrder: "asc" },

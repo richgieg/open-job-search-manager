@@ -13,7 +13,10 @@ export default makeProtectedApiHandler({
     try {
       const educationEntryBullet =
         await prisma.resumeEducationEntryBullet.update({
-          where: { pid: educationEntryBulletPid },
+          where: {
+            pid: educationEntryBulletPid,
+            educationEntry: { resume: { job: { userId: user.id } } },
+          },
           data: req.body,
         });
       return res.status(200).json(educationEntryBullet);
@@ -32,7 +35,10 @@ export default makeProtectedApiHandler({
     const educationEntryBulletPid = req.query.educationEntryBulletPid as string;
     try {
       await prisma.resumeEducationEntryBullet.delete({
-        where: { pid: educationEntryBulletPid },
+        where: {
+          pid: educationEntryBulletPid,
+          educationEntry: { resume: { job: { userId: user.id } } },
+        },
       });
       return sendResponse(res, 204);
     } catch (error) {

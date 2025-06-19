@@ -24,7 +24,7 @@ export default makeProtectedApiHandler({
   GET: async (user, req, res: NextApiResponse<FullJob>) => {
     const jobPid = req.query.jobPid as string;
     const fullJob = await prisma.job.findUnique({
-      where: { pid: jobPid },
+      where: { pid: jobPid, userId: user.id },
       include: {
         applicationQuestions: { orderBy: { sortOrder: "asc" } },
         contacts: { orderBy: { sortOrder: "asc" } },

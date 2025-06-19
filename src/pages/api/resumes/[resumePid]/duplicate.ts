@@ -11,7 +11,7 @@ export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<Resume>) => {
     const resumePid = req.query.resumePid as string;
     const original = await prisma.resume.findUnique({
-      where: { pid: resumePid },
+      where: { pid: resumePid, job: { userId: user.id } },
       include: {
         workEntries: {
           orderBy: { sortOrder: "asc" },

@@ -11,7 +11,12 @@ export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<EducationEntryBullet>) => {
     const educationEntryPid = req.query.educationEntryPid as string;
     const maxSortOrderEntry = await prisma.educationEntryBullet.findFirst({
-      where: { educationEntry: { pid: educationEntryPid } },
+      where: {
+        educationEntry: {
+          pid: educationEntryPid,
+          profile: { userId: user.id },
+        },
+      },
       orderBy: { sortOrder: "desc" },
     });
     const sortOrder = (maxSortOrderEntry?.sortOrder ?? -1) + 1;
@@ -22,7 +27,10 @@ export default makeProtectedApiHandler({
           enabled: true,
           sortOrder,
           educationEntry: {
-            connect: { pid: educationEntryPid },
+            connect: {
+              pid: educationEntryPid,
+              profile: { userId: user.id },
+            },
           },
         },
       });
