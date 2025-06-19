@@ -38,7 +38,7 @@ export default makeProtectedApiHandler({
     const duplicated = await prisma.$transaction(async (tx) => {
       const newResume = await tx.resume.create({
         data: {
-          resumeName: original.resumeName,
+          resumeName: `${original.resumeName} (Copy)`,
           name: original.name,
           location: original.location,
           phone: original.phone,
