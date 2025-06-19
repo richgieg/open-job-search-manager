@@ -57,7 +57,7 @@ export function JobPage() {
           <title>
             {fullJob.title || t.jobTitlePlaceholder}{" "}
             {fullJob.company ? `at ${fullJob.company}` : ""} -{" "}
-            {"Open Job Search Manager"}
+            {"Jobs - Open Job Search Manager"}
           </title>
         )}
         {!fullJob && <title>Loading Job... - Open Job Search Manager</title>}

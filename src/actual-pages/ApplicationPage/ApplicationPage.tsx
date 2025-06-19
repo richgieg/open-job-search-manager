@@ -53,8 +53,10 @@ export function ApplicationPage() {
       <Head>
         {fullResume && (
           <title>
-            {fullResume.resumeName || t.resumeNamePlaceholder} Application -{" "}
-            {"Open Job Search Manager"}
+            Application ({fullResume.resumeName || t.resumeNamePlaceholder}) -{" "}
+            {fullResume.job.title || t.jobTitlePlaceholder}{" "}
+            {fullResume.job.company ? `at ${fullResume.job.company}` : ""} -{" "}
+            {"Jobs - Open Job Search Manager"}
           </title>
         )}
         {!fullResume && (

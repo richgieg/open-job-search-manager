@@ -47,8 +47,8 @@ export function ProfilePage() {
       <Head>
         {fullProfile && (
           <title>
-            {fullProfile.profileName || t.profileNamePlaceholder} Profile -{" "}
-            {"Open Job Search Manager"}
+            {fullProfile.profileName || t.profileNamePlaceholder} -{" "}
+            {"Profiles - Open Job Search Manager"}
           </title>
         )}
         {!fullProfile && (

@@ -74,8 +74,10 @@ export function ResumePage() {
       <Head>
         {fullResume && (
           <title>
-            {fullResume.resumeName || t.resumeNamePlaceholder} Resume -{" "}
-            {"Open Job Search Manager"}
+            {fullResume.resumeName || t.resumeNamePlaceholder} -{" "}
+            {fullResume.job.title || t.jobTitlePlaceholder}{" "}
+            {fullResume.job.company ? `at ${fullResume.job.company}` : ""} -{" "}
+            {"Jobs - Open Job Search Manager"}
           </title>
         )}
         {!fullResume && (
