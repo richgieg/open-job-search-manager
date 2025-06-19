@@ -19,7 +19,7 @@ export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
       method: "POST",
     });
     const job: Job = await response.json();
-    setJobsWithLinks([...jobsWithLinks, { ...job, links: [] }]);
+    setJobsWithLinks([{ ...job, links: [] }, ...jobsWithLinks]);
   };
 
   const deleteJob = async (job: Job) => {
@@ -36,6 +36,9 @@ export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
   return (
     <div className="px-8 pb-28">
       <SectionHeading text="Jobs" />
+      <form onSubmit={createJob} className="mt-6">
+        <button type="submit">New Job</button>
+      </form>
       <div className="mt-6 flex flex-col gap-6">
         {jobsWithLinks.length > 0 && (
           <table className="table-auto border border-collapse border-gray-300 text-sm">
@@ -118,9 +121,6 @@ export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
             </tbody>
           </table>
         )}
-        <form onSubmit={createJob}>
-          <button type="submit">New Job</button>
-        </form>
       </div>
     </div>
   );
