@@ -4,7 +4,6 @@ import { Job, Link } from "@/generated/prisma";
 import { t } from "@/translate";
 import NextLink from "next/link";
 import React, { FormEvent, ReactNode } from "react";
-import { ScrollToBottomButton } from "./ScrollToBottomButton";
 
 type JobWithLinks = Job & { links: Link[] };
 
@@ -37,7 +36,6 @@ export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
   return (
     <div className="px-8 pb-28">
       <SectionHeading text="Jobs" />
-      <ScrollToBottomButton />
       <div className="mt-6 flex flex-col gap-6">
         {jobsWithLinks.length > 0 && (
           <table className="table-auto border border-collapse border-gray-300 text-sm">
