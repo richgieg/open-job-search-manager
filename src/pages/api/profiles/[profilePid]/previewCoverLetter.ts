@@ -1,4 +1,4 @@
-import { Contact, ResumeTemplate } from "@/generated/prisma";
+import { Contact } from "@/generated/prisma";
 import { makeProtectedApiHandler, prisma, sendError } from "@/lib";
 import { NextApiResponse } from "next";
 import {
@@ -7,12 +7,23 @@ import {
   template02_coverLetter,
   template02_makeDocument,
 } from "@/templates";
+import { pidSchema, resumeTemplateSchema } from "@/schemas";
+import { z } from "zod";
+
+const querySchema = z.object({
+  template: resumeTemplateSchema,
+  timezoneOffset: z.coerce.number().int(),
+});
 
 export default makeProtectedApiHandler({
   GET: async (user, req, res: NextApiResponse<Buffer<ArrayBufferLike>>) => {
-    const profilePid = req.query.profilePid as string;
+    const validatedPid = pidSchema.safeParse(req.query.profilePid);
+    const validatedQuery = querySchema.safeParse(req.query);
+    if (!validatedPid.success || !validatedQuery.success) {
+      return sendError(res, 400);
+    }
     const fullProfile = await prisma.profile.findUnique({
-      where: { pid: profilePid, userId: user.id },
+      where: { pid: validatedPid.data, userId: user.id },
       include: {
         workEntries: {
           orderBy: { sortOrder: "asc" },
@@ -33,8 +44,7 @@ export default makeProtectedApiHandler({
       return sendError(res, 404);
     }
 
-    const template = req.query.template as ResumeTemplate;
-    const timezoneOffset = Number(req.query.timezoneOffset as string);
+    const { template, timezoneOffset } = validatedQuery.data;
 
     const contact: Contact = {
       id: 0,

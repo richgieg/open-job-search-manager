@@ -5,19 +5,30 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema } from "@/schemas";
 import { NextApiResponse } from "next";
+import { z } from "zod";
+
+const updateSchema = z.object({
+  text: z.string().optional(),
+  enabled: z.boolean().optional(),
+});
 
 export default makeProtectedApiHandler({
   PUT: async (user, req, res: NextApiResponse<ResumeEducationEntryBullet>) => {
-    const educationEntryBulletPid = req.query.educationEntryBulletPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.educationEntryBulletPid);
+    const validatedBody = updateSchema.safeParse(req.body);
+    if (!validatedPid.success || !validatedBody.success) {
+      return sendError(res, 400);
+    }
     try {
       const educationEntryBullet =
         await prisma.resumeEducationEntryBullet.update({
           where: {
-            pid: educationEntryBulletPid,
+            pid: validatedPid.data,
             educationEntry: { resume: { job: { userId: user.id } } },
           },
-          data: req.body,
+          data: validatedBody.data,
         });
       return res.status(200).json(educationEntryBullet);
     } catch (error) {
@@ -32,11 +43,14 @@ export default makeProtectedApiHandler({
   },
 
   DELETE: async (user, req, res: NextApiResponse<void>) => {
-    const educationEntryBulletPid = req.query.educationEntryBulletPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.educationEntryBulletPid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     try {
       await prisma.resumeEducationEntryBullet.delete({
         where: {
-          pid: educationEntryBulletPid,
+          pid: validatedPid.data,
           educationEntry: { resume: { job: { userId: user.id } } },
         },
       });

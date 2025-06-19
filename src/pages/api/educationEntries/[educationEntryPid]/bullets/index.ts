@@ -6,14 +6,18 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema } from "@/schemas";
 
 export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<EducationEntryBullet>) => {
-    const educationEntryPid = req.query.educationEntryPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.educationEntryPid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     const maxSortOrderEntry = await prisma.educationEntryBullet.findFirst({
       where: {
         educationEntry: {
-          pid: educationEntryPid,
+          pid: validatedPid.data,
           profile: { userId: user.id },
         },
       },
@@ -28,7 +32,7 @@ export default makeProtectedApiHandler({
           sortOrder,
           educationEntry: {
             connect: {
-              pid: educationEntryPid,
+              pid: validatedPid.data,
               profile: { userId: user.id },
             },
           },

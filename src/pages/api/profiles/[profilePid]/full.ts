@@ -14,6 +14,7 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema } from "@/schemas";
 import { NextApiResponse } from "next";
 
 type FullProfile = Profile & {
@@ -25,9 +26,12 @@ type FullProfile = Profile & {
 
 export default makeProtectedApiHandler({
   GET: async (user, req, res: NextApiResponse<FullProfile>) => {
-    const profilePid = req.query.profilePid as string;
+    const validatedPid = pidSchema.safeParse(req.query.profilePid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     const fullProfile = await prisma.profile.findUnique({
-      where: { pid: profilePid, userId: user.id },
+      where: { pid: validatedPid.data, userId: user.id },
       include: {
         workEntries: {
           orderBy: { sortOrder: "asc" },

@@ -5,15 +5,29 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema } from "@/schemas";
 import { NextApiResponse } from "next";
+import { z } from "zod";
+
+const updateSchema = z.object({
+  schoolName: z.string().optional(),
+  schoolLocation: z.string().optional(),
+  title: z.string().optional(),
+  graduationDate: z.string().optional(),
+  enabled: z.boolean().optional(),
+});
 
 export default makeProtectedApiHandler({
   PUT: async (user, req, res: NextApiResponse<ResumeEducationEntry>) => {
-    const educationEntryPid = req.query.educationEntryPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.educationEntryPid);
+    const validatedBody = updateSchema.safeParse(req.body);
+    if (!validatedPid.success || !validatedBody.success) {
+      return sendError(res, 400);
+    }
     try {
       const educationEntry = await prisma.resumeEducationEntry.update({
-        where: { pid: educationEntryPid, resume: { job: { userId: user.id } } },
-        data: req.body,
+        where: { pid: validatedPid.data, resume: { job: { userId: user.id } } },
+        data: validatedBody.data,
       });
       return res.status(200).json(educationEntry);
     } catch (error) {
@@ -28,10 +42,13 @@ export default makeProtectedApiHandler({
   },
 
   DELETE: async (user, req, res: NextApiResponse<void>) => {
-    const educationEntryPid = req.query.educationEntryPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.educationEntryPid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     try {
       await prisma.resumeEducationEntry.delete({
-        where: { pid: educationEntryPid, resume: { job: { userId: user.id } } },
+        where: { pid: validatedPid.data, resume: { job: { userId: user.id } } },
       });
       return sendResponse(res, 204);
     } catch (error) {

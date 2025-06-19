@@ -5,15 +5,35 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema, resumeTemplateSchema } from "@/schemas";
 import { NextApiResponse } from "next";
+import { z } from "zod";
+
+const updateSchema = z.object({
+  resumeName: z.string().optional(),
+  name: z.string().optional(),
+  location: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().optional(),
+  websiteText: z.string().optional(),
+  websiteLink: z.string().optional(),
+  summary: z.string().optional(),
+  coverLetter: z.string().optional(),
+  allowPageBreaks: z.boolean().optional(),
+  template: resumeTemplateSchema.optional(),
+});
 
 export default makeProtectedApiHandler({
   PUT: async (user, req, res: NextApiResponse<Resume>) => {
-    const resumePid = req.query.resumePid as string;
+    const validatedPid = pidSchema.safeParse(req.query.resumePid);
+    const validatedBody = updateSchema.safeParse(req.body);
+    if (!validatedPid.success || !validatedBody.success) {
+      return sendError(res, 400);
+    }
     try {
       const resume = await prisma.resume.update({
-        where: { pid: resumePid, job: { userId: user.id } },
-        data: req.body,
+        where: { pid: validatedPid.data, job: { userId: user.id } },
+        data: validatedBody.data,
       });
       return res.status(200).json(resume);
     } catch (error) {
@@ -28,10 +48,13 @@ export default makeProtectedApiHandler({
   },
 
   DELETE: async (user, req, res: NextApiResponse<void>) => {
-    const resumePid = req.query.resumePid as string;
+    const validatedPid = pidSchema.safeParse(req.query.resumePid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     try {
       await prisma.resume.delete({
-        where: { pid: resumePid, job: { userId: user.id } },
+        where: { pid: validatedPid.data, job: { userId: user.id } },
       });
       return sendResponse(res, 204);
     } catch (error) {

@@ -6,13 +6,17 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema } from "@/schemas";
 
 export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<Skill>) => {
-    const skillCategoryPid = req.query.skillCategoryPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.skillCategoryPid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     const maxSortOrderEntry = await prisma.skill.findFirst({
       where: {
-        skillCategory: { pid: skillCategoryPid, profile: { userId: user.id } },
+        skillCategory: { pid: validatedPid.data, profile: { userId: user.id } },
       },
       orderBy: { sortOrder: "desc" },
     });
@@ -24,7 +28,7 @@ export default makeProtectedApiHandler({
           enabled: true,
           sortOrder,
           skillCategory: {
-            connect: { pid: skillCategoryPid, profile: { userId: user.id } },
+            connect: { pid: validatedPid.data, profile: { userId: user.id } },
           },
         },
       });

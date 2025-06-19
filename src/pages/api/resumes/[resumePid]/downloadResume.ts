@@ -6,12 +6,16 @@ import {
   template02_makeDocument,
   template02_resume,
 } from "@/templates";
+import { pidSchema } from "@/schemas";
 
 export default makeProtectedApiHandler({
   GET: async (user, req, res: NextApiResponse<Buffer<ArrayBufferLike>>) => {
-    const resumePid = req.query.resumePid as string;
+    const validatedPid = pidSchema.safeParse(req.query.resumePid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     const fullResume = await prisma.resume.findUnique({
-      where: { pid: resumePid, job: { userId: user.id } },
+      where: { pid: validatedPid.data, job: { userId: user.id } },
       include: {
         workEntries: {
           orderBy: { sortOrder: "asc" },

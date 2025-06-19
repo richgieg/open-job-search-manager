@@ -5,15 +5,34 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema } from "@/schemas";
 import { NextApiResponse } from "next";
+import { z } from "zod";
+
+const updateSchema = z.object({
+  profileName: z.string().optional(),
+  name: z.string().optional(),
+  jobTitle: z.string().optional(),
+  location: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().optional(),
+  websiteText: z.string().optional(),
+  websiteLink: z.string().optional(),
+  summary: z.string().optional(),
+  coverLetter: z.string().optional(),
+});
 
 export default makeProtectedApiHandler({
   PUT: async (user, req, res: NextApiResponse<Profile>) => {
-    const profilePid = req.query.profilePid as string;
+    const validatedPid = pidSchema.safeParse(req.query.profilePid);
+    const validatedBody = updateSchema.safeParse(req.body);
+    if (!validatedPid.success || !validatedBody.success) {
+      return sendError(res, 400);
+    }
     try {
       const profile = await prisma.profile.update({
-        where: { pid: profilePid, userId: user.id },
-        data: req.body,
+        where: { pid: validatedPid.data, userId: user.id },
+        data: validatedBody.data,
       });
       return res.status(200).json(profile);
     } catch (error) {
@@ -28,10 +47,13 @@ export default makeProtectedApiHandler({
   },
 
   DELETE: async (user, req, res: NextApiResponse<void>) => {
-    const profilePid = req.query.profilePid as string;
+    const validatedPid = pidSchema.safeParse(req.query.profilePid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     try {
       await prisma.profile.delete({
-        where: { pid: profilePid, userId: user.id },
+        where: { pid: validatedPid.data, userId: user.id },
       });
       return sendResponse(res, 204);
     } catch (error) {

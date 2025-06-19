@@ -6,13 +6,20 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { pidSchema } from "@/schemas";
 
 export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<ResumeWorkEntryBullet>) => {
-    const workEntryPid = req.query.workEntryPid as string;
+    const validatedPid = pidSchema.safeParse(req.query.workEntryPid);
+    if (!validatedPid.success) {
+      return sendError(res, 400);
+    }
     const maxSortOrderEntry = await prisma.resumeWorkEntryBullet.findFirst({
       where: {
-        workEntry: { pid: workEntryPid, resume: { job: { userId: user.id } } },
+        workEntry: {
+          pid: validatedPid.data,
+          resume: { job: { userId: user.id } },
+        },
       },
       orderBy: { sortOrder: "desc" },
     });
@@ -25,7 +32,7 @@ export default makeProtectedApiHandler({
           sortOrder,
           workEntry: {
             connect: {
-              pid: workEntryPid,
+              pid: validatedPid.data,
               resume: { job: { userId: user.id } },
             },
           },

@@ -6,11 +6,21 @@ import {
   sendError,
   sendResponse,
 } from "@/lib";
+import { z } from "zod";
+import { pidSchema } from "@/schemas";
+
+const bodySchema = z.object({
+  jobPid: pidSchema,
+  profilePid: pidSchema,
+});
 
 export default makeProtectedApiHandler({
   POST: async (user, req, res: NextApiResponse<Resume>) => {
-    const jobPid = req.body.jobPid as string;
-    const profilePid = req.body.profilePid as string;
+    const validatedBody = bodySchema.safeParse(req.body);
+    if (!validatedBody.success) {
+      return sendError(res, 400);
+    }
+    const { jobPid, profilePid } = validatedBody.data;
     const fullProfile = await prisma.profile.findUnique({
       where: { pid: profilePid, userId: user.id },
       include: {
