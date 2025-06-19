@@ -83,7 +83,7 @@ export function SignUpPage() {
           <div className="bg-green-700 text-center text-white rounded-lg px-4 py-3 w-96 mx-auto">
             Thanks for signing up!
             <br />
-            Please check your email for the confirmation link.
+            Please check your email for a confirmation link.
           </div>
         )}
       </form>
