@@ -76,14 +76,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   };
 
   const deleteResume = async (resume: Resume) => {
-    if (
-      !confirm(
-        `"${
-          resume.resumeName || t.resumeNamePlaceholder
-        }" will be deleted. Continue?`
-      )
-    )
-      return;
+    // TODO: Show confirmation modal.
     setFullJob({
       ...fullJob,
       resumes: fullJob.resumes.filter((r) => r.id !== resume.id),
