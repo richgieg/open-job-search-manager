@@ -42,7 +42,8 @@ export function JobPage() {
     }
   );
 
-  const setFullJob = (fullJob: FullJob) => mutateFullJob(fullJob, false);
+  const setFullJob = (fullJob: FullJob, revalidate = false) =>
+    mutateFullJob(fullJob, revalidate);
 
   const { data: profiles } = useSWR(
     user ? "/api/profiles" : null,

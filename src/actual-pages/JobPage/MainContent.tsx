@@ -24,7 +24,7 @@ type FullJob = Job & {
 
 type Props = {
   fullJob: FullJob;
-  setFullJob: (fullJob: FullJob) => void;
+  setFullJob: (fullJob: FullJob, revalidate?: boolean) => void;
   profiles: Profile[];
 };
 
@@ -32,6 +32,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   const [profilePid, setProfilePid] = useState<string>(profiles[0]?.pid ?? "");
 
   const updateJob = async (job: Job) => {
+    setFullJob({ ...fullJob, ...job });
     const response = await fetch(`/api/jobs/${job.pid}`, {
       method: "PUT",
       headers: {
@@ -39,11 +40,9 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       },
       body: JSON.stringify(job),
     });
-    const updatedJob: Job = await response.json();
-    setFullJob({
-      ...fullJob,
-      ...updatedJob,
-    });
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   const createResume = async (e: FormEvent<HTMLFormElement>) => {
@@ -85,13 +84,16 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       )
     )
       return;
-    await fetch(`/api/resumes/${resume.pid}`, {
-      method: "DELETE",
-    });
     setFullJob({
       ...fullJob,
       resumes: fullJob.resumes.filter((r) => r.id !== resume.id),
     });
+    const response = await fetch(`/api/resumes/${resume.pid}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   const createLink = async () => {
@@ -106,6 +108,16 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   };
 
   const updateLink = async (link: Link) => {
+    setFullJob({
+      ...fullJob,
+      links: fullJob.links.map((l) => {
+        if (l.id === link.id) {
+          return link;
+        } else {
+          return l;
+        }
+      }),
+    });
     const response = await fetch(`/api/links/${link.pid}`, {
       method: "PUT",
       headers: {
@@ -113,27 +125,22 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       },
       body: JSON.stringify(link),
     });
-    const updatedLink: Link = await response.json();
-    setFullJob({
-      ...fullJob,
-      links: fullJob.links.map((link) => {
-        if (link.id === updatedLink.id) {
-          return updatedLink;
-        } else {
-          return link;
-        }
-      }),
-    });
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   const deleteLink = async (link: Link) => {
-    await fetch(`/api/links/${link.pid}`, {
-      method: "DELETE",
-    });
     setFullJob({
       ...fullJob,
       links: fullJob.links.filter((l) => l.id !== link.id),
     });
+    const response = await fetch(`/api/links/${link.pid}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   const moveLinkUp = async (link: Link) => {
@@ -145,15 +152,18 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       links.push(links.shift()!);
     }
+    setFullJob({ ...fullJob, links });
     const orderedPids = links.map((item) => item.pid);
-    await fetch(`/api/jobs/${fullJob.pid}/links/order`, {
+    const response = await fetch(`/api/jobs/${fullJob.pid}/links/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullJob({ ...fullJob, links });
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   const moveLinkDown = async (link: Link) => {
@@ -165,15 +175,18 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       links.unshift(links.pop()!);
     }
+    setFullJob({ ...fullJob, links });
     const orderedPids = links.map((item) => item.pid);
-    await fetch(`/api/jobs/${fullJob.pid}/links/order`, {
+    const response = await fetch(`/api/jobs/${fullJob.pid}/links/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullJob({ ...fullJob, links });
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   const createApplicationQuestion = async () => {
@@ -196,6 +209,16 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   const updateApplicationQuestion = async (
     applicationQuestion: ApplicationQuestion
   ) => {
+    setFullJob({
+      ...fullJob,
+      applicationQuestions: fullJob.applicationQuestions.map((a) => {
+        if (a.id === applicationQuestion.id) {
+          return applicationQuestion;
+        } else {
+          return a;
+        }
+      }),
+    });
     const response = await fetch(
       `/api/applicationQuestions/${applicationQuestion.pid}`,
       {
@@ -206,34 +229,29 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
         body: JSON.stringify(applicationQuestion),
       }
     );
-    const updatedApplicationQuestion: ApplicationQuestion =
-      await response.json();
-    setFullJob({
-      ...fullJob,
-      applicationQuestions: fullJob.applicationQuestions.map(
-        (applicationQuestion) => {
-          if (applicationQuestion.id === updatedApplicationQuestion.id) {
-            return updatedApplicationQuestion;
-          } else {
-            return applicationQuestion;
-          }
-        }
-      ),
-    });
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   const deleteApplicationQuestion = async (
     applicationQuestion: ApplicationQuestion
   ) => {
-    await fetch(`/api/applicationQuestions/${applicationQuestion.pid}`, {
-      method: "DELETE",
-    });
     setFullJob({
       ...fullJob,
       applicationQuestions: fullJob.applicationQuestions.filter(
         (q) => q.id !== applicationQuestion.id
       ),
     });
+    const response = await fetch(
+      `/api/applicationQuestions/${applicationQuestion.pid}`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   const moveApplicationQuestionUp = async (
@@ -252,15 +270,21 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       applicationQuestions.push(applicationQuestions.shift()!);
     }
-    const orderedPids = applicationQuestions.map((item) => item.pid);
-    await fetch(`/api/jobs/${fullJob.pid}/applicationQuestions/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
     setFullJob({ ...fullJob, applicationQuestions });
+    const orderedPids = applicationQuestions.map((item) => item.pid);
+    const response = await fetch(
+      `/api/jobs/${fullJob.pid}/applicationQuestions/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   const moveApplicationQuestionDown = async (
@@ -279,15 +303,21 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       applicationQuestions.unshift(applicationQuestions.pop()!);
     }
-    const orderedPids = applicationQuestions.map((item) => item.pid);
-    await fetch(`/api/jobs/${fullJob.pid}/applicationQuestions/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
     setFullJob({ ...fullJob, applicationQuestions });
+    const orderedPids = applicationQuestions.map((item) => item.pid);
+    const response = await fetch(
+      `/api/jobs/${fullJob.pid}/applicationQuestions/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   const createContact = async () => {
@@ -313,6 +343,16 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   };
 
   const updateContact = async (contact: Contact) => {
+    setFullJob({
+      ...fullJob,
+      contacts: fullJob.contacts.map((c) => {
+        if (c.id === contact.id) {
+          return contact;
+        } else {
+          return c;
+        }
+      }),
+    });
     const response = await fetch(`/api/contacts/${contact.pid}`, {
       method: "PUT",
       headers: {
@@ -320,27 +360,22 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       },
       body: JSON.stringify(contact),
     });
-    const updatedContact: Contact = await response.json();
-    setFullJob({
-      ...fullJob,
-      contacts: fullJob.contacts.map((contact) => {
-        if (contact.id === updatedContact.id) {
-          return updatedContact;
-        } else {
-          return contact;
-        }
-      }),
-    });
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   const deleteContact = async (contact: Contact) => {
-    await fetch(`/api/contacts/${contact.pid}`, {
-      method: "DELETE",
-    });
     setFullJob({
       ...fullJob,
       contacts: fullJob.contacts.filter((c) => c.id !== contact.id),
     });
+    const response = await fetch(`/api/contacts/${contact.pid}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   const moveContactUp = async (contact: Contact) => {
@@ -355,15 +390,18 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       contacts.push(contacts.shift()!);
     }
+    setFullJob({ ...fullJob, contacts });
     const orderedPids = contacts.map((item) => item.pid);
-    await fetch(`/api/jobs/${fullJob.pid}/contacts/order`, {
+    const response = await fetch(`/api/jobs/${fullJob.pid}/contacts/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullJob({ ...fullJob, contacts });
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   const moveContactDown = async (contact: Contact) => {
@@ -378,15 +416,18 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       contacts.unshift(contacts.pop()!);
     }
+    setFullJob({ ...fullJob, contacts });
     const orderedPids = contacts.map((item) => item.pid);
-    await fetch(`/api/jobs/${fullJob.pid}/contacts/order`, {
+    const response = await fetch(`/api/jobs/${fullJob.pid}/contacts/order`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullJob({ ...fullJob, contacts });
+    if (!response.ok) {
+      setFullJob(fullJob, true);
+    }
   };
 
   return (
