@@ -1,7 +1,6 @@
 import { FormEvent } from "react";
 import { ProfileOverview } from "./ProfileOverview";
 import { SectionHeading } from "@/components/SectionHeading";
-import { t } from "@/translate";
 import { Profile } from "@/generated/prisma";
 
 type Props = {
@@ -28,14 +27,7 @@ export function MainContent({ profiles, setProfiles }: Props) {
   };
 
   const deleteProfile = async (profile: Profile) => {
-    if (
-      !confirm(
-        `"${
-          profile.profileName || t.profileNamePlaceholder
-        }" will be deleted. Continue?`
-      )
-    )
-      return;
+    // TODO: Show confirmation modal.
     setProfiles(profiles.filter((p) => p.id !== profile.id));
     const response = await fetch(`/api/profiles/${profile.pid}`, {
       method: "DELETE",

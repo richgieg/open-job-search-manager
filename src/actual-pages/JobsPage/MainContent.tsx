@@ -26,12 +26,7 @@ export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
   };
 
   const deleteJob = async (job: Job) => {
-    if (
-      !confirm(
-        `"${job.title || t.jobTitlePlaceholder}" will be deleted. Continue?`
-      )
-    )
-      return;
+    // TODO: Show confirmation modal.
     setJobsWithLinks(jobsWithLinks.filter((j) => j.id !== job.id));
     const response = await fetch(`/api/jobs/${job.pid}`, { method: "DELETE" });
     if (!response.ok) {
