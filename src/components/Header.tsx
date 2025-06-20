@@ -18,6 +18,7 @@ export function Header() {
         <Link href="/">Home</Link>
         <Link href="/profiles">Profiles</Link>
         <Link href="/jobs">Jobs</Link>
+        <Link href="/contact">Contact Us</Link>
         <div className="ml-auto">
           {user.email} | <button onClick={logOut}>Sign Out</button>
         </div>
