@@ -7,6 +7,10 @@ export function HomePage() {
     <>
       <Head>
         <title>Open Job Search Manager – Under Construction</title>
+        <meta
+          name="description"
+          content="Streamline your job search with Open Job Search Manager—track applications, build profiles, and generate resumes with ease."
+        />
       </Head>
       <div className="relative">
         <Header></Header>

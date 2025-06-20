@@ -44,6 +44,10 @@ export function SignUpPage() {
     <>
       <Head>
         <title>Sign Up - Open Job Search Manager</title>
+        <meta
+          name="description"
+          content="Create your free account and take control of your job search journey with Open Job Search Manager."
+        />
       </Head>
       <Header />
       <form

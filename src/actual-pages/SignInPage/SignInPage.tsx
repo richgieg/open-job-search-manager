@@ -43,6 +43,10 @@ export function SignInPage() {
     <>
       <Head>
         <title>Sign In - Open Job Search Manager</title>
+        <meta
+          name="description"
+          content="Sign in to access your job search dashboard."
+        />
       </Head>
       <Header />
       <form
