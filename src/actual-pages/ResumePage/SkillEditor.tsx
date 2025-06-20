@@ -42,7 +42,7 @@ export function SkillEditor({
       id: skill.id,
       pid: skill.pid,
       skillCategoryId: skill.skillCategoryId,
-      text,
+      text: skill.text,
       enabled: !skill.enabled,
       sortOrder: skill.sortOrder,
     });

@@ -40,7 +40,7 @@ export function SkillCategoryEditor({
       id: skillCategory.id,
       pid: skillCategory.pid,
       resumeId: skillCategory.resumeId,
-      name,
+      name: skillCategory.name,
       enabled: !skillCategory.enabled,
       sortOrder: skillCategory.sortOrder,
     });

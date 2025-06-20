@@ -45,9 +45,9 @@ export function CertificationEditor({
       id: certification.id,
       pid: certification.pid,
       profileId: certification.profileId,
-      title,
-      issuer,
-      issueDate,
+      title: certification.title,
+      issuer: certification.issuer,
+      issueDate: certification.issueDate,
       enabled: !certification.enabled,
       sortOrder: certification.sortOrder,
     });
