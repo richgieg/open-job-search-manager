@@ -45,7 +45,7 @@ type FullJob = Job & {
 
 type Props = {
   fullResume: FullResume;
-  setFullResume: (fullResume: FullResume) => void;
+  setFullResume: (fullResume: FullResume, revalidate?: boolean) => void;
   fullJob: FullJob;
 };
 
@@ -213,6 +213,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const updateResume = async (resume: Resume) => {
+    setFullResume({ ...fullResume, ...resume });
     const response = await fetch(`/api/resumes/${resume.pid}`, {
       method: "PUT",
       headers: {
@@ -220,11 +221,9 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       },
       body: JSON.stringify(resume),
     });
-    const updatedResume: Resume = await response.json();
-    setFullResume({
-      ...fullResume,
-      ...updatedResume,
-    });
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const createWorkEntry = async () => {
@@ -245,6 +244,16 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const updateWorkEntry = async (workEntry: ResumeWorkEntry) => {
+    setFullResume({
+      ...fullResume,
+      workEntries: fullResume.workEntries.map((w) => {
+        if (w.id === workEntry.id) {
+          return { ...w, ...workEntry };
+        } else {
+          return w;
+        }
+      }),
+    });
     const response = await fetch(`/api/resumeWorkEntries/${workEntry.pid}`, {
       method: "PUT",
       headers: {
@@ -252,30 +261,22 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       },
       body: JSON.stringify(workEntry),
     });
-    const updatedWorkEntry: ResumeWorkEntry = await response.json();
-    setFullResume({
-      ...fullResume,
-      workEntries: fullResume.workEntries.map((workEntry) => {
-        if (workEntry.id === updatedWorkEntry.id) {
-          return {
-            ...workEntry,
-            ...updatedWorkEntry,
-          };
-        } else {
-          return workEntry;
-        }
-      }),
-    });
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const deleteWorkEntry = async (workEntry: ResumeWorkEntry) => {
-    await fetch(`/api/resumeWorkEntries/${workEntry.pid}`, {
-      method: "DELETE",
-    });
     setFullResume({
       ...fullResume,
       workEntries: fullResume.workEntries.filter((w) => w.id !== workEntry.id),
     });
+    const response = await fetch(`/api/resumeWorkEntries/${workEntry.pid}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveWorkEntryUp = async (workEntry: ResumeWorkEntry) => {
@@ -290,15 +291,21 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       workEntries.push(workEntries.shift()!);
     }
-    const orderedPids = workEntries.map((item) => item.pid);
-    await fetch(`/api/resumes/${fullResume.pid}/workEntries/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
     setFullResume({ ...fullResume, workEntries });
+    const orderedPids = workEntries.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumes/${fullResume.pid}/workEntries/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveWorkEntryDown = async (workEntry: ResumeWorkEntry) => {
@@ -313,15 +320,21 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       workEntries.unshift(workEntries.pop()!);
     }
-    const orderedPids = workEntries.map((item) => item.pid);
-    await fetch(`/api/resumes/${fullResume.pid}/workEntries/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
     setFullResume({ ...fullResume, workEntries });
+    const orderedPids = workEntries.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumes/${fullResume.pid}/workEntries/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const createWorkEntryBullet = async (workEntryPid: string) => {
@@ -352,6 +365,25 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   const updateWorkEntryBullet = async (
     workEntryBullet: ResumeWorkEntryBullet
   ) => {
+    setFullResume({
+      ...fullResume,
+      workEntries: fullResume.workEntries.map((workEntry) => {
+        if (workEntry.id === workEntryBullet.workEntryId) {
+          return {
+            ...workEntry,
+            bullets: workEntry.bullets.map((b) => {
+              if (b.id === workEntryBullet.id) {
+                return workEntryBullet;
+              } else {
+                return b;
+              }
+            }),
+          };
+        } else {
+          return workEntry;
+        }
+      }),
+    });
     const response = await fetch(
       `/api/resumeWorkEntryBullets/${workEntryBullet.pid}`,
       {
@@ -362,34 +394,14 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         body: JSON.stringify(workEntryBullet),
       }
     );
-    const updatedWorkEntryBullet: ResumeWorkEntryBullet = await response.json();
-    setFullResume({
-      ...fullResume,
-      workEntries: fullResume.workEntries.map((workEntry) => {
-        if (workEntry.id === updatedWorkEntryBullet.workEntryId) {
-          return {
-            ...workEntry,
-            bullets: workEntry.bullets.map((workEntryBullet) => {
-              if (workEntryBullet.id === updatedWorkEntryBullet.id) {
-                return updatedWorkEntryBullet;
-              } else {
-                return workEntryBullet;
-              }
-            }),
-          };
-        } else {
-          return workEntry;
-        }
-      }),
-    });
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const deleteWorkEntryBullet = async (
     workEntryBullet: ResumeWorkEntryBullet
   ) => {
-    await fetch(`/api/resumeWorkEntryBullets/${workEntryBullet.pid}`, {
-      method: "DELETE",
-    });
     setFullResume({
       ...fullResume,
       workEntries: fullResume.workEntries.map((workEntry) => {
@@ -405,6 +417,15 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         }
       }),
     });
+    const response = await fetch(
+      `/api/resumeWorkEntryBullets/${workEntryBullet.pid}`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveWorkEntryBulletUp = async (
@@ -425,14 +446,6 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       bullets.push(bullets.shift()!);
     }
-    const orderedPids = bullets.map((item) => item.pid);
-    await fetch(`/api/resumeWorkEntries/${workEntry.pid}/bullets/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
     setFullResume({
       ...fullResume,
       workEntries: fullResume.workEntries.map((w) => {
@@ -442,6 +455,20 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         return w;
       }),
     });
+    const orderedPids = bullets.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumeWorkEntries/${workEntry.pid}/bullets/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveWorkEntryBulletDown = async (
@@ -462,14 +489,6 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       bullets.unshift(bullets.pop()!);
     }
-    const orderedPids = bullets.map((item) => item.pid);
-    await fetch(`/api/resumeWorkEntries/${workEntry.pid}/bullets/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
     setFullResume({
       ...fullResume,
       workEntries: fullResume.workEntries.map((w) => {
@@ -479,6 +498,20 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         return w;
       }),
     });
+    const orderedPids = bullets.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumeWorkEntries/${workEntry.pid}/bullets/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const createEducationEntry = async () => {
@@ -502,6 +535,16 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const updateEducationEntry = async (educationEntry: ResumeEducationEntry) => {
+    setFullResume({
+      ...fullResume,
+      educationEntries: fullResume.educationEntries.map((e) => {
+        if (e.id === educationEntry.id) {
+          return { ...e, ...educationEntry };
+        } else {
+          return e;
+        }
+      }),
+    });
     const response = await fetch(
       `/api/resumeEducationEntries/${educationEntry.pid}`,
       {
@@ -512,32 +555,27 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         body: JSON.stringify(educationEntry),
       }
     );
-    const updatedEducationEntry: ResumeEducationEntry = await response.json();
-    setFullResume({
-      ...fullResume,
-      educationEntries: fullResume.educationEntries.map((educationEntry) => {
-        if (educationEntry.id === updatedEducationEntry.id) {
-          return {
-            ...educationEntry,
-            ...updatedEducationEntry,
-          };
-        } else {
-          return educationEntry;
-        }
-      }),
-    });
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const deleteEducationEntry = async (educationEntry: ResumeEducationEntry) => {
-    await fetch(`/api/resumeEducationEntries/${educationEntry.pid}`, {
-      method: "DELETE",
-    });
     setFullResume({
       ...fullResume,
       educationEntries: fullResume.educationEntries.filter(
         (e) => e.id !== educationEntry.id
       ),
     });
+    const response = await fetch(
+      `/api/resumeEducationEntries/${educationEntry.pid}`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveEducationEntryUp = async (educationEntry: ResumeEducationEntry) => {
@@ -554,15 +592,21 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       educationEntries.push(educationEntries.shift()!);
     }
-    const orderedPids = educationEntries.map((item) => item.pid);
-    await fetch(`/api/resumes/${fullResume.pid}/educationEntries/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
     setFullResume({ ...fullResume, educationEntries });
+    const orderedPids = educationEntries.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumes/${fullResume.pid}/educationEntries/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveEducationEntryDown = async (
@@ -581,15 +625,21 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       educationEntries.unshift(educationEntries.pop()!);
     }
-    const orderedPids = educationEntries.map((item) => item.pid);
-    await fetch(`/api/resumes/${fullResume.pid}/educationEntries/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
     setFullResume({ ...fullResume, educationEntries });
+    const orderedPids = educationEntries.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumes/${fullResume.pid}/educationEntries/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const createEducationEntryBullet = async (educationEntryPid: string) => {
@@ -621,6 +671,25 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   const updateEducationEntryBullet = async (
     educationEntryBullet: ResumeEducationEntryBullet
   ) => {
+    setFullResume({
+      ...fullResume,
+      educationEntries: fullResume.educationEntries.map((educationEntry) => {
+        if (educationEntry.id === educationEntryBullet.educationEntryId) {
+          return {
+            ...educationEntry,
+            bullets: educationEntry.bullets.map((b) => {
+              if (b.id === educationEntryBullet.id) {
+                return educationEntryBullet;
+              } else {
+                return b;
+              }
+            }),
+          };
+        } else {
+          return educationEntry;
+        }
+      }),
+    });
     const response = await fetch(
       `/api/resumeEducationEntryBullets/${educationEntryBullet.pid}`,
       {
@@ -631,38 +700,14 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         body: JSON.stringify(educationEntryBullet),
       }
     );
-    const updatedEducationEntryBullet: ResumeEducationEntryBullet =
-      await response.json();
-    setFullResume({
-      ...fullResume,
-      educationEntries: fullResume.educationEntries.map((educationEntry) => {
-        if (
-          educationEntry.id === updatedEducationEntryBullet.educationEntryId
-        ) {
-          return {
-            ...educationEntry,
-            bullets: educationEntry.bullets.map((educationEntryBullet) => {
-              if (educationEntryBullet.id === updatedEducationEntryBullet.id) {
-                return updatedEducationEntryBullet;
-              } else {
-                return educationEntryBullet;
-              }
-            }),
-          };
-        } else {
-          return educationEntry;
-        }
-      }),
-    });
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const deleteEducationEntryBullet = async (
     educationEntryBullet: ResumeEducationEntryBullet
   ) => {
-    await fetch(
-      `/api/resumeEducationEntryBullets/${educationEntryBullet.pid}`,
-      { method: "DELETE" }
-    );
     setFullResume({
       ...fullResume,
       educationEntries: fullResume.educationEntries.map((educationEntry) => {
@@ -678,6 +723,13 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         }
       }),
     });
+    const response = await fetch(
+      `/api/resumeEducationEntryBullets/${educationEntryBullet.pid}`,
+      { method: "DELETE" }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveEducationEntryBulletUp = async (
@@ -700,17 +752,6 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       bullets.push(bullets.shift()!);
     }
-    const orderedPids = bullets.map((item) => item.pid);
-    await fetch(
-      `/api/resumeEducationEntries/${educationEntry.pid}/bullets/order`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ orderedPids }),
-      }
-    );
     setFullResume({
       ...fullResume,
       educationEntries: fullResume.educationEntries.map((e) => {
@@ -720,6 +761,20 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         return e;
       }),
     });
+    const orderedPids = bullets.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumeEducationEntries/${educationEntry.pid}/bullets/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveEducationEntryBulletDown = async (
@@ -742,17 +797,6 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       bullets.unshift(bullets.pop()!);
     }
-    const orderedPids = bullets.map((item) => item.pid);
-    await fetch(
-      `/api/resumeEducationEntries/${educationEntry.pid}/bullets/order`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ orderedPids }),
-      }
-    );
     setFullResume({
       ...fullResume,
       educationEntries: fullResume.educationEntries.map((e) => {
@@ -762,6 +806,20 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         return e;
       }),
     });
+    const orderedPids = bullets.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumeEducationEntries/${educationEntry.pid}/bullets/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const createCertification = async () => {
@@ -779,6 +837,16 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const updateCertification = async (certification: ResumeCertification) => {
+    setFullResume({
+      ...fullResume,
+      certifications: fullResume.certifications.map((c) => {
+        if (c.id === certification.id) {
+          return { ...c, ...certification };
+        } else {
+          return c;
+        }
+      }),
+    });
     const response = await fetch(
       `/api/resumeCertifications/${certification.pid}`,
       {
@@ -789,32 +857,27 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         body: JSON.stringify(certification),
       }
     );
-    const updatedCertification: ResumeCertification = await response.json();
-    setFullResume({
-      ...fullResume,
-      certifications: fullResume.certifications.map((certification) => {
-        if (certification.id === updatedCertification.id) {
-          return {
-            ...certification,
-            ...updatedCertification,
-          };
-        } else {
-          return certification;
-        }
-      }),
-    });
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const deleteCertification = async (certification: ResumeCertification) => {
-    await fetch(`/api/resumeCertifications/${certification.pid}`, {
-      method: "DELETE",
-    });
     setFullResume({
       ...fullResume,
       certifications: fullResume.certifications.filter(
         (c) => c.id !== certification.id
       ),
     });
+    const response = await fetch(
+      `/api/resumeCertifications/${certification.pid}`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveCertificationUp = async (certification: ResumeCertification) => {
@@ -831,15 +894,21 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       certifications.push(certifications.shift()!);
     }
-    const orderedPids = certifications.map((item) => item.pid);
-    await fetch(`/api/resumes/${fullResume.pid}/certifications/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
     setFullResume({ ...fullResume, certifications });
+    const orderedPids = certifications.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumes/${fullResume.pid}/certifications/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveCertificationDown = async (certification: ResumeCertification) => {
@@ -856,15 +925,21 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       certifications.unshift(certifications.pop()!);
     }
-    const orderedPids = certifications.map((item) => item.pid);
-    await fetch(`/api/resumes/${fullResume.pid}/certifications/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
     setFullResume({ ...fullResume, certifications });
+    const orderedPids = certifications.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumes/${fullResume.pid}/certifications/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const createSkillCategory = async () => {
@@ -888,6 +963,16 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const updateSkillCategory = async (skillCategory: ResumeSkillCategory) => {
+    setFullResume({
+      ...fullResume,
+      skillCategories: fullResume.skillCategories.map((s) => {
+        if (s.id === skillCategory.id) {
+          return { ...s, ...skillCategory };
+        } else {
+          return s;
+        }
+      }),
+    });
     const response = await fetch(
       `/api/resumeSkillCategories/${skillCategory.pid}`,
       {
@@ -898,32 +983,27 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         body: JSON.stringify(skillCategory),
       }
     );
-    const updatedSkillCategory: ResumeSkillCategory = await response.json();
-    setFullResume({
-      ...fullResume,
-      skillCategories: fullResume.skillCategories.map((skillCategory) => {
-        if (skillCategory.id === updatedSkillCategory.id) {
-          return {
-            ...skillCategory,
-            ...updatedSkillCategory,
-          };
-        } else {
-          return skillCategory;
-        }
-      }),
-    });
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const deleteSkillCategory = async (skillCategory: ResumeSkillCategory) => {
-    await fetch(`/api/resumeSkillCategories/${skillCategory.pid}`, {
-      method: "DELETE",
-    });
     setFullResume({
       ...fullResume,
       skillCategories: fullResume.skillCategories.filter(
         (s) => s.id !== skillCategory.id
       ),
     });
+    const response = await fetch(
+      `/api/resumeSkillCategories/${skillCategory.pid}`,
+      {
+        method: "DELETE",
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveSkillCategoryUp = async (skillCategory: ResumeSkillCategory) => {
@@ -940,15 +1020,21 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       skillCategories.push(skillCategories.shift()!);
     }
-    const orderedPids = skillCategories.map((item) => item.pid);
-    await fetch(`/api/resumes/${fullResume.pid}/skillCategories/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
     setFullResume({ ...fullResume, skillCategories });
+    const orderedPids = skillCategories.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumes/${fullResume.pid}/skillCategories/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveSkillCategoryDown = async (skillCategory: ResumeSkillCategory) => {
@@ -965,15 +1051,21 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       skillCategories.unshift(skillCategories.pop()!);
     }
-    const orderedPids = skillCategories.map((item) => item.pid);
-    await fetch(`/api/resumes/${fullResume.pid}/skillCategories/order`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderedPids }),
-    });
     setFullResume({ ...fullResume, skillCategories });
+    const orderedPids = skillCategories.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumes/${fullResume.pid}/skillCategories/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const createSkill = async (skillCategoryPid: string) => {
@@ -1002,25 +1094,17 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const updateSkill = async (skill: ResumeSkill) => {
-    const response = await fetch(`/api/resumeSkills/${skill.pid}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(skill),
-    });
-    const updatedSkill: ResumeSkill = await response.json();
     setFullResume({
       ...fullResume,
       skillCategories: fullResume.skillCategories.map((skillCategory) => {
-        if (skillCategory.id === updatedSkill.skillCategoryId) {
+        if (skillCategory.id === skill.skillCategoryId) {
           return {
             ...skillCategory,
-            skills: skillCategory.skills.map((skill) => {
-              if (skill.id === updatedSkill.id) {
-                return updatedSkill;
-              } else {
+            skills: skillCategory.skills.map((s) => {
+              if (s.id === skill.id) {
                 return skill;
+              } else {
+                return s;
               }
             }),
           };
@@ -1029,12 +1113,19 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         }
       }),
     });
+    const response = await fetch(`/api/resumeSkills/${skill.pid}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(skill),
+    });
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const deleteSkill = async (skill: ResumeSkill) => {
-    await fetch(`/api/resumeSkills/${skill.pid}`, {
-      method: "DELETE",
-    });
     setFullResume({
       ...fullResume,
       skillCategories: fullResume.skillCategories.map((skillCategory) => {
@@ -1048,6 +1139,12 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         }
       }),
     });
+    const response = await fetch(`/api/resumeSkills/${skill.pid}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveSkillUp = async (skill: ResumeSkill) => {
@@ -1063,17 +1160,6 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       skills.push(skills.shift()!);
     }
-    const orderedPids = skills.map((item) => item.pid);
-    await fetch(
-      `/api/resumeSkillCategories/${skillCategory.pid}/skills/order`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ orderedPids }),
-      }
-    );
     setFullResume({
       ...fullResume,
       skillCategories: fullResume.skillCategories.map((s) => {
@@ -1083,6 +1169,20 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         return s;
       }),
     });
+    const orderedPids = skills.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumeSkillCategories/${skillCategory.pid}/skills/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   const moveSkillDown = async (skill: ResumeSkill) => {
@@ -1098,17 +1198,6 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       skills.unshift(skills.pop()!);
     }
-    const orderedPids = skills.map((item) => item.pid);
-    await fetch(
-      `/api/resumeSkillCategories/${skillCategory.pid}/skills/order`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ orderedPids }),
-      }
-    );
     setFullResume({
       ...fullResume,
       skillCategories: fullResume.skillCategories.map((s) => {
@@ -1118,6 +1207,20 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         return s;
       }),
     });
+    const orderedPids = skills.map((item) => item.pid);
+    const response = await fetch(
+      `/api/resumeSkillCategories/${skillCategory.pid}/skills/order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderedPids }),
+      }
+    );
+    if (!response.ok) {
+      setFullResume(fullResume, true);
+    }
   };
 
   return (
