@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useUser } from "@/contexts/UserContext";
 import { createClient } from "@/lib/supabase/component";
+import { mutate } from "swr";
 
 export function Header() {
   const user = useUser();
@@ -10,6 +11,8 @@ export function Header() {
       const supabase = createClient();
       // TODO: Handle errors
       await supabase.auth.signOut();
+      // Clear everything from the SWR cache.
+      mutate(() => true, undefined, { revalidate: false });
     };
     return (
       <header className="flex w-full gap-8 p-8">

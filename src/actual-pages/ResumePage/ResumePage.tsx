@@ -21,6 +21,7 @@ import Head from "next/head";
 import { t } from "@/translate";
 import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
+import useSWR from "swr";
 
 type FullResume = Resume & {
   workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
@@ -44,33 +45,32 @@ export function ResumePage() {
   const user = useAuthRedirect();
   const router = useRouter();
   const [resumePid, setResumePid] = useState<string | null>(null);
-  const [fullResume, setFullResume] = useState<FullResume | null>(null);
-  const [fullJob, setFullJob] = useState<FullJob | null>(null);
 
   useEffect(() => {
     if (!router.isReady) return;
     setResumePid(router.query.resumePid as string);
   }, [router]);
 
-  useEffect(() => {
-    if (!resumePid || !user) return;
-    const fetchFullResume = async () => {
-      const response = await fetch(`/api/resumes/${resumePid}/full`);
+  const { data: fullResume, mutate: mutateResume } = useSWR(
+    user && resumePid ? `/api/resumes/${resumePid}/full` : null,
+    async (url) => {
+      const response = await fetch(url);
       const responseData = await response.json();
-      setFullResume(responseData);
-    };
-    fetchFullResume();
-  }, [resumePid, user]);
+      return responseData as FullResume;
+    }
+  );
 
-  useEffect(() => {
-    if (fullResume?.job.pid === undefined || !user) return;
-    const fetchFullJob = async () => {
-      const response = await fetch(`/api/jobs/${fullResume.job.pid}/full`);
+  const setFullResume = (fullResume: FullResume) =>
+    mutateResume(fullResume, false);
+
+  const { data: fullJob } = useSWR(
+    user && fullResume?.job.pid ? `/api/jobs/${fullResume.job.pid}/full` : null,
+    async (url) => {
+      const response = await fetch(url);
       const responseData = await response.json();
-      setFullJob(responseData);
-    };
-    fetchFullJob();
-  }, [fullResume?.job.pid, user]);
+      return responseData as FullJob;
+    }
+  );
 
   return (
     <>

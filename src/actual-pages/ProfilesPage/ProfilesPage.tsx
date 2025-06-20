@@ -1,24 +1,24 @@
 import { Header } from "@/components/Header";
-import { useEffect, useState } from "react";
 import { MainContent } from "./MainContent";
 import { Profile } from "@/generated/prisma";
 import Head from "next/head";
 import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
+import useSWR from "swr";
 
 export function ProfilesPage() {
   const user = useAuthRedirect();
-  const [profiles, setProfiles] = useState<Profile[] | null>(null);
 
-  useEffect(() => {
-    if (!user) return;
-    const fetchProfiles = async () => {
-      const response = await fetch(`/api/profiles`);
+  const { data: profiles, mutate: mutateProfiles } = useSWR(
+    user ? "/api/profiles" : null,
+    async (url) => {
+      const response = await fetch(url);
       const responseData = await response.json();
-      setProfiles(responseData);
-    };
-    fetchProfiles();
-  }, [user]);
+      return responseData as Profile[];
+    }
+  );
+
+  const setProfiles = (profiles: Profile[]) => mutateProfiles(profiles, false);
 
   return (
     <>

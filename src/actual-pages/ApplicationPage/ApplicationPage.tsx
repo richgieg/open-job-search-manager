@@ -18,6 +18,7 @@ import Head from "next/head";
 import { t } from "@/translate";
 import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
+import useSWR from "swr";
 
 type FullResume = Resume & {
   workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
@@ -34,22 +35,20 @@ export function ApplicationPage() {
   const user = useAuthRedirect();
   const router = useRouter();
   const [resumePid, setResumePid] = useState<string | null>(null);
-  const [fullResume, setFullResume] = useState<FullResume | null>(null);
 
   useEffect(() => {
     if (!router.isReady) return;
     setResumePid(router.query.resumePid as string);
   }, [router]);
 
-  useEffect(() => {
-    if (!resumePid || !user) return;
-    const fetchFullResume = async () => {
-      const response = await fetch(`/api/resumes/${resumePid}/full`);
+  const { data: fullResume } = useSWR(
+    user && resumePid ? `/api/resumes/${resumePid}/full` : null,
+    async (url) => {
+      const response = await fetch(url);
       const responseData = await response.json();
-      setFullResume(responseData);
-    };
-    fetchFullResume();
-  }, [resumePid, user]);
+      return responseData as FullResume;
+    }
+  );
 
   return (
     <>
