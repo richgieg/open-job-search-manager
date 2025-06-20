@@ -1,6 +1,7 @@
 import { DropdownInput } from "@/components/DropdownInput";
 import { Header } from "@/components/Header";
 import { LongTextInput } from "@/components/LongTextInput";
+import MetaNoIndex from "@/components/MetaNoIndex";
 import { SectionHeading } from "@/components/SectionHeading";
 import { CONTACT_MESSAGE_TYPES } from "@/constants";
 import { ContactMessageType } from "@/generated/prisma";
@@ -33,6 +34,7 @@ export function ContactPage() {
 
   return (
     <>
+      <MetaNoIndex />
       <Head>
         <title>Contact Us - Open Job Search Manager</title>
       </Head>

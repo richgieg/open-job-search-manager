@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { MainContent } from "./MainContent";
 import { Job, Link } from "@/generated/prisma";
 import Head from "next/head";
+import MetaNoIndex from "@/components/MetaNoIndex";
 
 type JobWithLinks = Job & { links: Link[] };
 
@@ -22,6 +23,7 @@ export function JobsPage() {
 
   return (
     <>
+      <MetaNoIndex />
       <Head>
         <title>Jobs - Open Job Search Manager</title>
       </Head>

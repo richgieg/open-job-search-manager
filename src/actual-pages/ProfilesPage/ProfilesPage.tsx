@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { MainContent } from "./MainContent";
 import { Profile } from "@/generated/prisma";
 import Head from "next/head";
+import MetaNoIndex from "@/components/MetaNoIndex";
 
 export function ProfilesPage() {
   const [profiles, setProfiles] = useState<Profile[] | null>(null);
@@ -18,6 +19,7 @@ export function ProfilesPage() {
 
   return (
     <>
+      <MetaNoIndex />
       <Head>
         <title>Profiles - Open Job Search Manager</title>
       </Head>

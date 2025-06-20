@@ -14,6 +14,7 @@ import {
 } from "@/generated/prisma";
 import Head from "next/head";
 import { t } from "@/translate";
+import MetaNoIndex from "@/components/MetaNoIndex";
 
 type FullProfile = Profile & {
   workEntries: (WorkEntry & { bullets: WorkEntryBullet[] })[];
@@ -44,6 +45,7 @@ export function ProfilePage() {
 
   return (
     <>
+      <MetaNoIndex />
       <Head>
         {fullProfile && (
           <title>

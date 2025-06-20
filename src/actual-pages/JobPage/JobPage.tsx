@@ -12,6 +12,7 @@ import {
 } from "@/generated/prisma";
 import Head from "next/head";
 import { t } from "@/translate";
+import MetaNoIndex from "@/components/MetaNoIndex";
 
 type FullJob = Job & {
   resumes: Resume[];
@@ -52,6 +53,7 @@ export function JobPage() {
 
   return (
     <>
+      <MetaNoIndex />
       <Head>
         {fullJob && (
           <title>

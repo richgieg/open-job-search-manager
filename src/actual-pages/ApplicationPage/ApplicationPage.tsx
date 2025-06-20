@@ -16,6 +16,7 @@ import {
 } from "@/generated/prisma";
 import Head from "next/head";
 import { t } from "@/translate";
+import MetaNoIndex from "@/components/MetaNoIndex";
 
 type FullResume = Resume & {
   workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
@@ -50,6 +51,7 @@ export function ApplicationPage() {
 
   return (
     <>
+      <MetaNoIndex />
       <Head>
         {fullResume && (
           <title>
