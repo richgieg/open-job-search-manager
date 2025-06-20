@@ -332,6 +332,7 @@ enum ContactMessageType {
 model ContactMessage {
   id        Int                @id @default(autoincrement())
   userId    String
+  email     String
   type      ContactMessageType
   message   String
   createdAt DateTime           @default(now())
