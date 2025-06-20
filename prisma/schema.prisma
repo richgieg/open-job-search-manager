@@ -321,3 +321,18 @@ model ResumeSkill {
   skillCategoryId Int
   skillCategory   ResumeSkillCategory @relation(fields: [skillCategoryId], references: [id], onDelete: Cascade)
 }
+
+enum ContactMessageType {
+  support
+  feedback
+  featureRequest
+  other
+}
+
+model ContactMessage {
+  id        Int                @id @default(autoincrement())
+  userId    String
+  type      ContactMessageType
+  message   String
+  createdAt DateTime           @default(now())
+}
