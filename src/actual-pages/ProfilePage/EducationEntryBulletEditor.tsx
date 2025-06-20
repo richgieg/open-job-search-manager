@@ -50,7 +50,7 @@ export function EducationEntryBulletEditor({
       id: educationEntryBullet.id,
       pid: educationEntryBullet.pid,
       educationEntryId: educationEntryBullet.educationEntryId,
-      text,
+      text: educationEntryBullet.text,
       enabled: !educationEntryBullet.enabled,
       sortOrder: educationEntryBullet.sortOrder,
     });

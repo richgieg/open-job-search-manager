@@ -42,7 +42,7 @@ export function WorkEntryBulletEditor({
       id: workEntryBullet.id,
       pid: workEntryBullet.pid,
       workEntryId: workEntryBullet.workEntryId,
-      text,
+      text: workEntryBullet.text,
       enabled: !workEntryBullet.enabled,
       sortOrder: workEntryBullet.sortOrder,
     });
