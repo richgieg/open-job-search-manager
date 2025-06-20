@@ -1,17 +1,15 @@
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useUser } from "@/contexts/UserContext";
 import { createClient } from "@/lib/supabase/component";
 
 export function Header() {
   const user = useUser();
-  const router = useRouter();
 
   if (user) {
     const logOut = async () => {
       const supabase = createClient();
+      // TODO: Handle errors
       await supabase.auth.signOut();
-      router.push("/");
     };
     return (
       <header className="flex w-full gap-8 p-8">

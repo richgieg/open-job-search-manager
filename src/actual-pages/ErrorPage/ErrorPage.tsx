@@ -1,9 +1,11 @@
 import { Header } from "@/components/Header";
+import MetaNoIndex from "@/components/MetaNoIndex";
 import Head from "next/head";
 
 export function ErrorPage() {
   return (
     <>
+      <MetaNoIndex />
       <Head>
         <title>Error - Open Job Search Manager</title>
       </Head>

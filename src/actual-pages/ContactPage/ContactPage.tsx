@@ -1,14 +1,17 @@
 import { DropdownInput } from "@/components/DropdownInput";
 import { Header } from "@/components/Header";
 import { LongTextInput } from "@/components/LongTextInput";
+import MetaNoIndex from "@/components/MetaNoIndex";
 import { SectionHeading } from "@/components/SectionHeading";
 import { CONTACT_MESSAGE_TYPES } from "@/constants";
 import { ContactMessageType } from "@/generated/prisma";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import { t } from "@/translate";
 import Head from "next/head";
 import { FormEvent, useEffect, useState } from "react";
 
 export function ContactPage() {
+  useAuthRedirect();
   const [type, setType] = useState<ContactMessageType>(
     CONTACT_MESSAGE_TYPES[0]
   );
@@ -33,6 +36,7 @@ export function ContactPage() {
 
   return (
     <>
+      <MetaNoIndex />
       <Head>
         <title>Contact Us - Open Job Search Manager</title>
       </Head>

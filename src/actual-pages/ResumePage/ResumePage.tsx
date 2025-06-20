@@ -19,6 +19,8 @@ import {
 } from "@/generated/prisma";
 import Head from "next/head";
 import { t } from "@/translate";
+import MetaNoIndex from "@/components/MetaNoIndex";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 
 type FullResume = Resume & {
   workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
@@ -39,6 +41,7 @@ type FullJob = Job & {
 };
 
 export function ResumePage() {
+  const user = useAuthRedirect();
   const router = useRouter();
   const [resumePid, setResumePid] = useState<string | null>(null);
   const [fullResume, setFullResume] = useState<FullResume | null>(null);
@@ -50,27 +53,28 @@ export function ResumePage() {
   }, [router]);
 
   useEffect(() => {
-    if (!resumePid) return;
+    if (!resumePid || !user) return;
     const fetchFullResume = async () => {
       const response = await fetch(`/api/resumes/${resumePid}/full`);
       const responseData = await response.json();
       setFullResume(responseData);
     };
     fetchFullResume();
-  }, [resumePid]);
+  }, [resumePid, user]);
 
   useEffect(() => {
-    if (fullResume?.job.pid === undefined) return;
+    if (fullResume?.job.pid === undefined || !user) return;
     const fetchFullJob = async () => {
       const response = await fetch(`/api/jobs/${fullResume.job.pid}/full`);
       const responseData = await response.json();
       setFullJob(responseData);
     };
     fetchFullJob();
-  }, [fullResume?.job.pid]);
+  }, [fullResume?.job.pid, user]);
 
   return (
     <>
+      <MetaNoIndex />
       <Head>
         {fullResume && (
           <title>
