@@ -20,8 +20,10 @@ export function JobsPage() {
     }
   );
 
-  const setJobsWithLinks = (jobsWithLinks: JobWithLinks[]) =>
-    mutateJobsWithLinks(jobsWithLinks, false);
+  const setJobsWithLinks = (
+    jobsWithLinks: JobWithLinks[],
+    revalidate = false
+  ) => mutateJobsWithLinks(jobsWithLinks, revalidate);
 
   return (
     <>
