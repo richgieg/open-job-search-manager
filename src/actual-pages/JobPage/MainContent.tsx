@@ -137,17 +137,15 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   };
 
   const moveLinkUp = async (link: Link) => {
-    const index = fullJob.links.findIndex((item) => item.id === link.id);
+    const links = [...fullJob.links];
+    const index = links.findIndex((item) => item.id === link.id);
     if (index > 0) {
       const swapIndex = index - 1;
-      [fullJob.links[index], fullJob.links[swapIndex]] = [
-        fullJob.links[swapIndex],
-        fullJob.links[index],
-      ];
+      [links[index], links[swapIndex]] = [links[swapIndex], links[index]];
     } else {
-      fullJob.links.push(fullJob.links.shift()!);
+      links.push(links.shift()!);
     }
-    const orderedPids = fullJob.links.map((item) => item.pid);
+    const orderedPids = links.map((item) => item.pid);
     await fetch(`/api/jobs/${fullJob.pid}/links/order`, {
       method: "PUT",
       headers: {
@@ -155,23 +153,19 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullJob({
-      ...fullJob,
-    });
+    setFullJob({ ...fullJob, links });
   };
 
   const moveLinkDown = async (link: Link) => {
-    const index = fullJob.links.findIndex((item) => item.id === link.id);
-    if (index < fullJob.links.length - 1) {
+    const links = [...fullJob.links];
+    const index = links.findIndex((item) => item.id === link.id);
+    if (index < links.length - 1) {
       const swapIndex = index + 1;
-      [fullJob.links[index], fullJob.links[swapIndex]] = [
-        fullJob.links[swapIndex],
-        fullJob.links[index],
-      ];
+      [links[index], links[swapIndex]] = [links[swapIndex], links[index]];
     } else {
-      fullJob.links.unshift(fullJob.links.pop()!);
+      links.unshift(links.pop()!);
     }
-    const orderedPids = fullJob.links.map((item) => item.pid);
+    const orderedPids = links.map((item) => item.pid);
     await fetch(`/api/jobs/${fullJob.pid}/links/order`, {
       method: "PUT",
       headers: {
@@ -179,9 +173,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullJob({
-      ...fullJob,
-    });
+    setFullJob({ ...fullJob, links });
   };
 
   const createApplicationQuestion = async () => {
@@ -247,22 +239,20 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   const moveApplicationQuestionUp = async (
     applicationQuestion: ApplicationQuestion
   ) => {
-    const index = fullJob.applicationQuestions.findIndex(
+    const applicationQuestions = [...fullJob.applicationQuestions];
+    const index = applicationQuestions.findIndex(
       (item) => item.id === applicationQuestion.id
     );
     if (index > 0) {
       const swapIndex = index - 1;
-      [
-        fullJob.applicationQuestions[index],
-        fullJob.applicationQuestions[swapIndex],
-      ] = [
-        fullJob.applicationQuestions[swapIndex],
-        fullJob.applicationQuestions[index],
+      [applicationQuestions[index], applicationQuestions[swapIndex]] = [
+        applicationQuestions[swapIndex],
+        applicationQuestions[index],
       ];
     } else {
-      fullJob.applicationQuestions.push(fullJob.applicationQuestions.shift()!);
+      applicationQuestions.push(applicationQuestions.shift()!);
     }
-    const orderedPids = fullJob.applicationQuestions.map((item) => item.pid);
+    const orderedPids = applicationQuestions.map((item) => item.pid);
     await fetch(`/api/jobs/${fullJob.pid}/applicationQuestions/order`, {
       method: "PUT",
       headers: {
@@ -270,30 +260,26 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullJob({
-      ...fullJob,
-    });
+    setFullJob({ ...fullJob, applicationQuestions });
   };
 
   const moveApplicationQuestionDown = async (
     applicationQuestion: ApplicationQuestion
   ) => {
-    const index = fullJob.applicationQuestions.findIndex(
+    const applicationQuestions = [...fullJob.applicationQuestions];
+    const index = applicationQuestions.findIndex(
       (item) => item.id === applicationQuestion.id
     );
-    if (index < fullJob.applicationQuestions.length - 1) {
+    if (index < applicationQuestions.length - 1) {
       const swapIndex = index + 1;
-      [
-        fullJob.applicationQuestions[index],
-        fullJob.applicationQuestions[swapIndex],
-      ] = [
-        fullJob.applicationQuestions[swapIndex],
-        fullJob.applicationQuestions[index],
+      [applicationQuestions[index], applicationQuestions[swapIndex]] = [
+        applicationQuestions[swapIndex],
+        applicationQuestions[index],
       ];
     } else {
-      fullJob.applicationQuestions.unshift(fullJob.applicationQuestions.pop()!);
+      applicationQuestions.unshift(applicationQuestions.pop()!);
     }
-    const orderedPids = fullJob.applicationQuestions.map((item) => item.pid);
+    const orderedPids = applicationQuestions.map((item) => item.pid);
     await fetch(`/api/jobs/${fullJob.pid}/applicationQuestions/order`, {
       method: "PUT",
       headers: {
@@ -301,9 +287,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullJob({
-      ...fullJob,
-    });
+    setFullJob({ ...fullJob, applicationQuestions });
   };
 
   const createContact = async () => {
@@ -360,17 +344,18 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
   };
 
   const moveContactUp = async (contact: Contact) => {
-    const index = fullJob.contacts.findIndex((item) => item.id === contact.id);
+    const contacts = [...fullJob.contacts];
+    const index = contacts.findIndex((item) => item.id === contact.id);
     if (index > 0) {
       const swapIndex = index - 1;
-      [fullJob.contacts[index], fullJob.contacts[swapIndex]] = [
-        fullJob.contacts[swapIndex],
-        fullJob.contacts[index],
+      [contacts[index], contacts[swapIndex]] = [
+        contacts[swapIndex],
+        contacts[index],
       ];
     } else {
-      fullJob.contacts.push(fullJob.contacts.shift()!);
+      contacts.push(contacts.shift()!);
     }
-    const orderedPids = fullJob.contacts.map((item) => item.pid);
+    const orderedPids = contacts.map((item) => item.pid);
     await fetch(`/api/jobs/${fullJob.pid}/contacts/order`, {
       method: "PUT",
       headers: {
@@ -378,23 +363,22 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullJob({
-      ...fullJob,
-    });
+    setFullJob({ ...fullJob, contacts });
   };
 
   const moveContactDown = async (contact: Contact) => {
-    const index = fullJob.contacts.findIndex((item) => item.id === contact.id);
-    if (index < fullJob.contacts.length - 1) {
+    const contacts = [...fullJob.contacts];
+    const index = contacts.findIndex((item) => item.id === contact.id);
+    if (index < contacts.length - 1) {
       const swapIndex = index + 1;
-      [fullJob.contacts[index], fullJob.contacts[swapIndex]] = [
-        fullJob.contacts[swapIndex],
-        fullJob.contacts[index],
+      [contacts[index], contacts[swapIndex]] = [
+        contacts[swapIndex],
+        contacts[index],
       ];
     } else {
-      fullJob.contacts.unshift(fullJob.contacts.pop()!);
+      contacts.unshift(contacts.pop()!);
     }
-    const orderedPids = fullJob.contacts.map((item) => item.pid);
+    const orderedPids = contacts.map((item) => item.pid);
     await fetch(`/api/jobs/${fullJob.pid}/contacts/order`, {
       method: "PUT",
       headers: {
@@ -402,9 +386,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullJob({
-      ...fullJob,
-    });
+    setFullJob({ ...fullJob, contacts });
   };
 
   return (
