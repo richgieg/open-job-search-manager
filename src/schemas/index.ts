@@ -1,4 +1,5 @@
 import {
+  ContactMessageType,
   JobArrangement,
   JobStatus,
   JobType,
@@ -25,3 +26,7 @@ export const jobStatusSchema = z.enum([...Object.values(JobStatus)] as [
 export const resumeTemplateSchema = z.enum([
   ...Object.values(ResumeTemplate),
 ] as [keyof typeof ResumeTemplate, ...(keyof typeof ResumeTemplate)[]]);
+
+export const contactMessageTypeSchema = z.enum([
+  ...Object.values(ContactMessageType),
+] as [keyof typeof ContactMessageType, ...(keyof typeof ContactMessageType)[]]);
