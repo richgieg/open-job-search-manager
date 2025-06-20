@@ -60,8 +60,8 @@ export function ResumePage() {
     }
   );
 
-  const setFullResume = (fullResume: FullResume) =>
-    mutateResume(fullResume, false);
+  const setFullResume = (fullResume: FullResume, revalidate = false) =>
+    mutateResume(fullResume, revalidate);
 
   const { data: fullJob } = useSWR(
     user && fullResume?.job.pid ? `/api/jobs/${fullResume.job.pid}/full` : null,

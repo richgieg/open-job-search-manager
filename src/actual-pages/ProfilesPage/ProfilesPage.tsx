@@ -18,7 +18,8 @@ export function ProfilesPage() {
     }
   );
 
-  const setProfiles = (profiles: Profile[]) => mutateProfiles(profiles, false);
+  const setProfiles = (profiles: Profile[], revalidate = false) =>
+    mutateProfiles(profiles, revalidate);
 
   return (
     <>

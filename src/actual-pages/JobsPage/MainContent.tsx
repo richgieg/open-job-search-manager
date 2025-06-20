@@ -9,7 +9,10 @@ type JobWithLinks = Job & { links: Link[] };
 
 type Props = {
   jobsWithLinks: JobWithLinks[];
-  setJobsWithLinks: (jobsWithLinks: JobWithLinks[]) => void;
+  setJobsWithLinks: (
+    jobsWithLinks: JobWithLinks[],
+    revalidate?: boolean
+  ) => void;
 };
 
 export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
@@ -29,8 +32,11 @@ export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
       )
     )
       return;
-    await fetch(`/api/jobs/${job.pid}`, { method: "DELETE" });
     setJobsWithLinks(jobsWithLinks.filter((j) => j.id !== job.id));
+    const response = await fetch(`/api/jobs/${job.pid}`, { method: "DELETE" });
+    if (!response.ok) {
+      setJobsWithLinks(jobsWithLinks, true);
+    }
   };
 
   return (
