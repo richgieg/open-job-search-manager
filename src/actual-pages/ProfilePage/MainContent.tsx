@@ -411,9 +411,8 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       workEntries: fullProfile.workEntries.map((w) => {
         if (w.id === workEntry.id) {
           return { ...w, bullets };
-        } else {
-          return w;
         }
+        return w;
       }),
     });
   };
@@ -447,9 +446,8 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       workEntries: fullProfile.workEntries.map((w) => {
         if (w.id === workEntry.id) {
           return { ...w, bullets };
-        } else {
-          return w;
         }
+        return w;
       }),
     });
   };
@@ -682,9 +680,8 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       educationEntries: fullProfile.educationEntries.map((e) => {
         if (e.id === educationEntry.id) {
           return { ...e, bullets };
-        } else {
-          return e;
         }
+        return e;
       }),
     });
   };
@@ -722,9 +719,8 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       educationEntries: fullProfile.educationEntries.map((e) => {
         if (e.id === educationEntry.id) {
           return { ...e, bullets };
-        } else {
-          return e;
         }
+        return e;
       }),
     });
   };
@@ -1035,9 +1031,8 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       skillCategories: fullProfile.skillCategories.map((s) => {
         if (s.id === skillCategory.id) {
           return { ...s, skills };
-        } else {
-          return s;
         }
+        return s;
       }),
     });
   };
@@ -1068,9 +1063,8 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       skillCategories: fullProfile.skillCategories.map((s) => {
         if (s.id === skillCategory.id) {
           return { ...s, skills };
-        } else {
-          return s;
         }
+        return s;
       }),
     });
   };
