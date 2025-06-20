@@ -261,19 +261,18 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const moveWorkEntryUp = async (workEntry: WorkEntry) => {
-    const index = fullProfile.workEntries.findIndex(
-      (item) => item.id === workEntry.id
-    );
+    const workEntries = [...fullProfile.workEntries];
+    const index = workEntries.findIndex((item) => item.id === workEntry.id);
     if (index > 0) {
       const swapIndex = index - 1;
-      [fullProfile.workEntries[index], fullProfile.workEntries[swapIndex]] = [
-        fullProfile.workEntries[swapIndex],
-        fullProfile.workEntries[index],
+      [workEntries[index], workEntries[swapIndex]] = [
+        workEntries[swapIndex],
+        workEntries[index],
       ];
     } else {
-      fullProfile.workEntries.push(fullProfile.workEntries.shift()!);
+      workEntries.push(workEntries.shift()!);
     }
-    const orderedPids = fullProfile.workEntries.map((item) => item.pid);
+    const orderedPids = workEntries.map((item) => item.pid);
     await fetch(`/api/profiles/${fullProfile.pid}/workEntries/order`, {
       method: "PUT",
       headers: {
@@ -281,25 +280,22 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
-    });
+    setFullProfile({ ...fullProfile, workEntries });
   };
 
   const moveWorkEntryDown = async (workEntry: WorkEntry) => {
-    const index = fullProfile.workEntries.findIndex(
-      (item) => item.id === workEntry.id
-    );
-    if (index < fullProfile.workEntries.length - 1) {
+    const workEntries = [...fullProfile.workEntries];
+    const index = workEntries.findIndex((item) => item.id === workEntry.id);
+    if (index < workEntries.length - 1) {
       const swapIndex = index + 1;
-      [fullProfile.workEntries[index], fullProfile.workEntries[swapIndex]] = [
-        fullProfile.workEntries[swapIndex],
-        fullProfile.workEntries[index],
+      [workEntries[index], workEntries[swapIndex]] = [
+        workEntries[swapIndex],
+        workEntries[index],
       ];
     } else {
-      fullProfile.workEntries.unshift(fullProfile.workEntries.pop()!);
+      workEntries.unshift(workEntries.pop()!);
     }
-    const orderedPids = fullProfile.workEntries.map((item) => item.pid);
+    const orderedPids = workEntries.map((item) => item.pid);
     await fetch(`/api/profiles/${fullProfile.pid}/workEntries/order`, {
       method: "PUT",
       headers: {
@@ -307,9 +303,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
-    });
+    setFullProfile({ ...fullProfile, workEntries });
   };
 
   const createWorkEntryBullet = async (workEntryPid: string) => {
@@ -393,7 +387,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       (item) => item.id === workEntryBullet.workEntryId
     );
     if (!workEntry) return;
-    const bullets = workEntry.bullets;
+    const bullets = [...workEntry.bullets];
     const index = bullets.findIndex((item) => item.id === workEntryBullet.id);
     if (index > 0) {
       const swapIndex = index - 1;
@@ -414,6 +408,12 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
     setFullProfile({
       ...fullProfile,
+      workEntries: fullProfile.workEntries.map((w) => {
+        if (w.id === workEntry.id) {
+          return { ...w, bullets };
+        }
+        return w;
+      }),
     });
   };
 
@@ -422,7 +422,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       (item) => item.id === workEntryBullet.workEntryId
     );
     if (!workEntry) return;
-    const bullets = workEntry.bullets;
+    const bullets = [...workEntry.bullets];
     const index = bullets.findIndex((item) => item.id === workEntryBullet.id);
     if (index < bullets.length - 1) {
       const swapIndex = index + 1;
@@ -443,6 +443,12 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
     setFullProfile({
       ...fullProfile,
+      workEntries: fullProfile.workEntries.map((w) => {
+        if (w.id === workEntry.id) {
+          return { ...w, bullets };
+        }
+        return w;
+      }),
     });
   };
 
@@ -506,22 +512,20 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const moveEducationEntryUp = async (educationEntry: EducationEntry) => {
-    const index = fullProfile.educationEntries.findIndex(
+    const educationEntries = [...fullProfile.educationEntries];
+    const index = educationEntries.findIndex(
       (item) => item.id === educationEntry.id
     );
     if (index > 0) {
       const swapIndex = index - 1;
-      [
-        fullProfile.educationEntries[index],
-        fullProfile.educationEntries[swapIndex],
-      ] = [
-        fullProfile.educationEntries[swapIndex],
-        fullProfile.educationEntries[index],
+      [educationEntries[index], educationEntries[swapIndex]] = [
+        educationEntries[swapIndex],
+        educationEntries[index],
       ];
     } else {
-      fullProfile.educationEntries.push(fullProfile.educationEntries.shift()!);
+      educationEntries.push(educationEntries.shift()!);
     }
-    const orderedPids = fullProfile.educationEntries.map((item) => item.pid);
+    const orderedPids = educationEntries.map((item) => item.pid);
     await fetch(`/api/profiles/${fullProfile.pid}/educationEntries/order`, {
       method: "PUT",
       headers: {
@@ -529,28 +533,24 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
-    });
+    setFullProfile({ ...fullProfile, educationEntries });
   };
 
   const moveEducationEntryDown = async (educationEntry: EducationEntry) => {
-    const index = fullProfile.educationEntries.findIndex(
+    const educationEntries = [...fullProfile.educationEntries];
+    const index = educationEntries.findIndex(
       (item) => item.id === educationEntry.id
     );
-    if (index < fullProfile.educationEntries.length - 1) {
+    if (index < educationEntries.length - 1) {
       const swapIndex = index + 1;
-      [
-        fullProfile.educationEntries[index],
-        fullProfile.educationEntries[swapIndex],
-      ] = [
-        fullProfile.educationEntries[swapIndex],
-        fullProfile.educationEntries[index],
+      [educationEntries[index], educationEntries[swapIndex]] = [
+        educationEntries[swapIndex],
+        educationEntries[index],
       ];
     } else {
-      fullProfile.educationEntries.unshift(fullProfile.educationEntries.pop()!);
+      educationEntries.unshift(educationEntries.pop()!);
     }
-    const orderedPids = fullProfile.educationEntries.map((item) => item.pid);
+    const orderedPids = educationEntries.map((item) => item.pid);
     await fetch(`/api/profiles/${fullProfile.pid}/educationEntries/order`, {
       method: "PUT",
       headers: {
@@ -558,9 +558,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
-    });
+    setFullProfile({ ...fullProfile, educationEntries });
   };
 
   const createEducationEntryBullet = async (educationEntryPid: string) => {
@@ -656,7 +654,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       (item) => item.id === educationEntryBullet.educationEntryId
     );
     if (!educationEntry) return;
-    const bullets = educationEntry.bullets;
+    const bullets = [...educationEntry.bullets];
     const index = bullets.findIndex(
       (item) => item.id === educationEntryBullet.id
     );
@@ -679,6 +677,12 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
     setFullProfile({
       ...fullProfile,
+      educationEntries: fullProfile.educationEntries.map((e) => {
+        if (e.id === educationEntry.id) {
+          return { ...e, bullets };
+        }
+        return e;
+      }),
     });
   };
 
@@ -689,7 +693,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       (item) => item.id === educationEntryBullet.educationEntryId
     );
     if (!educationEntry) return;
-    const bullets = educationEntry.bullets;
+    const bullets = [...educationEntry.bullets];
     const index = bullets.findIndex(
       (item) => item.id === educationEntryBullet.id
     );
@@ -712,6 +716,12 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
     setFullProfile({
       ...fullProfile,
+      educationEntries: fullProfile.educationEntries.map((e) => {
+        if (e.id === educationEntry.id) {
+          return { ...e, bullets };
+        }
+        return e;
+      }),
     });
   };
 
@@ -766,22 +776,20 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const moveCertificationUp = async (certification: Certification) => {
-    const index = fullProfile.certifications.findIndex(
+    const certifications = [...fullProfile.certifications];
+    const index = certifications.findIndex(
       (item) => item.id === certification.id
     );
     if (index > 0) {
       const swapIndex = index - 1;
-      [
-        fullProfile.certifications[index],
-        fullProfile.certifications[swapIndex],
-      ] = [
-        fullProfile.certifications[swapIndex],
-        fullProfile.certifications[index],
+      [certifications[index], certifications[swapIndex]] = [
+        certifications[swapIndex],
+        certifications[index],
       ];
     } else {
-      fullProfile.certifications.push(fullProfile.certifications.shift()!);
+      certifications.push(certifications.shift()!);
     }
-    const orderedPids = fullProfile.certifications.map((item) => item.pid);
+    const orderedPids = certifications.map((item) => item.pid);
     await fetch(`/api/profiles/${fullProfile.pid}/certifications/order`, {
       method: "PUT",
       headers: {
@@ -789,28 +797,24 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
-    });
+    setFullProfile({ ...fullProfile, certifications });
   };
 
   const moveCertificationDown = async (certification: Certification) => {
-    const index = fullProfile.certifications.findIndex(
+    const certifications = [...fullProfile.certifications];
+    const index = certifications.findIndex(
       (item) => item.id === certification.id
     );
-    if (index < fullProfile.certifications.length - 1) {
+    if (index < certifications.length - 1) {
       const swapIndex = index + 1;
-      [
-        fullProfile.certifications[index],
-        fullProfile.certifications[swapIndex],
-      ] = [
-        fullProfile.certifications[swapIndex],
-        fullProfile.certifications[index],
+      [certifications[index], certifications[swapIndex]] = [
+        certifications[swapIndex],
+        certifications[index],
       ];
     } else {
-      fullProfile.certifications.unshift(fullProfile.certifications.pop()!);
+      certifications.unshift(certifications.pop()!);
     }
-    const orderedPids = fullProfile.certifications.map((item) => item.pid);
+    const orderedPids = certifications.map((item) => item.pid);
     await fetch(`/api/profiles/${fullProfile.pid}/certifications/order`, {
       method: "PUT",
       headers: {
@@ -818,9 +822,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
-    });
+    setFullProfile({ ...fullProfile, certifications });
   };
 
   const createSkillCategory = async () => {
@@ -880,22 +882,20 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const moveSkillCategoryUp = async (skillCategory: SkillCategory) => {
-    const index = fullProfile.skillCategories.findIndex(
+    const skillCategories = [...fullProfile.skillCategories];
+    const index = skillCategories.findIndex(
       (item) => item.id === skillCategory.id
     );
     if (index > 0) {
       const swapIndex = index - 1;
-      [
-        fullProfile.skillCategories[index],
-        fullProfile.skillCategories[swapIndex],
-      ] = [
-        fullProfile.skillCategories[swapIndex],
-        fullProfile.skillCategories[index],
+      [skillCategories[index], skillCategories[swapIndex]] = [
+        skillCategories[swapIndex],
+        skillCategories[index],
       ];
     } else {
-      fullProfile.skillCategories.push(fullProfile.skillCategories.shift()!);
+      skillCategories.push(skillCategories.shift()!);
     }
-    const orderedPids = fullProfile.skillCategories.map((item) => item.pid);
+    const orderedPids = skillCategories.map((item) => item.pid);
     await fetch(`/api/profiles/${fullProfile.pid}/skillCategories/order`, {
       method: "PUT",
       headers: {
@@ -903,28 +903,24 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
-    });
+    setFullProfile({ ...fullProfile, skillCategories });
   };
 
   const moveSkillCategoryDown = async (skillCategory: SkillCategory) => {
-    const index = fullProfile.skillCategories.findIndex(
+    const skillCategories = [...fullProfile.skillCategories];
+    const index = skillCategories.findIndex(
       (item) => item.id === skillCategory.id
     );
-    if (index < fullProfile.skillCategories.length - 1) {
+    if (index < skillCategories.length - 1) {
       const swapIndex = index + 1;
-      [
-        fullProfile.skillCategories[index],
-        fullProfile.skillCategories[swapIndex],
-      ] = [
-        fullProfile.skillCategories[swapIndex],
-        fullProfile.skillCategories[index],
+      [skillCategories[index], skillCategories[swapIndex]] = [
+        skillCategories[swapIndex],
+        skillCategories[index],
       ];
     } else {
-      fullProfile.skillCategories.unshift(fullProfile.skillCategories.pop()!);
+      skillCategories.unshift(skillCategories.pop()!);
     }
-    const orderedPids = fullProfile.skillCategories.map((item) => item.pid);
+    const orderedPids = skillCategories.map((item) => item.pid);
     await fetch(`/api/profiles/${fullProfile.pid}/skillCategories/order`, {
       method: "PUT",
       headers: {
@@ -932,9 +928,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullProfile({
-      ...fullProfile,
-    });
+    setFullProfile({ ...fullProfile, skillCategories });
   };
 
   const createSkill = async (skillCategoryPid: string) => {
@@ -1016,7 +1010,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       (item) => item.id === skill.skillCategoryId
     );
     if (!skillCategory) return;
-    const skills = skillCategory.skills;
+    const skills = [...skillCategory.skills];
     const index = skills.findIndex((item) => item.id === skill.id);
     if (index > 0) {
       const swapIndex = index - 1;
@@ -1034,6 +1028,12 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
     setFullProfile({
       ...fullProfile,
+      skillCategories: fullProfile.skillCategories.map((s) => {
+        if (s.id === skillCategory.id) {
+          return { ...s, skills };
+        }
+        return s;
+      }),
     });
   };
 
@@ -1042,7 +1042,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       (item) => item.id === skill.skillCategoryId
     );
     if (!skillCategory) return;
-    const skills = skillCategory.skills;
+    const skills = [...skillCategory.skills];
     const index = skills.findIndex((item) => item.id === skill.id);
     if (index < skills.length - 1) {
       const swapIndex = index + 1;
@@ -1060,6 +1060,12 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     });
     setFullProfile({
       ...fullProfile,
+      skillCategories: fullProfile.skillCategories.map((s) => {
+        if (s.id === skillCategory.id) {
+          return { ...s, skills };
+        }
+        return s;
+      }),
     });
   };
 

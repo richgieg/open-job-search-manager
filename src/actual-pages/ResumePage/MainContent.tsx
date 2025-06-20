@@ -279,19 +279,18 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const moveWorkEntryUp = async (workEntry: ResumeWorkEntry) => {
-    const index = fullResume.workEntries.findIndex(
-      (item) => item.id === workEntry.id
-    );
+    const workEntries = [...fullResume.workEntries];
+    const index = workEntries.findIndex((item) => item.id === workEntry.id);
     if (index > 0) {
       const swapIndex = index - 1;
-      [fullResume.workEntries[index], fullResume.workEntries[swapIndex]] = [
-        fullResume.workEntries[swapIndex],
-        fullResume.workEntries[index],
+      [workEntries[index], workEntries[swapIndex]] = [
+        workEntries[swapIndex],
+        workEntries[index],
       ];
     } else {
-      fullResume.workEntries.push(fullResume.workEntries.shift()!);
+      workEntries.push(workEntries.shift()!);
     }
-    const orderedPids = fullResume.workEntries.map((item) => item.pid);
+    const orderedPids = workEntries.map((item) => item.pid);
     await fetch(`/api/resumes/${fullResume.pid}/workEntries/order`, {
       method: "PUT",
       headers: {
@@ -299,25 +298,22 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullResume({
-      ...fullResume,
-    });
+    setFullResume({ ...fullResume, workEntries });
   };
 
   const moveWorkEntryDown = async (workEntry: ResumeWorkEntry) => {
-    const index = fullResume.workEntries.findIndex(
-      (item) => item.id === workEntry.id
-    );
-    if (index < fullResume.workEntries.length - 1) {
+    const workEntries = [...fullResume.workEntries];
+    const index = workEntries.findIndex((item) => item.id === workEntry.id);
+    if (index < workEntries.length - 1) {
       const swapIndex = index + 1;
-      [fullResume.workEntries[index], fullResume.workEntries[swapIndex]] = [
-        fullResume.workEntries[swapIndex],
-        fullResume.workEntries[index],
+      [workEntries[index], workEntries[swapIndex]] = [
+        workEntries[swapIndex],
+        workEntries[index],
       ];
     } else {
-      fullResume.workEntries.unshift(fullResume.workEntries.pop()!);
+      workEntries.unshift(workEntries.pop()!);
     }
-    const orderedPids = fullResume.workEntries.map((item) => item.pid);
+    const orderedPids = workEntries.map((item) => item.pid);
     await fetch(`/api/resumes/${fullResume.pid}/workEntries/order`, {
       method: "PUT",
       headers: {
@@ -325,9 +321,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullResume({
-      ...fullResume,
-    });
+    setFullResume({ ...fullResume, workEntries });
   };
 
   const createWorkEntryBullet = async (workEntryPid: string) => {
@@ -420,7 +414,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       (item) => item.id === workEntryBullet.workEntryId
     );
     if (!workEntry) return;
-    const bullets = workEntry.bullets;
+    const bullets = [...workEntry.bullets];
     const index = bullets.findIndex((item) => item.id === workEntryBullet.id);
     if (index > 0) {
       const swapIndex = index - 1;
@@ -441,6 +435,12 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     });
     setFullResume({
       ...fullResume,
+      workEntries: fullResume.workEntries.map((w) => {
+        if (w.id === workEntry.id) {
+          return { ...w, bullets };
+        }
+        return w;
+      }),
     });
   };
 
@@ -451,7 +451,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       (item) => item.id === workEntryBullet.workEntryId
     );
     if (!workEntry) return;
-    const bullets = workEntry.bullets;
+    const bullets = [...workEntry.bullets];
     const index = bullets.findIndex((item) => item.id === workEntryBullet.id);
     if (index < bullets.length - 1) {
       const swapIndex = index + 1;
@@ -472,6 +472,12 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     });
     setFullResume({
       ...fullResume,
+      workEntries: fullResume.workEntries.map((w) => {
+        if (w.id === workEntry.id) {
+          return { ...w, bullets };
+        }
+        return w;
+      }),
     });
   };
 
@@ -535,22 +541,20 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const moveEducationEntryUp = async (educationEntry: ResumeEducationEntry) => {
-    const index = fullResume.educationEntries.findIndex(
+    const educationEntries = [...fullResume.educationEntries];
+    const index = educationEntries.findIndex(
       (item) => item.id === educationEntry.id
     );
     if (index > 0) {
       const swapIndex = index - 1;
-      [
-        fullResume.educationEntries[index],
-        fullResume.educationEntries[swapIndex],
-      ] = [
-        fullResume.educationEntries[swapIndex],
-        fullResume.educationEntries[index],
+      [educationEntries[index], educationEntries[swapIndex]] = [
+        educationEntries[swapIndex],
+        educationEntries[index],
       ];
     } else {
-      fullResume.educationEntries.push(fullResume.educationEntries.shift()!);
+      educationEntries.push(educationEntries.shift()!);
     }
-    const orderedPids = fullResume.educationEntries.map((item) => item.pid);
+    const orderedPids = educationEntries.map((item) => item.pid);
     await fetch(`/api/resumes/${fullResume.pid}/educationEntries/order`, {
       method: "PUT",
       headers: {
@@ -558,30 +562,26 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullResume({
-      ...fullResume,
-    });
+    setFullResume({ ...fullResume, educationEntries });
   };
 
   const moveEducationEntryDown = async (
     educationEntry: ResumeEducationEntry
   ) => {
-    const index = fullResume.educationEntries.findIndex(
+    const educationEntries = [...fullResume.educationEntries];
+    const index = educationEntries.findIndex(
       (item) => item.id === educationEntry.id
     );
-    if (index < fullResume.educationEntries.length - 1) {
+    if (index < educationEntries.length - 1) {
       const swapIndex = index + 1;
-      [
-        fullResume.educationEntries[index],
-        fullResume.educationEntries[swapIndex],
-      ] = [
-        fullResume.educationEntries[swapIndex],
-        fullResume.educationEntries[index],
+      [educationEntries[index], educationEntries[swapIndex]] = [
+        educationEntries[swapIndex],
+        educationEntries[index],
       ];
     } else {
-      fullResume.educationEntries.unshift(fullResume.educationEntries.pop()!);
+      educationEntries.unshift(educationEntries.pop()!);
     }
-    const orderedPids = fullResume.educationEntries.map((item) => item.pid);
+    const orderedPids = educationEntries.map((item) => item.pid);
     await fetch(`/api/resumes/${fullResume.pid}/educationEntries/order`, {
       method: "PUT",
       headers: {
@@ -589,9 +589,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullResume({
-      ...fullResume,
-    });
+    setFullResume({ ...fullResume, educationEntries });
   };
 
   const createEducationEntryBullet = async (educationEntryPid: string) => {
@@ -689,7 +687,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       (item) => item.id === educationEntryBullet.educationEntryId
     );
     if (!educationEntry) return;
-    const bullets = educationEntry.bullets;
+    const bullets = [...educationEntry.bullets];
     const index = bullets.findIndex(
       (item) => item.id === educationEntryBullet.id
     );
@@ -715,6 +713,12 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     );
     setFullResume({
       ...fullResume,
+      educationEntries: fullResume.educationEntries.map((e) => {
+        if (e.id === educationEntry.id) {
+          return { ...e, bullets };
+        }
+        return e;
+      }),
     });
   };
 
@@ -725,7 +729,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       (item) => item.id === educationEntryBullet.educationEntryId
     );
     if (!educationEntry) return;
-    const bullets = educationEntry.bullets;
+    const bullets = [...educationEntry.bullets];
     const index = bullets.findIndex(
       (item) => item.id === educationEntryBullet.id
     );
@@ -751,6 +755,12 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     );
     setFullResume({
       ...fullResume,
+      educationEntries: fullResume.educationEntries.map((e) => {
+        if (e.id === educationEntry.id) {
+          return { ...e, bullets };
+        }
+        return e;
+      }),
     });
   };
 
@@ -808,20 +818,20 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const moveCertificationUp = async (certification: ResumeCertification) => {
-    const index = fullResume.certifications.findIndex(
+    const certifications = [...fullResume.certifications];
+    const index = certifications.findIndex(
       (item) => item.id === certification.id
     );
     if (index > 0) {
       const swapIndex = index - 1;
-      [fullResume.certifications[index], fullResume.certifications[swapIndex]] =
-        [
-          fullResume.certifications[swapIndex],
-          fullResume.certifications[index],
-        ];
+      [certifications[index], certifications[swapIndex]] = [
+        certifications[swapIndex],
+        certifications[index],
+      ];
     } else {
-      fullResume.certifications.push(fullResume.certifications.shift()!);
+      certifications.push(certifications.shift()!);
     }
-    const orderedPids = fullResume.certifications.map((item) => item.pid);
+    const orderedPids = certifications.map((item) => item.pid);
     await fetch(`/api/resumes/${fullResume.pid}/certifications/order`, {
       method: "PUT",
       headers: {
@@ -829,26 +839,24 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullResume({
-      ...fullResume,
-    });
+    setFullResume({ ...fullResume, certifications });
   };
 
   const moveCertificationDown = async (certification: ResumeCertification) => {
-    const index = fullResume.certifications.findIndex(
+    const certifications = [...fullResume.certifications];
+    const index = certifications.findIndex(
       (item) => item.id === certification.id
     );
-    if (index < fullResume.certifications.length - 1) {
+    if (index < certifications.length - 1) {
       const swapIndex = index + 1;
-      [fullResume.certifications[index], fullResume.certifications[swapIndex]] =
-        [
-          fullResume.certifications[swapIndex],
-          fullResume.certifications[index],
-        ];
+      [certifications[index], certifications[swapIndex]] = [
+        certifications[swapIndex],
+        certifications[index],
+      ];
     } else {
-      fullResume.certifications.unshift(fullResume.certifications.pop()!);
+      certifications.unshift(certifications.pop()!);
     }
-    const orderedPids = fullResume.certifications.map((item) => item.pid);
+    const orderedPids = certifications.map((item) => item.pid);
     await fetch(`/api/resumes/${fullResume.pid}/certifications/order`, {
       method: "PUT",
       headers: {
@@ -856,9 +864,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullResume({
-      ...fullResume,
-    });
+    setFullResume({ ...fullResume, certifications });
   };
 
   const createSkillCategory = async () => {
@@ -921,22 +927,20 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const moveSkillCategoryUp = async (skillCategory: ResumeSkillCategory) => {
-    const index = fullResume.skillCategories.findIndex(
+    const skillCategories = [...fullResume.skillCategories];
+    const index = skillCategories.findIndex(
       (item) => item.id === skillCategory.id
     );
     if (index > 0) {
       const swapIndex = index - 1;
-      [
-        fullResume.skillCategories[index],
-        fullResume.skillCategories[swapIndex],
-      ] = [
-        fullResume.skillCategories[swapIndex],
-        fullResume.skillCategories[index],
+      [skillCategories[index], skillCategories[swapIndex]] = [
+        skillCategories[swapIndex],
+        skillCategories[index],
       ];
     } else {
-      fullResume.skillCategories.push(fullResume.skillCategories.shift()!);
+      skillCategories.push(skillCategories.shift()!);
     }
-    const orderedPids = fullResume.skillCategories.map((item) => item.pid);
+    const orderedPids = skillCategories.map((item) => item.pid);
     await fetch(`/api/resumes/${fullResume.pid}/skillCategories/order`, {
       method: "PUT",
       headers: {
@@ -944,28 +948,24 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullResume({
-      ...fullResume,
-    });
+    setFullResume({ ...fullResume, skillCategories });
   };
 
   const moveSkillCategoryDown = async (skillCategory: ResumeSkillCategory) => {
-    const index = fullResume.skillCategories.findIndex(
+    const skillCategories = [...fullResume.skillCategories];
+    const index = skillCategories.findIndex(
       (item) => item.id === skillCategory.id
     );
-    if (index < fullResume.skillCategories.length - 1) {
+    if (index < skillCategories.length - 1) {
       const swapIndex = index + 1;
-      [
-        fullResume.skillCategories[index],
-        fullResume.skillCategories[swapIndex],
-      ] = [
-        fullResume.skillCategories[swapIndex],
-        fullResume.skillCategories[index],
+      [skillCategories[index], skillCategories[swapIndex]] = [
+        skillCategories[swapIndex],
+        skillCategories[index],
       ];
     } else {
-      fullResume.skillCategories.unshift(fullResume.skillCategories.pop()!);
+      skillCategories.unshift(skillCategories.pop()!);
     }
-    const orderedPids = fullResume.skillCategories.map((item) => item.pid);
+    const orderedPids = skillCategories.map((item) => item.pid);
     await fetch(`/api/resumes/${fullResume.pid}/skillCategories/order`, {
       method: "PUT",
       headers: {
@@ -973,9 +973,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       },
       body: JSON.stringify({ orderedPids }),
     });
-    setFullResume({
-      ...fullResume,
-    });
+    setFullResume({ ...fullResume, skillCategories });
   };
 
   const createSkill = async (skillCategoryPid: string) => {
@@ -1057,7 +1055,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       (item) => item.id === skill.skillCategoryId
     );
     if (!skillCategory) return;
-    const skills = skillCategory.skills;
+    const skills = [...skillCategory.skills];
     const index = skills.findIndex((item) => item.id === skill.id);
     if (index > 0) {
       const swapIndex = index - 1;
@@ -1078,6 +1076,12 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     );
     setFullResume({
       ...fullResume,
+      skillCategories: fullResume.skillCategories.map((s) => {
+        if (s.id === skillCategory.id) {
+          return { ...s, skills };
+        }
+        return s;
+      }),
     });
   };
 
@@ -1086,7 +1090,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       (item) => item.id === skill.skillCategoryId
     );
     if (!skillCategory) return;
-    const skills = skillCategory.skills;
+    const skills = [...skillCategory.skills];
     const index = skills.findIndex((item) => item.id === skill.id);
     if (index < skills.length - 1) {
       const swapIndex = index + 1;
@@ -1107,6 +1111,12 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     );
     setFullResume({
       ...fullResume,
+      skillCategories: fullResume.skillCategories.map((s) => {
+        if (s.id === skillCategory.id) {
+          return { ...s, skills };
+        }
+        return s;
+      }),
     });
   };
 
