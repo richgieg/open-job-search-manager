@@ -13,6 +13,7 @@ import {
 import Head from "next/head";
 import { t } from "@/translate";
 import MetaNoIndex from "@/components/MetaNoIndex";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 
 type FullJob = Job & {
   resumes: Resume[];
@@ -22,6 +23,7 @@ type FullJob = Job & {
 };
 
 export function JobPage() {
+  const user = useAuthRedirect();
   const router = useRouter();
   const [jobPid, setJobPid] = useState<string | null>(null);
   const [fullJob, setFullJob] = useState<FullJob | null>(null);
@@ -33,23 +35,24 @@ export function JobPage() {
   }, [router]);
 
   useEffect(() => {
-    if (!jobPid) return;
+    if (!jobPid || !user) return;
     const fetchFullJob = async () => {
       const response = await fetch(`/api/jobs/${jobPid}/full`);
       const responseData: FullJob = await response.json();
       setFullJob(responseData);
     };
     fetchFullJob();
-  }, [jobPid]);
+  }, [jobPid, user]);
 
   useEffect(() => {
+    if (!user) return;
     const fetchProfiles = async () => {
       const response = await fetch(`/api/profiles`);
       const profiles: Profile[] = await response.json();
       setProfiles(profiles);
     };
     fetchProfiles();
-  }, []);
+  }, [user]);
 
   return (
     <>

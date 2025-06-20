@@ -15,6 +15,7 @@ import {
 import Head from "next/head";
 import { t } from "@/translate";
 import MetaNoIndex from "@/components/MetaNoIndex";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 
 type FullProfile = Profile & {
   workEntries: (WorkEntry & { bullets: WorkEntryBullet[] })[];
@@ -24,6 +25,7 @@ type FullProfile = Profile & {
 };
 
 export function ProfilePage() {
+  const user = useAuthRedirect();
   const router = useRouter();
   const [profilePid, setProfilePid] = useState<string | null>(null);
   const [fullProfile, setFullProfile] = useState<FullProfile | null>(null);
@@ -34,14 +36,14 @@ export function ProfilePage() {
   }, [router]);
 
   useEffect(() => {
-    if (!profilePid) return;
+    if (!profilePid || !user) return;
     const fetchFullProfile = async () => {
       const response = await fetch(`/api/profiles/${profilePid}/full`);
       const responseData = await response.json();
       setFullProfile(responseData);
     };
     fetchFullProfile();
-  }, [profilePid]);
+  }, [profilePid, user]);
 
   return (
     <>
