@@ -44,8 +44,8 @@ export function ProfilePage() {
     }
   );
 
-  const setFullProfile = (fullProfile: FullProfile) =>
-    mutateFullProfile(fullProfile, false);
+  const setFullProfile = (fullProfile: FullProfile, revalidate = false) =>
+    mutateFullProfile(fullProfile, revalidate);
 
   return (
     <>
