@@ -6,7 +6,7 @@ import { Profile } from "@/generated/prisma";
 
 type Props = {
   profiles: Profile[];
-  setProfiles: (profiles: Profile[]) => void;
+  setProfiles: (profiles: Profile[], revalidate?: boolean) => void;
 };
 
 export function MainContent({ profiles, setProfiles }: Props) {
@@ -36,10 +36,13 @@ export function MainContent({ profiles, setProfiles }: Props) {
       )
     )
       return;
-    await fetch(`/api/profiles/${profile.pid}`, {
+    setProfiles(profiles.filter((p) => p.id !== profile.id));
+    const response = await fetch(`/api/profiles/${profile.pid}`, {
       method: "DELETE",
     });
-    setProfiles(profiles.filter((p) => p.id !== profile.id));
+    if (!response.ok) {
+      setProfiles(profiles, true);
+    }
   };
 
   return (
