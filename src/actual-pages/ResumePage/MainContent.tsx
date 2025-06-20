@@ -1151,7 +1151,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
         </>
       )}
       <br />
-      <NextLink href={`/resumes/${fullResume.pid}/application`} target="_blank">
+      <NextLink href={`/resumes/${fullResume.pid}/application`}>
         APPLICATION
       </NextLink>
       <SectionHeading text="Basic Info" />

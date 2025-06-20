@@ -435,7 +435,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
             >
               {profiles.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.profileName}
+                  {p.profileName || t.profileNamePlaceholder}
                 </option>
               ))}
             </select>

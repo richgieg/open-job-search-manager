@@ -1,28 +1,27 @@
 import { Header } from "@/components/Header";
-import { useEffect, useState } from "react";
 import { MainContent } from "./MainContent";
 import { Job, Link } from "@/generated/prisma";
 import Head from "next/head";
 import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
+import useSWR from "swr";
 
 type JobWithLinks = Job & { links: Link[] };
 
 export function JobsPage() {
   const user = useAuthRedirect();
-  const [jobsWithLinks, setJobsWithLinks] = useState<JobWithLinks[] | null>(
-    null
+
+  const { data: jobsWithLinks, mutate: mutateJobsWithLinks } = useSWR(
+    user ? "/api/jobs/withLinks" : null,
+    async (url) => {
+      const response = await fetch(url);
+      const responseData = await response.json();
+      return responseData as JobWithLinks[];
+    }
   );
 
-  useEffect(() => {
-    if (!user) return;
-    const fetchJobs = async () => {
-      const response = await fetch(`/api/jobs/withLinks`);
-      const responseData = await response.json();
-      setJobsWithLinks(responseData);
-    };
-    fetchJobs();
-  }, [user]);
+  const setJobsWithLinks = (jobsWithLinks: JobWithLinks[]) =>
+    mutateJobsWithLinks(jobsWithLinks, false);
 
   return (
     <>
