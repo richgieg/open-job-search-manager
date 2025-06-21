@@ -42,9 +42,6 @@ export function JobPage() {
     }
   );
 
-  const setFullJob = (fullJob: FullJob, revalidate = false) =>
-    mutateFullJob(fullJob, revalidate);
-
   const { data: profiles } = useSWR(
     user ? "/api/profiles" : null,
     async (url) => {
@@ -71,7 +68,7 @@ export function JobPage() {
       {fullJob && profiles && (
         <MainContent
           fullJob={fullJob}
-          setFullJob={setFullJob}
+          mutateFullJob={mutateFullJob}
           profiles={profiles}
         />
       )}

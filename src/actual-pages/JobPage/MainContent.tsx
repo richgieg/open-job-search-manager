@@ -14,6 +14,7 @@ import { LinkEditor } from "./LinkEditor";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ResumeOverview } from "./ResumeOverview";
 import { t } from "@/translate";
+import { KeyedMutator } from "swr";
 
 type FullJob = Job & {
   resumes: Resume[];
@@ -24,15 +25,15 @@ type FullJob = Job & {
 
 type Props = {
   fullJob: FullJob;
-  setFullJob: (fullJob: FullJob, revalidate?: boolean) => void;
+  mutateFullJob: KeyedMutator<FullJob>;
   profiles: Profile[];
 };
 
-export function MainContent({ fullJob, setFullJob, profiles }: Props) {
+export function MainContent({ fullJob, mutateFullJob, profiles }: Props) {
   const [profilePid, setProfilePid] = useState<string>(profiles[0]?.pid ?? "");
 
   const updateJob = async (job: Job) => {
-    setFullJob({ ...fullJob, ...job });
+    mutateFullJob({ ...fullJob, ...job }, { revalidate: false });
     const response = await fetch(`/api/jobs/${job.pid}`, {
       method: "PUT",
       headers: {
@@ -41,7 +42,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       body: JSON.stringify(job),
     });
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
@@ -58,10 +59,13 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       }),
     });
     const resume: Resume = await response.json();
-    setFullJob({
-      ...fullJob,
-      resumes: [...fullJob.resumes, resume],
-    });
+    mutateFullJob(
+      {
+        ...fullJob,
+        resumes: [...fullJob.resumes, resume],
+      },
+      { revalidate: false }
+    );
   };
 
   const duplicateResume = async (resume: Resume) => {
@@ -69,23 +73,29 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       method: "POST",
     });
     const duplicatedResume: Resume = await response.json();
-    setFullJob({
-      ...fullJob,
-      resumes: [...fullJob.resumes, duplicatedResume],
-    });
+    mutateFullJob(
+      {
+        ...fullJob,
+        resumes: [...fullJob.resumes, duplicatedResume],
+      },
+      { revalidate: false }
+    );
   };
 
   const deleteResume = async (resume: Resume) => {
     // TODO: Show confirmation modal.
-    setFullJob({
-      ...fullJob,
-      resumes: fullJob.resumes.filter((r) => r.id !== resume.id),
-    });
+    mutateFullJob(
+      {
+        ...fullJob,
+        resumes: fullJob.resumes.filter((r) => r.id !== resume.id),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/resumes/${resume.pid}`, {
       method: "DELETE",
     });
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
@@ -94,23 +104,29 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       method: "POST",
     });
     const link: Link = await response.json();
-    setFullJob({
-      ...fullJob,
-      links: [...fullJob.links, link],
-    });
+    mutateFullJob(
+      {
+        ...fullJob,
+        links: [...fullJob.links, link],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateLink = async (link: Link) => {
-    setFullJob({
-      ...fullJob,
-      links: fullJob.links.map((l) => {
-        if (l.id === link.id) {
-          return link;
-        } else {
-          return l;
-        }
-      }),
-    });
+    mutateFullJob(
+      {
+        ...fullJob,
+        links: fullJob.links.map((l) => {
+          if (l.id === link.id) {
+            return link;
+          } else {
+            return l;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/links/${link.pid}`, {
       method: "PUT",
       headers: {
@@ -119,20 +135,23 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       body: JSON.stringify(link),
     });
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
   const deleteLink = async (link: Link) => {
-    setFullJob({
-      ...fullJob,
-      links: fullJob.links.filter((l) => l.id !== link.id),
-    });
+    mutateFullJob(
+      {
+        ...fullJob,
+        links: fullJob.links.filter((l) => l.id !== link.id),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/links/${link.pid}`, {
       method: "DELETE",
     });
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
@@ -145,7 +164,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       links.push(links.shift()!);
     }
-    setFullJob({ ...fullJob, links });
+    mutateFullJob({ ...fullJob, links }, { revalidate: false });
     const orderedPids = links.map((item) => item.pid);
     const response = await fetch(`/api/jobs/${fullJob.pid}/links/order`, {
       method: "PUT",
@@ -155,7 +174,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       body: JSON.stringify({ orderedPids }),
     });
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
@@ -168,7 +187,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       links.unshift(links.pop()!);
     }
-    setFullJob({ ...fullJob, links });
+    mutateFullJob({ ...fullJob, links }, { revalidate: false });
     const orderedPids = links.map((item) => item.pid);
     const response = await fetch(`/api/jobs/${fullJob.pid}/links/order`, {
       method: "PUT",
@@ -178,7 +197,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       body: JSON.stringify({ orderedPids }),
     });
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
@@ -190,28 +209,34 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       }
     );
     const applicationQuestion: ApplicationQuestion = await response.json();
-    setFullJob({
-      ...fullJob,
-      applicationQuestions: [
-        ...fullJob.applicationQuestions,
-        applicationQuestion,
-      ],
-    });
+    mutateFullJob(
+      {
+        ...fullJob,
+        applicationQuestions: [
+          ...fullJob.applicationQuestions,
+          applicationQuestion,
+        ],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateApplicationQuestion = async (
     applicationQuestion: ApplicationQuestion
   ) => {
-    setFullJob({
-      ...fullJob,
-      applicationQuestions: fullJob.applicationQuestions.map((a) => {
-        if (a.id === applicationQuestion.id) {
-          return applicationQuestion;
-        } else {
-          return a;
-        }
-      }),
-    });
+    mutateFullJob(
+      {
+        ...fullJob,
+        applicationQuestions: fullJob.applicationQuestions.map((a) => {
+          if (a.id === applicationQuestion.id) {
+            return applicationQuestion;
+          } else {
+            return a;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/applicationQuestions/${applicationQuestion.pid}`,
       {
@@ -223,19 +248,22 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       }
     );
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
   const deleteApplicationQuestion = async (
     applicationQuestion: ApplicationQuestion
   ) => {
-    setFullJob({
-      ...fullJob,
-      applicationQuestions: fullJob.applicationQuestions.filter(
-        (q) => q.id !== applicationQuestion.id
-      ),
-    });
+    mutateFullJob(
+      {
+        ...fullJob,
+        applicationQuestions: fullJob.applicationQuestions.filter(
+          (q) => q.id !== applicationQuestion.id
+        ),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/applicationQuestions/${applicationQuestion.pid}`,
       {
@@ -243,7 +271,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       }
     );
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
@@ -263,7 +291,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       applicationQuestions.push(applicationQuestions.shift()!);
     }
-    setFullJob({ ...fullJob, applicationQuestions });
+    mutateFullJob({ ...fullJob, applicationQuestions }, { revalidate: false });
     const orderedPids = applicationQuestions.map((item) => item.pid);
     const response = await fetch(
       `/api/jobs/${fullJob.pid}/applicationQuestions/order`,
@@ -276,7 +304,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       }
     );
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
@@ -296,7 +324,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       applicationQuestions.unshift(applicationQuestions.pop()!);
     }
-    setFullJob({ ...fullJob, applicationQuestions });
+    mutateFullJob({ ...fullJob, applicationQuestions }, { revalidate: false });
     const orderedPids = applicationQuestions.map((item) => item.pid);
     const response = await fetch(
       `/api/jobs/${fullJob.pid}/applicationQuestions/order`,
@@ -309,7 +337,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       }
     );
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
@@ -318,10 +346,13 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       method: "POST",
     });
     const contact: Contact = await response.json();
-    setFullJob({
-      ...fullJob,
-      contacts: [...fullJob.contacts, contact],
-    });
+    mutateFullJob(
+      {
+        ...fullJob,
+        contacts: [...fullJob.contacts, contact],
+      },
+      { revalidate: false }
+    );
   };
 
   const duplicateContact = async (contact: Contact) => {
@@ -329,23 +360,29 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       method: "POST",
     });
     const duplicatedContact: Contact = await response.json();
-    setFullJob({
-      ...fullJob,
-      contacts: [...fullJob.contacts, duplicatedContact],
-    });
+    mutateFullJob(
+      {
+        ...fullJob,
+        contacts: [...fullJob.contacts, duplicatedContact],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateContact = async (contact: Contact) => {
-    setFullJob({
-      ...fullJob,
-      contacts: fullJob.contacts.map((c) => {
-        if (c.id === contact.id) {
-          return contact;
-        } else {
-          return c;
-        }
-      }),
-    });
+    mutateFullJob(
+      {
+        ...fullJob,
+        contacts: fullJob.contacts.map((c) => {
+          if (c.id === contact.id) {
+            return contact;
+          } else {
+            return c;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/contacts/${contact.pid}`, {
       method: "PUT",
       headers: {
@@ -354,20 +391,23 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       body: JSON.stringify(contact),
     });
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
   const deleteContact = async (contact: Contact) => {
-    setFullJob({
-      ...fullJob,
-      contacts: fullJob.contacts.filter((c) => c.id !== contact.id),
-    });
+    mutateFullJob(
+      {
+        ...fullJob,
+        contacts: fullJob.contacts.filter((c) => c.id !== contact.id),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/contacts/${contact.pid}`, {
       method: "DELETE",
     });
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
@@ -383,7 +423,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       contacts.push(contacts.shift()!);
     }
-    setFullJob({ ...fullJob, contacts });
+    mutateFullJob({ ...fullJob, contacts }, { revalidate: false });
     const orderedPids = contacts.map((item) => item.pid);
     const response = await fetch(`/api/jobs/${fullJob.pid}/contacts/order`, {
       method: "PUT",
@@ -393,7 +433,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       body: JSON.stringify({ orderedPids }),
     });
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
@@ -409,7 +449,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
     } else {
       contacts.unshift(contacts.pop()!);
     }
-    setFullJob({ ...fullJob, contacts });
+    mutateFullJob({ ...fullJob, contacts }, { revalidate: false });
     const orderedPids = contacts.map((item) => item.pid);
     const response = await fetch(`/api/jobs/${fullJob.pid}/contacts/order`, {
       method: "PUT",
@@ -419,7 +459,7 @@ export function MainContent({ fullJob, setFullJob, profiles }: Props) {
       body: JSON.stringify({ orderedPids }),
     });
     if (!response.ok) {
-      setFullJob(fullJob, true);
+      mutateFullJob(fullJob, { revalidate: true });
     }
   };
 
