@@ -11,7 +11,6 @@ import { useFullJobContext } from "./FullJobContext";
 import { useLinkMutations } from "./useLinkMutations";
 import { useApplicationQuestionMutations } from "./useApplicationQuestionMutations";
 import { useContactMutations } from "./useContactMutations";
-import { useJobMutations } from "./useJobMutations";
 import { useResumeMutations } from "./useResumeMutations";
 
 type Props = {
@@ -19,27 +18,12 @@ type Props = {
 };
 
 export function MainContent({ profiles }: Props) {
-  const { fullJob } = useFullJobContext();
   const [profilePid, setProfilePid] = useState<string>(profiles[0]?.pid ?? "");
-  const { updateJob } = useJobMutations();
-  const { createResume, duplicateResume, deleteResume } = useResumeMutations();
-  const { createLink, updateLink, deleteLink, moveLinkUp, moveLinkDown } =
-    useLinkMutations();
-  const {
-    createApplicationQuestion,
-    updateApplicationQuestion,
-    deleteApplicationQuestion,
-    moveApplicationQuestionUp,
-    moveApplicationQuestionDown,
-  } = useApplicationQuestionMutations();
-  const {
-    createContact,
-    duplicateContact,
-    updateContact,
-    deleteContact,
-    moveContactUp,
-    moveContactDown,
-  } = useContactMutations();
+  const { fullJob } = useFullJobContext();
+  const { createResume } = useResumeMutations();
+  const { createLink } = useLinkMutations();
+  const { createApplicationQuestion } = useApplicationQuestionMutations();
+  const { createContact } = useContactMutations();
 
   const handleCreateResume = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,18 +33,13 @@ export function MainContent({ profiles }: Props) {
   return (
     <div className="px-8 pb-28">
       <SectionHeading text="Job Details" />
-      <JobEditor job={fullJob} updateJob={updateJob} />
+      <JobEditor job={fullJob} />
       <SectionHeading text="Resumes" />
       <div className="mt-6 flex flex-col gap-6">
         {fullJob.resumes.length > 0 && (
           <div className="flex flex-col gap-4">
             {fullJob.resumes.map((r) => (
-              <ResumeOverview
-                key={r.id}
-                resume={r}
-                deleteResume={deleteResume}
-                duplicateResume={duplicateResume}
-              />
+              <ResumeOverview key={r.id} resume={r} />
             ))}
           </div>
         )}
@@ -89,14 +68,7 @@ export function MainContent({ profiles }: Props) {
         {fullJob.links.length > 0 && (
           <div className="flex flex-col gap-4">
             {fullJob.links.map((l) => (
-              <LinkEditor
-                key={l.id}
-                link={l}
-                updateLink={updateLink}
-                deleteLink={deleteLink}
-                moveLinkUp={moveLinkUp}
-                moveLinkDown={moveLinkDown}
-              />
+              <LinkEditor key={l.id} link={l} />
             ))}
           </div>
         )}
@@ -109,14 +81,7 @@ export function MainContent({ profiles }: Props) {
         {fullJob.applicationQuestions.length > 0 && (
           <div className="flex flex-col gap-4">
             {fullJob.applicationQuestions.map((q) => (
-              <ApplicationQuestionEditor
-                key={q.id}
-                applicationQuestion={q}
-                updateApplicationQuestion={updateApplicationQuestion}
-                deleteApplicationQuestion={deleteApplicationQuestion}
-                moveApplicationQuestionUp={moveApplicationQuestionUp}
-                moveApplicationQuestionDown={moveApplicationQuestionDown}
-              />
+              <ApplicationQuestionEditor key={q.id} applicationQuestion={q} />
             ))}
           </div>
         )}
@@ -129,15 +94,7 @@ export function MainContent({ profiles }: Props) {
         {fullJob.contacts.length > 0 && (
           <div className="flex flex-col gap-4">
             {fullJob.contacts.map((c) => (
-              <ContactEditor
-                key={c.id}
-                contact={c}
-                updateContact={updateContact}
-                deleteContact={deleteContact}
-                duplicateContact={duplicateContact}
-                moveContactUp={moveContactUp}
-                moveContactDown={moveContactDown}
-              />
+              <ContactEditor key={c.id} contact={c} />
             ))}
           </div>
         )}

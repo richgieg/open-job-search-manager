@@ -7,13 +7,13 @@ import { JOB_ARRANGEMENTS, JOB_STATUSES, JOB_TYPES } from "@/constants";
 import { Job } from "@/generated/prisma";
 import { t } from "@/translate";
 import { FormEvent, useState } from "react";
+import { useJobMutations } from "./useJobMutations";
 
 type Props = {
   job: Job;
-  updateJob: (job: Job) => Promise<void>;
 };
 
-export function JobEditor({ job, updateJob }: Props) {
+export function JobEditor({ job }: Props) {
   const [title, setTitle] = useState(job.title);
   const [company, setCompany] = useState(job.company);
   const [location, setLocation] = useState(job.location);
@@ -27,6 +27,7 @@ export function JobEditor({ job, updateJob }: Props) {
   const [notes, setNotes] = useState(job.notes);
   const [postedSalary, setPostedSalary] = useState(job.postedSalary);
   const [desiredSalary, setDesiredSalary] = useState(job.desiredSalary);
+  const { updateJob } = useJobMutations();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -5,32 +5,21 @@ import { MoveUpButton } from "@/components/MoveUpButton";
 import { SaveButton } from "@/components/SaveButton";
 import { ApplicationQuestion } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
+import { useApplicationQuestionMutations } from "./useApplicationQuestionMutations";
 
 type Props = {
   applicationQuestion: ApplicationQuestion;
-  updateApplicationQuestion: (
-    applicationQuestion: ApplicationQuestion
-  ) => Promise<void>;
-  deleteApplicationQuestion: (
-    applicationQuestion: ApplicationQuestion
-  ) => Promise<void>;
-  moveApplicationQuestionUp: (
-    applicationQuestion: ApplicationQuestion
-  ) => Promise<void>;
-  moveApplicationQuestionDown: (
-    applicationQuestion: ApplicationQuestion
-  ) => Promise<void>;
 };
 
-export function ApplicationQuestionEditor({
-  applicationQuestion,
-  updateApplicationQuestion,
-  deleteApplicationQuestion,
-  moveApplicationQuestionUp,
-  moveApplicationQuestionDown,
-}: Props) {
+export function ApplicationQuestionEditor({ applicationQuestion }: Props) {
   const [question, setQuestion] = useState(applicationQuestion.question);
   const [answer, setAnswer] = useState(applicationQuestion.answer);
+  const {
+    updateApplicationQuestion,
+    deleteApplicationQuestion,
+    moveApplicationQuestionUp,
+    moveApplicationQuestionDown,
+  } = useApplicationQuestionMutations();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

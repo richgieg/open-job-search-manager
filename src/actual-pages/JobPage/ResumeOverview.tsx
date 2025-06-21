@@ -3,18 +3,15 @@ import { DuplicateButton } from "@/components/DuplicateButton";
 import { Resume } from "@/generated/prisma";
 import { t } from "@/translate";
 import Link from "next/link";
+import { useResumeMutations } from "./useResumeMutations";
 
 type Props = {
   resume: Resume;
-  deleteResume: (resume: Resume) => Promise<void>;
-  duplicateResume: (resume: Resume) => Promise<void>;
 };
 
-export function ResumeOverview({
-  resume,
-  deleteResume,
-  duplicateResume,
-}: Props) {
+export function ResumeOverview({ resume }: Props) {
+  const { duplicateResume, deleteResume } = useResumeMutations();
+
   return (
     <div className="flex gap-2">
       <Link href={`/resumes/${resume.pid}`}>

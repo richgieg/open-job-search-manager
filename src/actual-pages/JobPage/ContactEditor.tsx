@@ -6,24 +6,13 @@ import { SaveButton } from "@/components/SaveButton";
 import { TextEditor } from "@/components/TextEditor";
 import { Contact } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
+import { useContactMutations } from "./useContactMutations";
 
 type Props = {
   contact: Contact;
-  updateContact: (contact: Contact) => Promise<void>;
-  deleteContact: (contact: Contact) => Promise<void>;
-  duplicateContact: (contact: Contact) => Promise<void>;
-  moveContactUp: (contact: Contact) => Promise<void>;
-  moveContactDown: (contact: Contact) => Promise<void>;
 };
 
-export function ContactEditor({
-  contact,
-  updateContact,
-  deleteContact,
-  duplicateContact,
-  moveContactUp,
-  moveContactDown,
-}: Props) {
+export function ContactEditor({ contact }: Props) {
   const [name, setName] = useState(contact.name);
   const [title, setTitle] = useState(contact.title);
   const [phone, setPhone] = useState(contact.phone);
@@ -33,6 +22,13 @@ export function ContactEditor({
   const [addressLine2, setAddressLine2] = useState(contact.addressLine2);
   const [addressLine3, setAddressLine3] = useState(contact.addressLine3);
   const [addressLine4, setAddressLine4] = useState(contact.addressLine4);
+  const {
+    updateContact,
+    duplicateContact,
+    deleteContact,
+    moveContactUp,
+    moveContactDown,
+  } = useContactMutations();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

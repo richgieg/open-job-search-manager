@@ -5,24 +5,17 @@ import { SaveButton } from "@/components/SaveButton";
 import { TextEditor } from "@/components/TextEditor";
 import { Link } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
+import { useLinkMutations } from "./useLinkMutations";
 
 type Props = {
   link: Link;
-  updateLink: (link: Link) => Promise<void>;
-  deleteLink: (link: Link) => Promise<void>;
-  moveLinkUp: (link: Link) => Promise<void>;
-  moveLinkDown: (link: Link) => Promise<void>;
 };
 
-export function LinkEditor({
-  link,
-  updateLink,
-  deleteLink,
-  moveLinkUp,
-  moveLinkDown,
-}: Props) {
+export function LinkEditor({ link }: Props) {
   const [name, setName] = useState(link.name);
   const [url, setUrl] = useState(link.url);
+  const { updateLink, deleteLink, moveLinkUp, moveLinkDown } =
+    useLinkMutations();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
