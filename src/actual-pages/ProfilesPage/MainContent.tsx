@@ -1,44 +1,17 @@
 import { FormEvent } from "react";
 import { ProfileOverview } from "./ProfileOverview";
 import { SectionHeading } from "@/components/SectionHeading";
-import { Profile } from "@/generated/prisma";
-import { KeyedMutator } from "swr";
+import { useProfilesContext } from "./ProfilesContext";
+import { useProfileMutations } from "./useProfileMutations";
 
-type Props = {
-  profiles: Profile[];
-  mutateProfiles: KeyedMutator<Profile[]>;
-};
+export function MainContent() {
+  const { profiles } = useProfilesContext();
+  const { createProfile, duplicateProfile, deleteProfile } =
+    useProfileMutations();
 
-export function MainContent({ profiles, mutateProfiles }: Props) {
-  const createProfile = async (e: FormEvent<HTMLFormElement>) => {
+  const handleCreateProfile = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const response = await fetch("/api/profiles", {
-      method: "POST",
-    });
-    const profile: Profile = await response.json();
-    mutateProfiles([...profiles, profile], { revalidate: false });
-  };
-
-  const duplicateProfile = async (profile: Profile) => {
-    const response = await fetch(`/api/profiles/${profile.pid}/duplicate`, {
-      method: "POST",
-    });
-    const duplicatedProfile: Profile = await response.json();
-    mutateProfiles([...profiles, duplicatedProfile], { revalidate: false });
-  };
-
-  const deleteProfile = async (profile: Profile) => {
-    // TODO: Show confirmation modal.
-    mutateProfiles(
-      profiles.filter((p) => p.id !== profile.id),
-      { revalidate: false }
-    );
-    const response = await fetch(`/api/profiles/${profile.pid}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) {
-      mutateProfiles(profiles, { revalidate: true });
-    }
+    createProfile();
   };
 
   return (
@@ -57,7 +30,7 @@ export function MainContent({ profiles, mutateProfiles }: Props) {
             ))}
           </div>
         )}
-        <form onSubmit={createProfile}>
+        <form onSubmit={handleCreateProfile}>
           <button type="submit">New Profile</button>
         </form>
       </div>

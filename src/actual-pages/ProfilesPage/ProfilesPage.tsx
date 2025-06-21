@@ -5,6 +5,7 @@ import Head from "next/head";
 import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
+import { ProfilesProvider } from "./ProfilesContext";
 
 export function ProfilesPage() {
   const user = useAuthRedirect();
@@ -26,7 +27,9 @@ export function ProfilesPage() {
       </Head>
       <Header />
       {profiles && (
-        <MainContent profiles={profiles} mutateProfiles={mutateProfiles} />
+        <ProfilesProvider profiles={profiles} mutateProfiles={mutateProfiles}>
+          <MainContent />
+        </ProfilesProvider>
       )}
     </>
   );
