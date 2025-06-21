@@ -5,7 +5,7 @@ import { MoveUpButton } from "@/components/MoveUpButton";
 import { SaveButton } from "@/components/SaveButton";
 import { ApplicationQuestion } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useApplicationQuestionMutations } from "./useApplicationQuestionMutations";
+import { useApplicationQuestionMutations } from "../mutations";
 
 type Props = {
   applicationQuestion: ApplicationQuestion;

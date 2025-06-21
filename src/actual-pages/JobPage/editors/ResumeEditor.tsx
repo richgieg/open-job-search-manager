@@ -3,13 +3,13 @@ import { DuplicateButton } from "@/components/DuplicateButton";
 import { Resume } from "@/generated/prisma";
 import { t } from "@/translate";
 import Link from "next/link";
-import { useResumeMutations } from "./useResumeMutations";
+import { useResumeMutations } from "../mutations";
 
 type Props = {
   resume: Resume;
 };
 
-export function ResumeOverview({ resume }: Props) {
+export function ResumeEditor({ resume }: Props) {
   const { duplicateResume, deleteResume } = useResumeMutations();
 
   return (

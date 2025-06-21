@@ -7,7 +7,7 @@ import { JOB_ARRANGEMENTS, JOB_STATUSES, JOB_TYPES } from "@/constants";
 import { Job } from "@/generated/prisma";
 import { t } from "@/translate";
 import { FormEvent, useState } from "react";
-import { useJobMutations } from "./useJobMutations";
+import { useJobMutations } from "../mutations";
 
 type Props = {
   job: Job;

@@ -1,17 +1,21 @@
 import { Profile } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { JobEditor } from "./JobEditor";
-import { ApplicationQuestionEditor } from "./ApplicationQuestionEditor";
-import { ContactEditor } from "./ContactEditor";
-import { LinkEditor } from "./LinkEditor";
 import { SectionHeading } from "@/components/SectionHeading";
-import { ResumeOverview } from "./ResumeOverview";
 import { t } from "@/translate";
 import { useFullJobContext } from "./FullJobContext";
-import { useLinkMutations } from "./useLinkMutations";
-import { useApplicationQuestionMutations } from "./useApplicationQuestionMutations";
-import { useContactMutations } from "./useContactMutations";
-import { useResumeMutations } from "./useResumeMutations";
+import {
+  ApplicationQuestionEditor,
+  ContactEditor,
+  JobEditor,
+  LinkEditor,
+  ResumeEditor,
+} from "./editors";
+import {
+  useApplicationQuestionMutations,
+  useContactMutations,
+  useLinkMutations,
+  useResumeMutations,
+} from "./mutations";
 
 type Props = {
   profiles: Profile[];
@@ -39,7 +43,7 @@ export function MainContent({ profiles }: Props) {
         {fullJob.resumes.length > 0 && (
           <div className="flex flex-col gap-4">
             {fullJob.resumes.map((r) => (
-              <ResumeOverview key={r.id} resume={r} />
+              <ResumeEditor key={r.id} resume={r} />
             ))}
           </div>
         )}

@@ -1,5 +1,5 @@
 import { ApplicationQuestion } from "@/generated/prisma";
-import { useFullJobContext } from "./FullJobContext";
+import { useFullJobContext } from "../FullJobContext";
 
 export function useApplicationQuestionMutations() {
   const { fullJob, mutateFullJob } = useFullJobContext();

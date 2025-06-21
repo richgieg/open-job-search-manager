@@ -6,7 +6,7 @@ import { SaveButton } from "@/components/SaveButton";
 import { TextEditor } from "@/components/TextEditor";
 import { Contact } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useContactMutations } from "./useContactMutations";
+import { useContactMutations } from "../mutations";
 
 type Props = {
   contact: Contact;

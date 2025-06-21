@@ -5,7 +5,7 @@ import { SaveButton } from "@/components/SaveButton";
 import { TextEditor } from "@/components/TextEditor";
 import { Link } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useLinkMutations } from "./useLinkMutations";
+import { useLinkMutations } from "../mutations";
 
 type Props = {
   link: Link;

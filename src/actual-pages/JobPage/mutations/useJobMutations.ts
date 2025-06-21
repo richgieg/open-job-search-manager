@@ -1,5 +1,5 @@
 import { Job } from "@/generated/prisma";
-import { useFullJobContext } from "./FullJobContext";
+import { useFullJobContext } from "../FullJobContext";
 
 export function useJobMutations() {
   const { fullJob, mutateFullJob } = useFullJobContext();
