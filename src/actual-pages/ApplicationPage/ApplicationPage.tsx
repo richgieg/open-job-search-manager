@@ -1,35 +1,12 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { Header } from "@/components/Header";
 import { MainContent } from "./MainContent";
-import {
-  Job,
-  Profile,
-  Resume,
-  ResumeCertification,
-  ResumeEducationEntry,
-  ResumeEducationEntryBullet,
-  ResumeSkill,
-  ResumeSkillCategory,
-  ResumeWorkEntry,
-  ResumeWorkEntryBullet,
-} from "@/generated/prisma";
 import Head from "next/head";
 import { t } from "@/translate";
-import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
-
-type FullResume = Resume & {
-  workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
-  educationEntries: (ResumeEducationEntry & {
-    bullets: ResumeEducationEntryBullet[];
-  })[];
-  certifications: ResumeCertification[];
-  skillCategories: (ResumeSkillCategory & { skills: ResumeSkill[] })[];
-  profile: Profile | null;
-  job: Job;
-};
+import { Header, MetaNoIndex } from "@/components";
+import type { FullResume } from "@/types";
 
 export function ApplicationPage() {
   const user = useAuthRedirect();

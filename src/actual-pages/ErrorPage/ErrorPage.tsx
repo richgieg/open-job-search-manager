@@ -1,5 +1,4 @@
-import { Header } from "@/components/Header";
-import MetaNoIndex from "@/components/MetaNoIndex";
+import { Header, MetaNoIndex } from "@/components";
 import Head from "next/head";
 
 export function ErrorPage() {

@@ -1,43 +1,7 @@
 import { Paragraph, TextRun } from "docx";
 import { header } from "./header";
-import {
-  Certification,
-  Contact,
-  EducationEntry,
-  EducationEntryBullet,
-  Job,
-  Profile,
-  Resume,
-  ResumeCertification,
-  ResumeEducationEntry,
-  ResumeEducationEntryBullet,
-  ResumeSkill,
-  ResumeSkillCategory,
-  ResumeWorkEntry,
-  ResumeWorkEntryBullet,
-  Skill,
-  SkillCategory,
-  WorkEntry,
-  WorkEntryBullet,
-} from "@/generated/prisma";
-
-type FullProfile = Profile & {
-  workEntries: (WorkEntry & { bullets: WorkEntryBullet[] })[];
-  educationEntries: (EducationEntry & { bullets: EducationEntryBullet[] })[];
-  certifications: Certification[];
-  skillCategories: (SkillCategory & { skills: Skill[] })[];
-};
-
-type FullResume = Resume & {
-  workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
-  educationEntries: (ResumeEducationEntry & {
-    bullets: ResumeEducationEntryBullet[];
-  })[];
-  certifications: ResumeCertification[];
-  skillCategories: (ResumeSkillCategory & { skills: ResumeSkill[] })[];
-  profile: Profile | null;
-  job: Job;
-};
+import { Contact } from "@/generated/prisma";
+import type { FullProfile, FullResume } from "@/types";
 
 export function coverLetter(
   data: (FullProfile & { allowPageBreaks: boolean }) | FullResume,

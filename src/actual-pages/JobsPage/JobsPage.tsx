@@ -1,12 +1,10 @@
-import { Header } from "@/components/Header";
 import { MainContent } from "./MainContent";
-import { Job, Link } from "@/generated/prisma";
 import Head from "next/head";
-import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
-
-type JobWithLinks = Job & { links: Link[] };
+import { JobsWithLinksProvider } from "./JobsWithLinksContext";
+import { Header, MetaNoIndex } from "@/components";
+import type { JobWithLinks } from "@/types";
 
 export function JobsPage() {
   const user = useAuthRedirect();
@@ -20,11 +18,6 @@ export function JobsPage() {
     }
   );
 
-  const setJobsWithLinks = (
-    jobsWithLinks: JobWithLinks[],
-    revalidate = false
-  ) => mutateJobsWithLinks(jobsWithLinks, revalidate);
-
   return (
     <>
       <MetaNoIndex />
@@ -33,10 +26,12 @@ export function JobsPage() {
       </Head>
       <Header />
       {jobsWithLinks && (
-        <MainContent
+        <JobsWithLinksProvider
           jobsWithLinks={jobsWithLinks}
-          setJobsWithLinks={setJobsWithLinks}
-        />
+          mutateJobsWithLinks={mutateJobsWithLinks}
+        >
+          <MainContent />
+        </JobsWithLinksProvider>
       )}
     </>
   );

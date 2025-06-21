@@ -1,34 +1,12 @@
 import {
-  Job,
-  Profile,
-  Resume,
-  ResumeCertification,
-  ResumeEducationEntry,
-  ResumeEducationEntryBullet,
-  ResumeSkill,
-  ResumeSkillCategory,
-  ResumeWorkEntry,
-  ResumeWorkEntryBullet,
-} from "@/generated/prisma";
-import {
   makeProtectedApiHandler,
   prisma,
   sendError,
   sendResponse,
 } from "@/lib";
 import { pidSchema } from "@/schemas";
+import type { FullResume } from "@/types";
 import { NextApiResponse } from "next";
-
-type FullResume = Resume & {
-  workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
-  educationEntries: (ResumeEducationEntry & {
-    bullets: ResumeEducationEntryBullet[];
-  })[];
-  certifications: ResumeCertification[];
-  skillCategories: (ResumeSkillCategory & { skills: ResumeSkill[] })[];
-  profile: Profile | null;
-  job: Job;
-};
 
 export default makeProtectedApiHandler({
   GET: async (user, req, res: NextApiResponse<FullResume>) => {

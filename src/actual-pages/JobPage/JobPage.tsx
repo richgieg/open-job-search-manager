@@ -1,27 +1,14 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Header } from "@/components/Header";
 import { MainContent } from "./MainContent";
-import {
-  ApplicationQuestion,
-  Contact,
-  Job,
-  Link,
-  Profile,
-  Resume,
-} from "@/generated/prisma";
 import Head from "next/head";
 import { t } from "@/translate";
-import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
-
-type FullJob = Job & {
-  resumes: Resume[];
-  links: Link[];
-  contacts: Contact[];
-  applicationQuestions: ApplicationQuestion[];
-};
+import { FullJobProvider } from "./FullJobContext";
+import { Header, MetaNoIndex } from "@/components";
+import { Profile } from "@/generated/prisma";
+import type { FullJob } from "@/types";
 
 export function JobPage() {
   const user = useAuthRedirect();
@@ -41,9 +28,6 @@ export function JobPage() {
       return responseData as FullJob;
     }
   );
-
-  const setFullJob = (fullJob: FullJob, revalidate = false) =>
-    mutateFullJob(fullJob, revalidate);
 
   const { data: profiles } = useSWR(
     user ? "/api/profiles" : null,
@@ -69,11 +53,9 @@ export function JobPage() {
       </Head>
       <Header />
       {fullJob && profiles && (
-        <MainContent
-          fullJob={fullJob}
-          setFullJob={setFullJob}
-          profiles={profiles}
-        />
+        <FullJobProvider fullJob={fullJob} mutateFullJob={mutateFullJob}>
+          <MainContent profiles={profiles} />
+        </FullJobProvider>
       )}
     </>
   );

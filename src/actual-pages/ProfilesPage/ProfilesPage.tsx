@@ -1,10 +1,10 @@
-import { Header } from "@/components/Header";
 import { MainContent } from "./MainContent";
 import { Profile } from "@/generated/prisma";
 import Head from "next/head";
-import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
+import { ProfilesProvider } from "./ProfilesContext";
+import { Header, MetaNoIndex } from "@/components";
 
 export function ProfilesPage() {
   const user = useAuthRedirect();
@@ -18,9 +18,6 @@ export function ProfilesPage() {
     }
   );
 
-  const setProfiles = (profiles: Profile[], revalidate = false) =>
-    mutateProfiles(profiles, revalidate);
-
   return (
     <>
       <MetaNoIndex />
@@ -29,7 +26,9 @@ export function ProfilesPage() {
       </Head>
       <Header />
       {profiles && (
-        <MainContent profiles={profiles} setProfiles={setProfiles} />
+        <ProfilesProvider profiles={profiles} mutateProfiles={mutateProfiles}>
+          <MainContent />
+        </ProfilesProvider>
       )}
     </>
   );

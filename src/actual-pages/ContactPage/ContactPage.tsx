@@ -1,8 +1,10 @@
-import { DropdownInput } from "@/components/DropdownInput";
-import { Header } from "@/components/Header";
-import { LongTextInput } from "@/components/LongTextInput";
-import MetaNoIndex from "@/components/MetaNoIndex";
-import { SectionHeading } from "@/components/SectionHeading";
+import {
+  DropdownInput,
+  Header,
+  LongTextInput,
+  MetaNoIndex,
+  SectionHeading,
+} from "@/components";
 import { CONTACT_MESSAGE_TYPES } from "@/constants";
 import { ContactMessageType } from "@/generated/prisma";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";

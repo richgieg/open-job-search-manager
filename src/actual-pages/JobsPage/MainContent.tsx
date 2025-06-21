@@ -1,43 +1,23 @@
-import { DeleteButton } from "@/components/DeleteButton";
-import { SectionHeading } from "@/components/SectionHeading";
-import { Job, Link } from "@/generated/prisma";
 import { t } from "@/translate";
 import NextLink from "next/link";
 import React, { FormEvent, ReactNode } from "react";
+import { useJobMutations } from "./useJobMutations";
+import { useJobsWithLinksContext } from "./JobsWithLinksContext";
+import { DeleteButton, SectionHeading } from "@/components";
 
-type JobWithLinks = Job & { links: Link[] };
+export function MainContent() {
+  const { jobsWithLinks } = useJobsWithLinksContext();
+  const { createJob, deleteJob } = useJobMutations();
 
-type Props = {
-  jobsWithLinks: JobWithLinks[];
-  setJobsWithLinks: (
-    jobsWithLinks: JobWithLinks[],
-    revalidate?: boolean
-  ) => void;
-};
-
-export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
-  const createJob = async (e: FormEvent<HTMLFormElement>) => {
+  const handleCreateJob = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const response = await fetch("/api/jobs", {
-      method: "POST",
-    });
-    const job: Job = await response.json();
-    setJobsWithLinks([{ ...job, links: [] }, ...jobsWithLinks]);
-  };
-
-  const deleteJob = async (job: Job) => {
-    // TODO: Show confirmation modal.
-    setJobsWithLinks(jobsWithLinks.filter((j) => j.id !== job.id));
-    const response = await fetch(`/api/jobs/${job.pid}`, { method: "DELETE" });
-    if (!response.ok) {
-      setJobsWithLinks(jobsWithLinks, true);
-    }
+    createJob();
   };
 
   return (
     <div className="px-8 pb-28">
       <SectionHeading text="Jobs" />
-      <form onSubmit={createJob} className="mt-6">
+      <form onSubmit={handleCreateJob} className="mt-6">
         <button type="submit">New Job</button>
       </form>
       <div className="mt-6 flex flex-col gap-6">

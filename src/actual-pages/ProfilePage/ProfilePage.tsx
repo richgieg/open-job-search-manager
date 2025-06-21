@@ -1,29 +1,13 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { Header } from "@/components/Header";
 import { MainContent } from "./MainContent";
-import {
-  Certification,
-  EducationEntry,
-  EducationEntryBullet,
-  Profile,
-  Skill,
-  SkillCategory,
-  WorkEntry,
-  WorkEntryBullet,
-} from "@/generated/prisma";
 import Head from "next/head";
 import { t } from "@/translate";
-import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
-
-type FullProfile = Profile & {
-  workEntries: (WorkEntry & { bullets: WorkEntryBullet[] })[];
-  educationEntries: (EducationEntry & { bullets: EducationEntryBullet[] })[];
-  certifications: Certification[];
-  skillCategories: (SkillCategory & { skills: Skill[] })[];
-};
+import { FullProfileProvider } from "./FullProfileContext";
+import { Header, MetaNoIndex } from "@/components";
+import type { FullProfile } from "@/types";
 
 export function ProfilePage() {
   const user = useAuthRedirect();
@@ -44,9 +28,6 @@ export function ProfilePage() {
     }
   );
 
-  const setFullProfile = (fullProfile: FullProfile, revalidate = false) =>
-    mutateFullProfile(fullProfile, revalidate);
-
   return (
     <>
       <MetaNoIndex />
@@ -63,10 +44,12 @@ export function ProfilePage() {
       </Head>
       <Header />
       {fullProfile && (
-        <MainContent
+        <FullProfileProvider
           fullProfile={fullProfile}
-          setFullProfile={setFullProfile}
-        />
+          mutateFullProfile={mutateFullProfile}
+        >
+          <MainContent />
+        </FullProfileProvider>
       )}
     </>
   );

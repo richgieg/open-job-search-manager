@@ -1,45 +1,13 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { Header } from "@/components/Header";
 import { MainContent } from "./MainContent";
-import {
-  ApplicationQuestion,
-  Contact,
-  Job,
-  Link,
-  Profile,
-  Resume,
-  ResumeCertification,
-  ResumeEducationEntry,
-  ResumeEducationEntryBullet,
-  ResumeSkill,
-  ResumeSkillCategory,
-  ResumeWorkEntry,
-  ResumeWorkEntryBullet,
-} from "@/generated/prisma";
 import Head from "next/head";
 import { t } from "@/translate";
-import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
-
-type FullResume = Resume & {
-  workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
-  educationEntries: (ResumeEducationEntry & {
-    bullets: ResumeEducationEntryBullet[];
-  })[];
-  certifications: ResumeCertification[];
-  skillCategories: (ResumeSkillCategory & { skills: ResumeSkill[] })[];
-  profile: Profile | null;
-  job: Job;
-};
-
-type FullJob = Job & {
-  resumes: Resume[];
-  links: Link[];
-  contacts: Contact[];
-  applicationQuestions: ApplicationQuestion[];
-};
+import { Header, MetaNoIndex } from "@/components";
+import { FullResumeProvider } from "./FullResumeContext";
+import type { FullJob, FullResume } from "@/types";
 
 export function ResumePage() {
   const user = useAuthRedirect();
@@ -51,7 +19,7 @@ export function ResumePage() {
     setResumePid(router.query.resumePid as string);
   }, [router]);
 
-  const { data: fullResume, mutate: mutateResume } = useSWR(
+  const { data: fullResume, mutate: mutateFullResume } = useSWR(
     user && resumePid ? `/api/resumes/${resumePid}/full` : null,
     async (url) => {
       const response = await fetch(url);
@@ -59,9 +27,6 @@ export function ResumePage() {
       return responseData as FullResume;
     }
   );
-
-  const setFullResume = (fullResume: FullResume, revalidate = false) =>
-    mutateResume(fullResume, revalidate);
 
   const { data: fullJob } = useSWR(
     user && fullResume?.job.pid ? `/api/jobs/${fullResume.job.pid}/full` : null,
@@ -90,11 +55,12 @@ export function ResumePage() {
       </Head>
       <Header />
       {fullResume && fullJob && (
-        <MainContent
+        <FullResumeProvider
           fullResume={fullResume}
-          setFullResume={setFullResume}
-          fullJob={fullJob}
-        />
+          mutateFullResume={mutateFullResume}
+        >
+          <MainContent fullJob={fullJob} />
+        </FullResumeProvider>
       )}
     </>
   );

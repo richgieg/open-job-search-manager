@@ -1,40 +1,17 @@
 import { FormEvent } from "react";
-import { ProfileOverview } from "./ProfileOverview";
-import { SectionHeading } from "@/components/SectionHeading";
-import { Profile } from "@/generated/prisma";
+import { ProfileEditor } from "./ProfileEditor";
+import { SectionHeading } from "@/components";
+import { useProfilesContext } from "./ProfilesContext";
+import { useProfileMutations } from "./useProfileMutations";
 
-type Props = {
-  profiles: Profile[];
-  setProfiles: (profiles: Profile[], revalidate?: boolean) => void;
-};
+export function MainContent() {
+  const { profiles } = useProfilesContext();
+  const { createProfile, duplicateProfile, deleteProfile } =
+    useProfileMutations();
 
-export function MainContent({ profiles, setProfiles }: Props) {
-  const createProfile = async (e: FormEvent<HTMLFormElement>) => {
+  const handleCreateProfile = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const response = await fetch("/api/profiles", {
-      method: "POST",
-    });
-    const profile: Profile = await response.json();
-    setProfiles([...profiles, profile]);
-  };
-
-  const duplicateProfile = async (profile: Profile) => {
-    const response = await fetch(`/api/profiles/${profile.pid}/duplicate`, {
-      method: "POST",
-    });
-    const duplicatedProfile: Profile = await response.json();
-    setProfiles([...profiles, duplicatedProfile]);
-  };
-
-  const deleteProfile = async (profile: Profile) => {
-    // TODO: Show confirmation modal.
-    setProfiles(profiles.filter((p) => p.id !== profile.id));
-    const response = await fetch(`/api/profiles/${profile.pid}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) {
-      setProfiles(profiles, true);
-    }
+    createProfile();
   };
 
   return (
@@ -44,7 +21,7 @@ export function MainContent({ profiles, setProfiles }: Props) {
         {profiles.length > 0 && (
           <div className="flex flex-col gap-4">
             {profiles.map((p) => (
-              <ProfileOverview
+              <ProfileEditor
                 key={p.id}
                 profile={p}
                 deleteProfile={deleteProfile}
@@ -53,7 +30,7 @@ export function MainContent({ profiles, setProfiles }: Props) {
             ))}
           </div>
         )}
-        <form onSubmit={createProfile}>
+        <form onSubmit={handleCreateProfile}>
           <button type="submit">New Profile</button>
         </form>
       </div>

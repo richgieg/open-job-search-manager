@@ -1,8 +1,6 @@
-import type { NextApiResponse } from "next";
-import { Job, Link } from "@/generated/prisma";
 import { makeProtectedApiHandler, prisma, sendResponse } from "@/lib";
-
-type JobWithLinks = Job & { links: Link[] };
+import type { NextApiResponse } from "next";
+import type { JobWithLinks } from "@/types";
 
 export default makeProtectedApiHandler({
   GET: async (user, req, res: NextApiResponse<JobWithLinks[]>) => {

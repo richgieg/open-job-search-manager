@@ -1,49 +1,13 @@
 import { Paragraph, TextRun } from "docx";
 import { t } from "@/translate";
 import { header } from "./header";
-import {
-  Certification,
-  EducationEntry,
-  EducationEntryBullet,
-  Job,
-  Profile,
-  Resume,
-  ResumeCertification,
-  ResumeEducationEntry,
-  ResumeEducationEntryBullet,
-  ResumeSkill,
-  ResumeSkillCategory,
-  ResumeWorkEntry,
-  ResumeWorkEntryBullet,
-  Skill,
-  SkillCategory,
-  WorkEntry,
-  WorkEntryBullet,
-} from "@/generated/prisma";
 import { dateStringToDate } from "@/lib";
+import type { FullProfile, FullResume } from "@/types";
 
 const HEADING_SPACING_BEFORE = 400;
 const SECTION_SPACING_BEFORE = 200;
 const BULLET_SPACING_LINE = 230;
 const BULLET_SPACING_AFTER = 80;
-
-type FullProfile = Profile & {
-  workEntries: (WorkEntry & { bullets: WorkEntryBullet[] })[];
-  educationEntries: (EducationEntry & { bullets: EducationEntryBullet[] })[];
-  certifications: Certification[];
-  skillCategories: (SkillCategory & { skills: Skill[] })[];
-};
-
-type FullResume = Resume & {
-  workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
-  educationEntries: (ResumeEducationEntry & {
-    bullets: ResumeEducationEntryBullet[];
-  })[];
-  certifications: ResumeCertification[];
-  skillCategories: (ResumeSkillCategory & { skills: ResumeSkill[] })[];
-  profile: Profile | null;
-  job: Job;
-};
 
 export function resume(
   data: (FullProfile & { allowPageBreaks: boolean }) | FullResume
