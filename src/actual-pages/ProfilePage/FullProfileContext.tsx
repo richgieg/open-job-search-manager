@@ -43,7 +43,7 @@ export const useFullProfileContext = () => {
   const ctx = useContext(FullProfileContext);
   if (!ctx) {
     throw new Error(
-      "useFullProfileContext must be used within FullProfileContext"
+      "useFullProfileContext must be used within FullProfileProvider"
     );
   }
   return ctx;

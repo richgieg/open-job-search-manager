@@ -14,7 +14,6 @@ import {
   Contact,
   Job,
   Link,
-  Profile,
   Resume,
   ResumeCertification,
   ResumeEducationEntry,
@@ -24,18 +23,7 @@ import {
   ResumeWorkEntry,
   ResumeWorkEntryBullet,
 } from "@/generated/prisma";
-import { KeyedMutator } from "swr";
-
-type FullResume = Resume & {
-  workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
-  educationEntries: (ResumeEducationEntry & {
-    bullets: ResumeEducationEntryBullet[];
-  })[];
-  certifications: ResumeCertification[];
-  skillCategories: (ResumeSkillCategory & { skills: ResumeSkill[] })[];
-  profile: Profile | null;
-  job: Job;
-};
+import { useFullResumeContext } from "./FullResumeContext";
 
 type FullJob = Job & {
   resumes: Resume[];
@@ -45,15 +33,15 @@ type FullJob = Job & {
 };
 
 type Props = {
-  fullResume: FullResume;
-  mutateFullResume: KeyedMutator<FullResume>;
   fullJob: FullJob;
 };
 
-export function MainContent({ fullResume, mutateFullResume, fullJob }: Props) {
+export function MainContent({ fullJob }: Props) {
   const [selectedContactPid, setSelectedContactPid] = useState<string>(
     fullJob.contacts[0]?.pid ?? ""
   );
+
+  const { fullResume, mutateFullResume } = useFullResumeContext();
 
   const generateSummaryPrompt = async () => {
     const lines = [];

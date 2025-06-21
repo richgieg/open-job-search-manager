@@ -21,6 +21,7 @@ import { t } from "@/translate";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
 import { Header, MetaNoIndex } from "@/components";
+import { FullResumeProvider } from "./FullResumeContext";
 
 type FullResume = Resume & {
   workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
@@ -86,11 +87,12 @@ export function ResumePage() {
       </Head>
       <Header />
       {fullResume && fullJob && (
-        <MainContent
+        <FullResumeProvider
           fullResume={fullResume}
           mutateFullResume={mutateFullResume}
-          fullJob={fullJob}
-        />
+        >
+          <MainContent fullJob={fullJob} />
+        </FullResumeProvider>
       )}
     </>
   );
