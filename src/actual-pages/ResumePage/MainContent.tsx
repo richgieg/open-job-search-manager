@@ -1,12 +1,4 @@
-import { ResumeEditor } from "./ResumeEditor";
 import React, { useState } from "react";
-import { WorkEntryEditor } from "./WorkEntryEditor";
-import { WorkEntryBulletEditor } from "./WorkEntryBulletEditor";
-import { EducationEntryEditor } from "./EducationEntryEditor";
-import { EducationEntryBulletEditor } from "./EducationEntryBulletEditor";
-import { CertificationEditor } from "./CertificationEditor";
-import { SkillCategoryEditor } from "./SkillCategoryEditor";
-import { SkillEditor } from "./SkillEditor";
 import { SectionHeading } from "@/components";
 import NextLink from "next/link";
 import {
@@ -26,6 +18,16 @@ import {
   useWorkEntryBulletMutations,
   useWorkEntryMutations,
 } from "./mutations";
+import {
+  CertificationEditor,
+  EducationEntryBulletEditor,
+  EducationEntryEditor,
+  ResumeEditor,
+  SkillCategoryEditor,
+  SkillEditor,
+  WorkEntryBulletEditor,
+  WorkEntryEditor,
+} from "./editors";
 
 type FullJob = Job & {
   resumes: Resume[];

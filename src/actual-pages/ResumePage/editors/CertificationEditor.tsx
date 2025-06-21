@@ -8,7 +8,7 @@ import {
 } from "@/components";
 import { ResumeCertification } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useCertificationMutations } from "./mutations";
+import { useCertificationMutations } from "../mutations";
 
 type Props = {
   certification: ResumeCertification;

@@ -7,7 +7,7 @@ import {
 } from "@/components";
 import { ResumeEducationEntryBullet } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useEducationEntryBulletMutations } from "./mutations";
+import { useEducationEntryBulletMutations } from "../mutations";
 
 type Props = {
   educationEntryBullet: ResumeEducationEntryBullet;

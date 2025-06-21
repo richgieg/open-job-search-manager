@@ -11,7 +11,7 @@ import { JOB_ARRANGEMENTS, JOB_TYPES } from "@/constants";
 import { ResumeWorkEntry } from "@/generated/prisma";
 import { t } from "@/translate";
 import { FormEvent, useState } from "react";
-import { useWorkEntryMutations } from "./mutations";
+import { useWorkEntryMutations } from "../mutations";
 
 type Props = {
   workEntry: ResumeWorkEntry;

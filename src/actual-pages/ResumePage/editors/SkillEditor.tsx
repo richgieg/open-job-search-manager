@@ -7,7 +7,7 @@ import {
 } from "@/components";
 import { ResumeSkill } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useSkillMutations } from "./mutations";
+import { useSkillMutations } from "../mutations";
 
 type Props = {
   skill: ResumeSkill;

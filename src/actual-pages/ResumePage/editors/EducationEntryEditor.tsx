@@ -8,7 +8,7 @@ import {
 } from "@/components";
 import { ResumeEducationEntry } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useEducationEntryMutations } from "./mutations";
+import { useEducationEntryMutations } from "../mutations";
 
 type Props = {
   educationEntry: ResumeEducationEntry;

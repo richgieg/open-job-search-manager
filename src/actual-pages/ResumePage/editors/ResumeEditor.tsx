@@ -16,8 +16,8 @@ import {
 import { t } from "@/translate";
 import NextLink from "next/link";
 import { FormEvent, useState } from "react";
-import { useResumeMutations } from "./mutations";
-import { usePromptGenerators } from "./usePromptGenerators";
+import { useResumeMutations } from "../mutations";
+import { usePromptGenerators } from "../usePromptGenerators";
 
 type ResumeWithProfile = Resume & {
   profile: Profile | null;

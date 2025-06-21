@@ -7,7 +7,7 @@ import {
 } from "@/components";
 import { ResumeWorkEntryBullet } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useWorkEntryBulletMutations } from "./mutations";
+import { useWorkEntryBulletMutations } from "../mutations";
 
 type Props = {
   workEntryBullet: ResumeWorkEntryBullet;
