@@ -1,43 +1,7 @@
-import {
-  Certification,
-  EducationEntry,
-  EducationEntryBullet,
-  Job,
-  Profile,
-  Resume,
-  ResumeCertification,
-  ResumeEducationEntry,
-  ResumeEducationEntryBullet,
-  ResumeSkill,
-  ResumeSkillCategory,
-  ResumeWorkEntry,
-  ResumeWorkEntryBullet,
-  Skill,
-  SkillCategory,
-  WorkEntry,
-  WorkEntryBullet,
-} from "@/generated/prisma";
+import type { FullProfile, FullResume } from "@/types";
 import { ExternalHyperlink, Paragraph, TextRun } from "docx";
 
 const FONT_SIZE = 28;
-
-type FullProfile = Profile & {
-  workEntries: (WorkEntry & { bullets: WorkEntryBullet[] })[];
-  educationEntries: (EducationEntry & { bullets: EducationEntryBullet[] })[];
-  certifications: Certification[];
-  skillCategories: (SkillCategory & { skills: Skill[] })[];
-};
-
-type FullResume = Resume & {
-  workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
-  educationEntries: (ResumeEducationEntry & {
-    bullets: ResumeEducationEntryBullet[];
-  })[];
-  certifications: ResumeCertification[];
-  skillCategories: (ResumeSkillCategory & { skills: ResumeSkill[] })[];
-  profile: Profile | null;
-  job: Job;
-};
 
 export function header(data: FullProfile | FullResume): Paragraph {
   return new Paragraph({

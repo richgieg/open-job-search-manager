@@ -1,19 +1,6 @@
-import {
-  ApplicationQuestion,
-  Contact,
-  Job,
-  Link,
-  Resume,
-} from "@/generated/prisma";
 import { createContext, ReactNode, useContext } from "react";
 import { KeyedMutator } from "swr";
-
-type FullJob = Job & {
-  resumes: Resume[];
-  links: Link[];
-  contacts: Contact[];
-  applicationQuestions: ApplicationQuestion[];
-};
+import type { FullJob } from "@/types";
 
 const FullJobContext = createContext<{
   fullJob: FullJob;

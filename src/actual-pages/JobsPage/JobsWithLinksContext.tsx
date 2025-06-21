@@ -1,8 +1,6 @@
-import { Job, Link } from "@/generated/prisma";
 import { createContext, ReactNode, useContext } from "react";
 import { KeyedMutator } from "swr";
-
-type JobWithLinks = Job & { links: Link[] };
+import type { JobWithLinks } from "@/types";
 
 const JobsWithLinksContext = createContext<{
   jobsWithLinks: JobWithLinks[];

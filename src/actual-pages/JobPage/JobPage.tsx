@@ -1,27 +1,14 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { MainContent } from "./MainContent";
-import {
-  ApplicationQuestion,
-  Contact,
-  Job,
-  Link,
-  Profile,
-  Resume,
-} from "@/generated/prisma";
 import Head from "next/head";
 import { t } from "@/translate";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
 import { FullJobProvider } from "./FullJobContext";
 import { Header, MetaNoIndex } from "@/components";
-
-type FullJob = Job & {
-  resumes: Resume[];
-  links: Link[];
-  contacts: Contact[];
-  applicationQuestions: ApplicationQuestion[];
-};
+import { Profile } from "@/generated/prisma";
+import type { FullJob } from "@/types";
 
 export function JobPage() {
   const user = useAuthRedirect();

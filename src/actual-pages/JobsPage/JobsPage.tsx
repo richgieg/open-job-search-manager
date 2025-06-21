@@ -1,12 +1,10 @@
 import { MainContent } from "./MainContent";
-import { Job, Link } from "@/generated/prisma";
 import Head from "next/head";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
 import { JobsWithLinksProvider } from "./JobsWithLinksContext";
 import { Header, MetaNoIndex } from "@/components";
-
-type JobWithLinks = Job & { links: Link[] };
+import type { JobWithLinks } from "@/types";
 
 export function JobsPage() {
   const user = useAuthRedirect();

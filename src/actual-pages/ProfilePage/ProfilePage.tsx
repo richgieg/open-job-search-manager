@@ -1,29 +1,13 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { MainContent } from "./MainContent";
-import {
-  Certification,
-  EducationEntry,
-  EducationEntryBullet,
-  Profile,
-  Skill,
-  SkillCategory,
-  WorkEntry,
-  WorkEntryBullet,
-} from "@/generated/prisma";
 import Head from "next/head";
 import { t } from "@/translate";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
 import { FullProfileProvider } from "./FullProfileContext";
 import { Header, MetaNoIndex } from "@/components";
-
-type FullProfile = Profile & {
-  workEntries: (WorkEntry & { bullets: WorkEntryBullet[] })[];
-  educationEntries: (EducationEntry & { bullets: EducationEntryBullet[] })[];
-  certifications: Certification[];
-  skillCategories: (SkillCategory & { skills: Skill[] })[];
-};
+import type { FullProfile } from "@/types";
 
 export function ProfilePage() {
   const user = useAuthRedirect();

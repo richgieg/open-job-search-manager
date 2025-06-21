@@ -1,25 +1,12 @@
 import {
-  ApplicationQuestion,
-  Contact,
-  Job,
-  Link,
-  Resume,
-} from "@/generated/prisma";
-import {
   makeProtectedApiHandler,
   prisma,
   sendError,
   sendResponse,
 } from "@/lib";
 import { pidSchema } from "@/schemas";
+import type { FullJob } from "@/types";
 import { NextApiResponse } from "next";
-
-type FullJob = Job & {
-  links: Link[];
-  resumes: Resume[];
-  contacts: Contact[];
-  applicationQuestions: ApplicationQuestion[];
-};
 
 export default makeProtectedApiHandler({
   GET: async (user, req, res: NextApiResponse<FullJob>) => {

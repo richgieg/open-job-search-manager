@@ -1,13 +1,6 @@
 import React, { useState } from "react";
 import { SectionHeading } from "@/components";
 import NextLink from "next/link";
-import {
-  ApplicationQuestion,
-  Contact,
-  Job,
-  Link,
-  Resume,
-} from "@/generated/prisma";
 import { useFullResumeContext } from "./FullResumeContext";
 import {
   useCertificationMutations,
@@ -28,13 +21,7 @@ import {
   WorkEntryBulletEditor,
   WorkEntryEditor,
 } from "./editors";
-
-type FullJob = Job & {
-  resumes: Resume[];
-  links: Link[];
-  contacts: Contact[];
-  applicationQuestions: ApplicationQuestion[];
-};
+import type { FullJob } from "@/types";
 
 type Props = {
   fullJob: FullJob;

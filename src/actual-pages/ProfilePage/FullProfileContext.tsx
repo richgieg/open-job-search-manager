@@ -1,22 +1,6 @@
-import {
-  Certification,
-  EducationEntry,
-  EducationEntryBullet,
-  Profile,
-  Skill,
-  SkillCategory,
-  WorkEntry,
-  WorkEntryBullet,
-} from "@/generated/prisma";
+import type { FullProfile } from "@/types";
 import { createContext, ReactNode, useContext } from "react";
 import { KeyedMutator } from "swr";
-
-type FullProfile = Profile & {
-  workEntries: (WorkEntry & { bullets: WorkEntryBullet[] })[];
-  educationEntries: (EducationEntry & { bullets: EducationEntryBullet[] })[];
-  certifications: Certification[];
-  skillCategories: (SkillCategory & { skills: Skill[] })[];
-};
 
 const FullProfileContext = createContext<{
   fullProfile: FullProfile;

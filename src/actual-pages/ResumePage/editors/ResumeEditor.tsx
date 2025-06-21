@@ -5,29 +5,16 @@ import {
   TextEditor,
 } from "@/components";
 import { RESUME_TEMPLATES } from "@/constants";
-import {
-  ApplicationQuestion,
-  Contact,
-  Job,
-  Link,
-  Profile,
-  Resume,
-} from "@/generated/prisma";
+import { Profile, Resume } from "@/generated/prisma";
 import { t } from "@/translate";
 import NextLink from "next/link";
 import { FormEvent, useState } from "react";
 import { useResumeMutations } from "../mutations";
 import { usePromptGenerators } from "../usePromptGenerators";
+import type { FullJob } from "@/types";
 
 type ResumeWithProfile = Resume & {
   profile: Profile | null;
-};
-
-type FullJob = Job & {
-  resumes: Resume[];
-  links: Link[];
-  contacts: Contact[];
-  applicationQuestions: ApplicationQuestion[];
 };
 
 type Props = {

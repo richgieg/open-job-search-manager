@@ -1,28 +1,6 @@
-import {
-  Job,
-  Profile,
-  Resume,
-  ResumeCertification,
-  ResumeEducationEntry,
-  ResumeEducationEntryBullet,
-  ResumeSkill,
-  ResumeSkillCategory,
-  ResumeWorkEntry,
-  ResumeWorkEntryBullet,
-} from "@/generated/prisma";
+import type { FullResume } from "@/types";
 import { createContext, ReactNode, useContext } from "react";
 import { KeyedMutator } from "swr";
-
-type FullResume = Resume & {
-  workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
-  educationEntries: (ResumeEducationEntry & {
-    bullets: ResumeEducationEntryBullet[];
-  })[];
-  certifications: ResumeCertification[];
-  skillCategories: (ResumeSkillCategory & { skills: ResumeSkill[] })[];
-  profile: Profile | null;
-  job: Job;
-};
 
 const FullResumeContext = createContext<{
   fullResume: FullResume;

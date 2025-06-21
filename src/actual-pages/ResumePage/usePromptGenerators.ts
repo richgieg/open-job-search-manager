@@ -1,18 +1,5 @@
-import {
-  ApplicationQuestion,
-  Contact,
-  Job,
-  Link,
-  Resume,
-} from "@/generated/prisma";
 import { useFullResumeContext } from "./FullResumeContext";
-
-type FullJob = Job & {
-  resumes: Resume[];
-  links: Link[];
-  contacts: Contact[];
-  applicationQuestions: ApplicationQuestion[];
-};
+import type { FullJob } from "@/types";
 
 export function usePromptGenerators(fullJob: FullJob) {
   const { fullResume } = useFullResumeContext();
