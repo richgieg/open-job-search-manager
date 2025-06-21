@@ -2,20 +2,21 @@ import { FormEvent } from "react";
 import { ProfileOverview } from "./ProfileOverview";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Profile } from "@/generated/prisma";
+import { KeyedMutator } from "swr";
 
 type Props = {
   profiles: Profile[];
-  setProfiles: (profiles: Profile[], revalidate?: boolean) => void;
+  mutateProfiles: KeyedMutator<Profile[]>;
 };
 
-export function MainContent({ profiles, setProfiles }: Props) {
+export function MainContent({ profiles, mutateProfiles }: Props) {
   const createProfile = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const response = await fetch("/api/profiles", {
       method: "POST",
     });
     const profile: Profile = await response.json();
-    setProfiles([...profiles, profile]);
+    mutateProfiles([...profiles, profile], { revalidate: false });
   };
 
   const duplicateProfile = async (profile: Profile) => {
@@ -23,17 +24,20 @@ export function MainContent({ profiles, setProfiles }: Props) {
       method: "POST",
     });
     const duplicatedProfile: Profile = await response.json();
-    setProfiles([...profiles, duplicatedProfile]);
+    mutateProfiles([...profiles, duplicatedProfile], { revalidate: false });
   };
 
   const deleteProfile = async (profile: Profile) => {
     // TODO: Show confirmation modal.
-    setProfiles(profiles.filter((p) => p.id !== profile.id));
+    mutateProfiles(
+      profiles.filter((p) => p.id !== profile.id),
+      { revalidate: false }
+    );
     const response = await fetch(`/api/profiles/${profile.pid}`, {
       method: "DELETE",
     });
     if (!response.ok) {
-      setProfiles(profiles, true);
+      mutateProfiles(profiles, { revalidate: true });
     }
   };
 

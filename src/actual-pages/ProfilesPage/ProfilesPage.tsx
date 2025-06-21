@@ -18,9 +18,6 @@ export function ProfilesPage() {
     }
   );
 
-  const setProfiles = (profiles: Profile[], revalidate = false) =>
-    mutateProfiles(profiles, revalidate);
-
   return (
     <>
       <MetaNoIndex />
@@ -29,7 +26,7 @@ export function ProfilesPage() {
       </Head>
       <Header />
       {profiles && (
-        <MainContent profiles={profiles} setProfiles={setProfiles} />
+        <MainContent profiles={profiles} mutateProfiles={mutateProfiles} />
       )}
     </>
   );
