@@ -1,14 +1,6 @@
 import { RESUME_TEMPLATES } from "@/constants";
 import { t } from "@/translate";
 import React, { useState } from "react";
-import { ProfileEditor } from "./ProfileEditor";
-import { WorkEntryEditor } from "./WorkEntryEditor";
-import { WorkEntryBulletEditor } from "./WorkEntryBulletEditor";
-import { EducationEntryEditor } from "./EducationEntryEditor";
-import { EducationEntryBulletEditor } from "./EducationEntryBulletEditor";
-import { CertificationEditor } from "./CertificationEditor";
-import { SkillCategoryEditor } from "./SkillCategoryEditor";
-import { SkillEditor } from "./SkillEditor";
 import { SectionHeading } from "@/components/SectionHeading";
 import Link from "next/link";
 import { ResumeTemplate } from "@/generated/prisma";
@@ -20,6 +12,16 @@ import { useEducationEntryBulletMutations } from "./useEducationEntryBulletMutat
 import { useCertificationMutations } from "./useCertificationMutations";
 import { useSkillCategoryMutations } from "./useSkillCategoryMutations";
 import { useSkillMutations } from "./useSkillMutations";
+import {
+  CertificationEditor,
+  EducationEntryBulletEditor,
+  EducationEntryEditor,
+  ProfileEditor,
+  SkillCategoryEditor,
+  SkillEditor,
+  WorkEntryBulletEditor,
+  WorkEntryEditor,
+} from "./editors";
 
 export function MainContent() {
   const [previewTemplate, setPreviewTemplate] =

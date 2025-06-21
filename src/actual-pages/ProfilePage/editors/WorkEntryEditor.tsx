@@ -9,7 +9,7 @@ import { JOB_ARRANGEMENTS, JOB_TYPES } from "@/constants";
 import { WorkEntry } from "@/generated/prisma";
 import { t } from "@/translate";
 import { FormEvent, useState } from "react";
-import { useWorkEntryMutations } from "./useWorkEntryMutations";
+import { useWorkEntryMutations } from "../useWorkEntryMutations";
 
 type Props = {
   workEntry: WorkEntry;

@@ -5,7 +5,7 @@ import { SaveButton } from "@/components/SaveButton";
 import { TextEditor } from "@/components/TextEditor";
 import { SkillCategory } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useSkillCategoryMutations } from "./useSkillCategoryMutations";
+import { useSkillCategoryMutations } from "../useSkillCategoryMutations";
 
 type Props = {
   skillCategory: SkillCategory;

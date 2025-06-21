@@ -5,7 +5,7 @@ import { SaveButton } from "@/components/SaveButton";
 import { TextEditor } from "@/components/TextEditor";
 import { Skill } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useSkillMutations } from "./useSkillMutations";
+import { useSkillMutations } from "../useSkillMutations";
 
 type Props = {
   skill: Skill;
