@@ -44,9 +44,6 @@ export function ProfilePage() {
     }
   );
 
-  const setFullProfile = (fullProfile: FullProfile, revalidate = false) =>
-    mutateFullProfile(fullProfile, revalidate);
-
   return (
     <>
       <MetaNoIndex />
@@ -65,7 +62,7 @@ export function ProfilePage() {
       {fullProfile && (
         <MainContent
           fullProfile={fullProfile}
-          setFullProfile={setFullProfile}
+          mutateFullProfile={mutateFullProfile}
         />
       )}
     </>

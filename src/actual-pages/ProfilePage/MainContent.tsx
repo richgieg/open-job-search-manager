@@ -22,6 +22,7 @@ import {
   WorkEntry,
   WorkEntryBullet,
 } from "@/generated/prisma";
+import { KeyedMutator } from "swr";
 
 type FullProfile = Profile & {
   workEntries: (WorkEntry & { bullets: WorkEntryBullet[] })[];
@@ -32,10 +33,10 @@ type FullProfile = Profile & {
 
 type Props = {
   fullProfile: FullProfile;
-  setFullProfile: (fullProfile: FullProfile, revalidate?: boolean) => void;
+  mutateFullProfile: KeyedMutator<FullProfile>;
 };
 
-export function MainContent({ fullProfile, setFullProfile }: Props) {
+export function MainContent({ fullProfile, mutateFullProfile }: Props) {
   const [previewTemplate, setPreviewTemplate] =
     useState<ResumeTemplate>("template01");
 
@@ -192,7 +193,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
   };
 
   const updateProfile = async (profile: Profile) => {
-    setFullProfile({ ...fullProfile, ...profile });
+    mutateFullProfile({ ...fullProfile, ...profile }, { revalidate: false });
     const response = await fetch(`/api/profiles/${profile.pid}`, {
       method: "PUT",
       headers: {
@@ -201,7 +202,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       body: JSON.stringify(profile),
     });
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -213,29 +214,35 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     const workEntry: WorkEntry = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      workEntries: [
-        ...fullProfile.workEntries,
-        {
-          ...workEntry,
-          bullets: [],
-        },
-      ],
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        workEntries: [
+          ...fullProfile.workEntries,
+          {
+            ...workEntry,
+            bullets: [],
+          },
+        ],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateWorkEntry = async (workEntry: WorkEntry) => {
-    setFullProfile({
-      ...fullProfile,
-      workEntries: fullProfile.workEntries.map((w) => {
-        if (w.id === workEntry.id) {
-          return { ...w, ...workEntry };
-        } else {
-          return w;
-        }
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        workEntries: fullProfile.workEntries.map((w) => {
+          if (w.id === workEntry.id) {
+            return { ...w, ...workEntry };
+          } else {
+            return w;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/workEntries/${workEntry.pid}`, {
       method: "PUT",
       headers: {
@@ -244,20 +251,25 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       body: JSON.stringify(workEntry),
     });
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
   const deleteWorkEntry = async (workEntry: WorkEntry) => {
-    setFullProfile({
-      ...fullProfile,
-      workEntries: fullProfile.workEntries.filter((w) => w.id !== workEntry.id),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        workEntries: fullProfile.workEntries.filter(
+          (w) => w.id !== workEntry.id
+        ),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/workEntries/${workEntry.pid}`, {
       method: "DELETE",
     });
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -273,7 +285,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       workEntries.push(workEntries.shift()!);
     }
-    setFullProfile({ ...fullProfile, workEntries });
+    mutateFullProfile({ ...fullProfile, workEntries }, { revalidate: false });
     const orderedPids = workEntries.map((item) => item.pid);
     const response = await fetch(
       `/api/profiles/${fullProfile.pid}/workEntries/order`,
@@ -286,7 +298,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -302,7 +314,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       workEntries.unshift(workEntries.pop()!);
     }
-    setFullProfile({ ...fullProfile, workEntries });
+    mutateFullProfile({ ...fullProfile, workEntries }, { revalidate: false });
     const orderedPids = workEntries.map((item) => item.pid);
     const response = await fetch(
       `/api/profiles/${fullProfile.pid}/workEntries/order`,
@@ -315,7 +327,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -324,43 +336,49 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       method: "POST",
     });
     const workEntryBullet: WorkEntryBullet = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      workEntries: [
-        ...fullProfile.workEntries.map((workEntry) => {
-          if (workEntry.pid === workEntryPid) {
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        workEntries: [
+          ...fullProfile.workEntries.map((workEntry) => {
+            if (workEntry.pid === workEntryPid) {
+              return {
+                ...workEntry,
+                bullets: [...workEntry.bullets, workEntryBullet],
+              };
+            } else {
+              return workEntry;
+            }
+          }),
+        ],
+      },
+      { revalidate: false }
+    );
+  };
+
+  const updateWorkEntryBullet = async (workEntryBullet: WorkEntryBullet) => {
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        workEntries: fullProfile.workEntries.map((workEntry) => {
+          if (workEntry.id === workEntryBullet.workEntryId) {
             return {
               ...workEntry,
-              bullets: [...workEntry.bullets, workEntryBullet],
+              bullets: workEntry.bullets.map((b) => {
+                if (b.id === workEntryBullet.id) {
+                  return workEntryBullet;
+                } else {
+                  return b;
+                }
+              }),
             };
           } else {
             return workEntry;
           }
         }),
-      ],
-    });
-  };
-
-  const updateWorkEntryBullet = async (workEntryBullet: WorkEntryBullet) => {
-    setFullProfile({
-      ...fullProfile,
-      workEntries: fullProfile.workEntries.map((workEntry) => {
-        if (workEntry.id === workEntryBullet.workEntryId) {
-          return {
-            ...workEntry,
-            bullets: workEntry.bullets.map((b) => {
-              if (b.id === workEntryBullet.id) {
-                return workEntryBullet;
-              } else {
-                return b;
-              }
-            }),
-          };
-        } else {
-          return workEntry;
-        }
-      }),
-    });
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/workEntryBullets/${workEntryBullet.pid}`,
       {
@@ -372,26 +390,29 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
   const deleteWorkEntryBullet = async (workEntryBullet: WorkEntryBullet) => {
-    setFullProfile({
-      ...fullProfile,
-      workEntries: fullProfile.workEntries.map((workEntry) => {
-        if (workEntry.id === workEntryBullet.workEntryId) {
-          return {
-            ...workEntry,
-            bullets: workEntry.bullets.filter(
-              (b) => b.id !== workEntryBullet.id
-            ),
-          };
-        } else {
-          return workEntry;
-        }
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        workEntries: fullProfile.workEntries.map((workEntry) => {
+          if (workEntry.id === workEntryBullet.workEntryId) {
+            return {
+              ...workEntry,
+              bullets: workEntry.bullets.filter(
+                (b) => b.id !== workEntryBullet.id
+              ),
+            };
+          } else {
+            return workEntry;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/workEntryBullets/${workEntryBullet.pid}`,
       {
@@ -399,7 +420,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -419,15 +440,18 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       bullets.push(bullets.shift()!);
     }
-    setFullProfile({
-      ...fullProfile,
-      workEntries: fullProfile.workEntries.map((w) => {
-        if (w.id === workEntry.id) {
-          return { ...w, bullets };
-        }
-        return w;
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        workEntries: fullProfile.workEntries.map((w) => {
+          if (w.id === workEntry.id) {
+            return { ...w, bullets };
+          }
+          return w;
+        }),
+      },
+      { revalidate: false }
+    );
     const orderedPids = bullets.map((item) => item.pid);
     const response = await fetch(
       `/api/workEntries/${workEntry.pid}/bullets/order`,
@@ -440,7 +464,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -460,15 +484,18 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       bullets.unshift(bullets.pop()!);
     }
-    setFullProfile({
-      ...fullProfile,
-      workEntries: fullProfile.workEntries.map((w) => {
-        if (w.id === workEntry.id) {
-          return { ...w, bullets };
-        }
-        return w;
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        workEntries: fullProfile.workEntries.map((w) => {
+          if (w.id === workEntry.id) {
+            return { ...w, bullets };
+          }
+          return w;
+        }),
+      },
+      { revalidate: false }
+    );
     const orderedPids = bullets.map((item) => item.pid);
     const response = await fetch(
       `/api/workEntries/${workEntry.pid}/bullets/order`,
@@ -481,7 +508,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -493,29 +520,35 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     const educationEntry: EducationEntry = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      educationEntries: [
-        ...fullProfile.educationEntries,
-        {
-          ...educationEntry,
-          bullets: [],
-        },
-      ],
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        educationEntries: [
+          ...fullProfile.educationEntries,
+          {
+            ...educationEntry,
+            bullets: [],
+          },
+        ],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateEducationEntry = async (educationEntry: EducationEntry) => {
-    setFullProfile({
-      ...fullProfile,
-      educationEntries: fullProfile.educationEntries.map((e) => {
-        if (e.id === educationEntry.id) {
-          return { ...e, ...educationEntry };
-        } else {
-          return e;
-        }
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        educationEntries: fullProfile.educationEntries.map((e) => {
+          if (e.id === educationEntry.id) {
+            return { ...e, ...educationEntry };
+          } else {
+            return e;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/educationEntries/${educationEntry.pid}`,
       {
@@ -527,17 +560,20 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
   const deleteEducationEntry = async (educationEntry: EducationEntry) => {
-    setFullProfile({
-      ...fullProfile,
-      educationEntries: fullProfile.educationEntries.filter(
-        (e) => e.id !== educationEntry.id
-      ),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        educationEntries: fullProfile.educationEntries.filter(
+          (e) => e.id !== educationEntry.id
+        ),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/educationEntries/${educationEntry.pid}`,
       {
@@ -545,7 +581,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -563,7 +599,10 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       educationEntries.push(educationEntries.shift()!);
     }
-    setFullProfile({ ...fullProfile, educationEntries });
+    mutateFullProfile(
+      { ...fullProfile, educationEntries },
+      { revalidate: false }
+    );
     const orderedPids = educationEntries.map((item) => item.pid);
     const response = await fetch(
       `/api/profiles/${fullProfile.pid}/educationEntries/order`,
@@ -576,7 +615,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -594,7 +633,10 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       educationEntries.unshift(educationEntries.pop()!);
     }
-    setFullProfile({ ...fullProfile, educationEntries });
+    mutateFullProfile(
+      { ...fullProfile, educationEntries },
+      { revalidate: false }
+    );
     const orderedPids = educationEntries.map((item) => item.pid);
     const response = await fetch(
       `/api/profiles/${fullProfile.pid}/educationEntries/order`,
@@ -607,7 +649,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -619,45 +661,51 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     const educationEntryBullet: EducationEntryBullet = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      educationEntries: [
-        ...fullProfile.educationEntries.map((educationEntry) => {
-          if (educationEntry.pid === educationEntryPid) {
-            return {
-              ...educationEntry,
-              bullets: [...educationEntry.bullets, educationEntryBullet],
-            };
-          } else {
-            return educationEntry;
-          }
-        }),
-      ],
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        educationEntries: [
+          ...fullProfile.educationEntries.map((educationEntry) => {
+            if (educationEntry.pid === educationEntryPid) {
+              return {
+                ...educationEntry,
+                bullets: [...educationEntry.bullets, educationEntryBullet],
+              };
+            } else {
+              return educationEntry;
+            }
+          }),
+        ],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateEducationEntryBullet = async (
     educationEntryBullet: EducationEntryBullet
   ) => {
-    setFullProfile({
-      ...fullProfile,
-      educationEntries: fullProfile.educationEntries.map((educationEntry) => {
-        if (educationEntry.id === educationEntryBullet.educationEntryId) {
-          return {
-            ...educationEntry,
-            bullets: educationEntry.bullets.map((b) => {
-              if (b.id === educationEntryBullet.id) {
-                return educationEntryBullet;
-              } else {
-                return b;
-              }
-            }),
-          };
-        } else {
-          return educationEntry;
-        }
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        educationEntries: fullProfile.educationEntries.map((educationEntry) => {
+          if (educationEntry.id === educationEntryBullet.educationEntryId) {
+            return {
+              ...educationEntry,
+              bullets: educationEntry.bullets.map((b) => {
+                if (b.id === educationEntryBullet.id) {
+                  return educationEntryBullet;
+                } else {
+                  return b;
+                }
+              }),
+            };
+          } else {
+            return educationEntry;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/educationEntryBullets/${educationEntryBullet.pid}`,
       {
@@ -669,28 +717,31 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
   const deleteEducationEntryBullet = async (
     educationEntryBullet: EducationEntryBullet
   ) => {
-    setFullProfile({
-      ...fullProfile,
-      educationEntries: fullProfile.educationEntries.map((educationEntry) => {
-        if (educationEntry.id === educationEntryBullet.educationEntryId) {
-          return {
-            ...educationEntry,
-            bullets: educationEntry.bullets.filter(
-              (b) => b.id !== educationEntryBullet.id
-            ),
-          };
-        } else {
-          return educationEntry;
-        }
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        educationEntries: fullProfile.educationEntries.map((educationEntry) => {
+          if (educationEntry.id === educationEntryBullet.educationEntryId) {
+            return {
+              ...educationEntry,
+              bullets: educationEntry.bullets.filter(
+                (b) => b.id !== educationEntryBullet.id
+              ),
+            };
+          } else {
+            return educationEntry;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/educationEntryBullets/${educationEntryBullet.pid}`,
       {
@@ -698,7 +749,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -722,15 +773,18 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       bullets.push(bullets.shift()!);
     }
-    setFullProfile({
-      ...fullProfile,
-      educationEntries: fullProfile.educationEntries.map((e) => {
-        if (e.id === educationEntry.id) {
-          return { ...e, bullets };
-        }
-        return e;
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        educationEntries: fullProfile.educationEntries.map((e) => {
+          if (e.id === educationEntry.id) {
+            return { ...e, bullets };
+          }
+          return e;
+        }),
+      },
+      { revalidate: false }
+    );
     const orderedPids = bullets.map((item) => item.pid);
     const response = await fetch(
       `/api/educationEntries/${educationEntry.pid}/bullets/order`,
@@ -743,7 +797,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -767,15 +821,18 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       bullets.unshift(bullets.pop()!);
     }
-    setFullProfile({
-      ...fullProfile,
-      educationEntries: fullProfile.educationEntries.map((e) => {
-        if (e.id === educationEntry.id) {
-          return { ...e, bullets };
-        }
-        return e;
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        educationEntries: fullProfile.educationEntries.map((e) => {
+          if (e.id === educationEntry.id) {
+            return { ...e, bullets };
+          }
+          return e;
+        }),
+      },
+      { revalidate: false }
+    );
     const orderedPids = bullets.map((item) => item.pid);
     const response = await fetch(
       `/api/educationEntries/${educationEntry.pid}/bullets/order`,
@@ -788,7 +845,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -800,23 +857,29 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     const certification: Certification = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      certifications: [...fullProfile.certifications, certification],
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        certifications: [...fullProfile.certifications, certification],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateCertification = async (certification: Certification) => {
-    setFullProfile({
-      ...fullProfile,
-      certifications: fullProfile.certifications.map((c) => {
-        if (c.id === certification.id) {
-          return { ...c, ...certification };
-        } else {
-          return c;
-        }
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        certifications: fullProfile.certifications.map((c) => {
+          if (c.id === certification.id) {
+            return { ...c, ...certification };
+          } else {
+            return c;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/certifications/${certification.pid}`, {
       method: "PUT",
       headers: {
@@ -825,22 +888,25 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       body: JSON.stringify(certification),
     });
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
   const deleteCertification = async (certification: Certification) => {
-    setFullProfile({
-      ...fullProfile,
-      certifications: fullProfile.certifications.filter(
-        (c) => c.id !== certification.id
-      ),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        certifications: fullProfile.certifications.filter(
+          (c) => c.id !== certification.id
+        ),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/certifications/${certification.pid}`, {
       method: "DELETE",
     });
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -858,7 +924,10 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       certifications.push(certifications.shift()!);
     }
-    setFullProfile({ ...fullProfile, certifications });
+    mutateFullProfile(
+      { ...fullProfile, certifications },
+      { revalidate: false }
+    );
     const orderedPids = certifications.map((item) => item.pid);
     const response = await fetch(
       `/api/profiles/${fullProfile.pid}/certifications/order`,
@@ -871,7 +940,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -889,7 +958,10 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       certifications.unshift(certifications.pop()!);
     }
-    setFullProfile({ ...fullProfile, certifications });
+    mutateFullProfile(
+      { ...fullProfile, certifications },
+      { revalidate: false }
+    );
     const orderedPids = certifications.map((item) => item.pid);
     const response = await fetch(
       `/api/profiles/${fullProfile.pid}/certifications/order`,
@@ -902,7 +974,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -914,29 +986,35 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     const skillCategory: SkillCategory = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      skillCategories: [
-        ...fullProfile.skillCategories,
-        {
-          ...skillCategory,
-          skills: [],
-        },
-      ],
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        skillCategories: [
+          ...fullProfile.skillCategories,
+          {
+            ...skillCategory,
+            skills: [],
+          },
+        ],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateSkillCategory = async (skillCategory: SkillCategory) => {
-    setFullProfile({
-      ...fullProfile,
-      skillCategories: fullProfile.skillCategories.map((s) => {
-        if (s.id === skillCategory.id) {
-          return { ...s, ...skillCategory };
-        } else {
-          return s;
-        }
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        skillCategories: fullProfile.skillCategories.map((s) => {
+          if (s.id === skillCategory.id) {
+            return { ...s, ...skillCategory };
+          } else {
+            return s;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/skillCategories/${skillCategory.pid}`, {
       method: "PUT",
       headers: {
@@ -945,22 +1023,25 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       body: JSON.stringify(skillCategory),
     });
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
   const deleteSkillCategory = async (skillCategory: SkillCategory) => {
-    setFullProfile({
-      ...fullProfile,
-      skillCategories: fullProfile.skillCategories.filter(
-        (s) => s.id !== skillCategory.id
-      ),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        skillCategories: fullProfile.skillCategories.filter(
+          (s) => s.id !== skillCategory.id
+        ),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/skillCategories/${skillCategory.pid}`, {
       method: "DELETE",
     });
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -978,7 +1059,10 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       skillCategories.push(skillCategories.shift()!);
     }
-    setFullProfile({ ...fullProfile, skillCategories });
+    mutateFullProfile(
+      { ...fullProfile, skillCategories },
+      { revalidate: false }
+    );
     const orderedPids = skillCategories.map((item) => item.pid);
     const response = await fetch(
       `/api/profiles/${fullProfile.pid}/skillCategories/order`,
@@ -991,7 +1075,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -1009,7 +1093,10 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       skillCategories.unshift(skillCategories.pop()!);
     }
-    setFullProfile({ ...fullProfile, skillCategories });
+    mutateFullProfile(
+      { ...fullProfile, skillCategories },
+      { revalidate: false }
+    );
     const orderedPids = skillCategories.map((item) => item.pid);
     const response = await fetch(
       `/api/profiles/${fullProfile.pid}/skillCategories/order`,
@@ -1022,7 +1109,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -1034,43 +1121,49 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     const skill: Skill = await response.json();
-    setFullProfile({
-      ...fullProfile,
-      skillCategories: [
-        ...fullProfile.skillCategories.map((skillCategory) => {
-          if (skillCategory.pid === skillCategoryPid) {
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        skillCategories: [
+          ...fullProfile.skillCategories.map((skillCategory) => {
+            if (skillCategory.pid === skillCategoryPid) {
+              return {
+                ...skillCategory,
+                skills: [...skillCategory.skills, skill],
+              };
+            } else {
+              return skillCategory;
+            }
+          }),
+        ],
+      },
+      { revalidate: false }
+    );
+  };
+
+  const updateSkill = async (skill: Skill) => {
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        skillCategories: fullProfile.skillCategories.map((skillCategory) => {
+          if (skillCategory.id === skill.skillCategoryId) {
             return {
               ...skillCategory,
-              skills: [...skillCategory.skills, skill],
+              skills: skillCategory.skills.map((s) => {
+                if (s.id === skill.id) {
+                  return skill;
+                } else {
+                  return s;
+                }
+              }),
             };
           } else {
             return skillCategory;
           }
         }),
-      ],
-    });
-  };
-
-  const updateSkill = async (skill: Skill) => {
-    setFullProfile({
-      ...fullProfile,
-      skillCategories: fullProfile.skillCategories.map((skillCategory) => {
-        if (skillCategory.id === skill.skillCategoryId) {
-          return {
-            ...skillCategory,
-            skills: skillCategory.skills.map((s) => {
-              if (s.id === skill.id) {
-                return skill;
-              } else {
-                return s;
-              }
-            }),
-          };
-        } else {
-          return skillCategory;
-        }
-      }),
-    });
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/skills/${skill.pid}`, {
       method: "PUT",
       headers: {
@@ -1079,29 +1172,32 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       body: JSON.stringify(skill),
     });
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
   const deleteSkill = async (skill: Skill) => {
-    setFullProfile({
-      ...fullProfile,
-      skillCategories: fullProfile.skillCategories.map((skillCategory) => {
-        if (skillCategory.id === skill.skillCategoryId) {
-          return {
-            ...skillCategory,
-            skills: skillCategory.skills.filter((s) => s.id !== skill.id),
-          };
-        } else {
-          return skillCategory;
-        }
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        skillCategories: fullProfile.skillCategories.map((skillCategory) => {
+          if (skillCategory.id === skill.skillCategoryId) {
+            return {
+              ...skillCategory,
+              skills: skillCategory.skills.filter((s) => s.id !== skill.id),
+            };
+          } else {
+            return skillCategory;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/skills/${skill.pid}`, {
       method: "DELETE",
     });
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -1118,15 +1214,18 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       skills.push(skills.shift()!);
     }
-    setFullProfile({
-      ...fullProfile,
-      skillCategories: fullProfile.skillCategories.map((s) => {
-        if (s.id === skillCategory.id) {
-          return { ...s, skills };
-        }
-        return s;
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        skillCategories: fullProfile.skillCategories.map((s) => {
+          if (s.id === skillCategory.id) {
+            return { ...s, skills };
+          }
+          return s;
+        }),
+      },
+      { revalidate: false }
+    );
     const orderedPids = skills.map((item) => item.pid);
     const response = await fetch(
       `/api/skillCategories/${skillCategory.pid}/skills/order`,
@@ -1139,7 +1238,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
@@ -1156,15 +1255,18 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
     } else {
       skills.unshift(skills.pop()!);
     }
-    setFullProfile({
-      ...fullProfile,
-      skillCategories: fullProfile.skillCategories.map((s) => {
-        if (s.id === skillCategory.id) {
-          return { ...s, skills };
-        }
-        return s;
-      }),
-    });
+    mutateFullProfile(
+      {
+        ...fullProfile,
+        skillCategories: fullProfile.skillCategories.map((s) => {
+          if (s.id === skillCategory.id) {
+            return { ...s, skills };
+          }
+          return s;
+        }),
+      },
+      { revalidate: false }
+    );
     const orderedPids = skills.map((item) => item.pid);
     const response = await fetch(
       `/api/skillCategories/${skillCategory.pid}/skills/order`,
@@ -1177,7 +1279,7 @@ export function MainContent({ fullProfile, setFullProfile }: Props) {
       }
     );
     if (!response.ok) {
-      setFullProfile(fullProfile, true);
+      mutateFullProfile(fullProfile, { revalidate: true });
     }
   };
 
