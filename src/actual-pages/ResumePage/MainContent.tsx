@@ -24,6 +24,7 @@ import {
   ResumeWorkEntry,
   ResumeWorkEntryBullet,
 } from "@/generated/prisma";
+import { KeyedMutator } from "swr";
 
 type FullResume = Resume & {
   workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];
@@ -45,11 +46,11 @@ type FullJob = Job & {
 
 type Props = {
   fullResume: FullResume;
-  setFullResume: (fullResume: FullResume, revalidate?: boolean) => void;
+  mutateResume: KeyedMutator<FullResume>;
   fullJob: FullJob;
 };
 
-export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
+export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
   const [selectedContactPid, setSelectedContactPid] = useState<string>(
     fullJob.contacts[0]?.pid ?? ""
   );
@@ -213,7 +214,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
   };
 
   const updateResume = async (resume: Resume) => {
-    setFullResume({ ...fullResume, ...resume });
+    mutateResume({ ...fullResume, ...resume }, { revalidate: false });
     const response = await fetch(`/api/resumes/${resume.pid}`, {
       method: "PUT",
       headers: {
@@ -222,7 +223,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       body: JSON.stringify(resume),
     });
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -231,29 +232,35 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       method: "POST",
     });
     const workEntry: ResumeWorkEntry = await response.json();
-    setFullResume({
-      ...fullResume,
-      workEntries: [
-        ...fullResume.workEntries,
-        {
-          ...workEntry,
-          bullets: [],
-        },
-      ],
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        workEntries: [
+          ...fullResume.workEntries,
+          {
+            ...workEntry,
+            bullets: [],
+          },
+        ],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateWorkEntry = async (workEntry: ResumeWorkEntry) => {
-    setFullResume({
-      ...fullResume,
-      workEntries: fullResume.workEntries.map((w) => {
-        if (w.id === workEntry.id) {
-          return { ...w, ...workEntry };
-        } else {
-          return w;
-        }
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        workEntries: fullResume.workEntries.map((w) => {
+          if (w.id === workEntry.id) {
+            return { ...w, ...workEntry };
+          } else {
+            return w;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/resumeWorkEntries/${workEntry.pid}`, {
       method: "PUT",
       headers: {
@@ -262,20 +269,25 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       body: JSON.stringify(workEntry),
     });
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteWorkEntry = async (workEntry: ResumeWorkEntry) => {
-    setFullResume({
-      ...fullResume,
-      workEntries: fullResume.workEntries.filter((w) => w.id !== workEntry.id),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        workEntries: fullResume.workEntries.filter(
+          (w) => w.id !== workEntry.id
+        ),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/resumeWorkEntries/${workEntry.pid}`, {
       method: "DELETE",
     });
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -291,7 +303,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       workEntries.push(workEntries.shift()!);
     }
-    setFullResume({ ...fullResume, workEntries });
+    mutateResume({ ...fullResume, workEntries }, { revalidate: false });
     const orderedPids = workEntries.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/workEntries/order`,
@@ -304,7 +316,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -320,7 +332,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       workEntries.unshift(workEntries.pop()!);
     }
-    setFullResume({ ...fullResume, workEntries });
+    mutateResume({ ...fullResume, workEntries }, { revalidate: false });
     const orderedPids = workEntries.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/workEntries/order`,
@@ -333,7 +345,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -345,45 +357,51 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     const workEntryBullet: ResumeWorkEntryBullet = await response.json();
-    setFullResume({
-      ...fullResume,
-      workEntries: [
-        ...fullResume.workEntries.map((workEntry) => {
-          if (workEntry.pid === workEntryPid) {
-            return {
-              ...workEntry,
-              bullets: [...workEntry.bullets, workEntryBullet],
-            };
-          } else {
-            return workEntry;
-          }
-        }),
-      ],
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        workEntries: [
+          ...fullResume.workEntries.map((workEntry) => {
+            if (workEntry.pid === workEntryPid) {
+              return {
+                ...workEntry,
+                bullets: [...workEntry.bullets, workEntryBullet],
+              };
+            } else {
+              return workEntry;
+            }
+          }),
+        ],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateWorkEntryBullet = async (
     workEntryBullet: ResumeWorkEntryBullet
   ) => {
-    setFullResume({
-      ...fullResume,
-      workEntries: fullResume.workEntries.map((workEntry) => {
-        if (workEntry.id === workEntryBullet.workEntryId) {
-          return {
-            ...workEntry,
-            bullets: workEntry.bullets.map((b) => {
-              if (b.id === workEntryBullet.id) {
-                return workEntryBullet;
-              } else {
-                return b;
-              }
-            }),
-          };
-        } else {
-          return workEntry;
-        }
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        workEntries: fullResume.workEntries.map((workEntry) => {
+          if (workEntry.id === workEntryBullet.workEntryId) {
+            return {
+              ...workEntry,
+              bullets: workEntry.bullets.map((b) => {
+                if (b.id === workEntryBullet.id) {
+                  return workEntryBullet;
+                } else {
+                  return b;
+                }
+              }),
+            };
+          } else {
+            return workEntry;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/resumeWorkEntryBullets/${workEntryBullet.pid}`,
       {
@@ -395,28 +413,31 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteWorkEntryBullet = async (
     workEntryBullet: ResumeWorkEntryBullet
   ) => {
-    setFullResume({
-      ...fullResume,
-      workEntries: fullResume.workEntries.map((workEntry) => {
-        if (workEntry.id === workEntryBullet.workEntryId) {
-          return {
-            ...workEntry,
-            bullets: workEntry.bullets.filter(
-              (b) => b.id !== workEntryBullet.id
-            ),
-          };
-        } else {
-          return workEntry;
-        }
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        workEntries: fullResume.workEntries.map((workEntry) => {
+          if (workEntry.id === workEntryBullet.workEntryId) {
+            return {
+              ...workEntry,
+              bullets: workEntry.bullets.filter(
+                (b) => b.id !== workEntryBullet.id
+              ),
+            };
+          } else {
+            return workEntry;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/resumeWorkEntryBullets/${workEntryBullet.pid}`,
       {
@@ -424,7 +445,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -446,15 +467,18 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       bullets.push(bullets.shift()!);
     }
-    setFullResume({
-      ...fullResume,
-      workEntries: fullResume.workEntries.map((w) => {
-        if (w.id === workEntry.id) {
-          return { ...w, bullets };
-        }
-        return w;
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        workEntries: fullResume.workEntries.map((w) => {
+          if (w.id === workEntry.id) {
+            return { ...w, bullets };
+          }
+          return w;
+        }),
+      },
+      { revalidate: false }
+    );
     const orderedPids = bullets.map((item) => item.pid);
     const response = await fetch(
       `/api/resumeWorkEntries/${workEntry.pid}/bullets/order`,
@@ -467,7 +491,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -489,15 +513,18 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       bullets.unshift(bullets.pop()!);
     }
-    setFullResume({
-      ...fullResume,
-      workEntries: fullResume.workEntries.map((w) => {
-        if (w.id === workEntry.id) {
-          return { ...w, bullets };
-        }
-        return w;
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        workEntries: fullResume.workEntries.map((w) => {
+          if (w.id === workEntry.id) {
+            return { ...w, bullets };
+          }
+          return w;
+        }),
+      },
+      { revalidate: false }
+    );
     const orderedPids = bullets.map((item) => item.pid);
     const response = await fetch(
       `/api/resumeWorkEntries/${workEntry.pid}/bullets/order`,
@@ -510,7 +537,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -522,29 +549,35 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     const educationEntry: ResumeEducationEntry = await response.json();
-    setFullResume({
-      ...fullResume,
-      educationEntries: [
-        ...fullResume.educationEntries,
-        {
-          ...educationEntry,
-          bullets: [],
-        },
-      ],
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        educationEntries: [
+          ...fullResume.educationEntries,
+          {
+            ...educationEntry,
+            bullets: [],
+          },
+        ],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateEducationEntry = async (educationEntry: ResumeEducationEntry) => {
-    setFullResume({
-      ...fullResume,
-      educationEntries: fullResume.educationEntries.map((e) => {
-        if (e.id === educationEntry.id) {
-          return { ...e, ...educationEntry };
-        } else {
-          return e;
-        }
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        educationEntries: fullResume.educationEntries.map((e) => {
+          if (e.id === educationEntry.id) {
+            return { ...e, ...educationEntry };
+          } else {
+            return e;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/resumeEducationEntries/${educationEntry.pid}`,
       {
@@ -556,17 +589,20 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteEducationEntry = async (educationEntry: ResumeEducationEntry) => {
-    setFullResume({
-      ...fullResume,
-      educationEntries: fullResume.educationEntries.filter(
-        (e) => e.id !== educationEntry.id
-      ),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        educationEntries: fullResume.educationEntries.filter(
+          (e) => e.id !== educationEntry.id
+        ),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/resumeEducationEntries/${educationEntry.pid}`,
       {
@@ -574,7 +610,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -592,7 +628,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       educationEntries.push(educationEntries.shift()!);
     }
-    setFullResume({ ...fullResume, educationEntries });
+    mutateResume({ ...fullResume, educationEntries }, { revalidate: false });
     const orderedPids = educationEntries.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/educationEntries/order`,
@@ -605,7 +641,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -625,7 +661,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       educationEntries.unshift(educationEntries.pop()!);
     }
-    setFullResume({ ...fullResume, educationEntries });
+    mutateResume({ ...fullResume, educationEntries }, { revalidate: false });
     const orderedPids = educationEntries.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/educationEntries/order`,
@@ -638,7 +674,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -651,45 +687,51 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     );
     const educationEntryBullet: ResumeEducationEntryBullet =
       await response.json();
-    setFullResume({
-      ...fullResume,
-      educationEntries: [
-        ...fullResume.educationEntries.map((educationEntry) => {
-          if (educationEntry.pid === educationEntryPid) {
-            return {
-              ...educationEntry,
-              bullets: [...educationEntry.bullets, educationEntryBullet],
-            };
-          } else {
-            return educationEntry;
-          }
-        }),
-      ],
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        educationEntries: [
+          ...fullResume.educationEntries.map((educationEntry) => {
+            if (educationEntry.pid === educationEntryPid) {
+              return {
+                ...educationEntry,
+                bullets: [...educationEntry.bullets, educationEntryBullet],
+              };
+            } else {
+              return educationEntry;
+            }
+          }),
+        ],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateEducationEntryBullet = async (
     educationEntryBullet: ResumeEducationEntryBullet
   ) => {
-    setFullResume({
-      ...fullResume,
-      educationEntries: fullResume.educationEntries.map((educationEntry) => {
-        if (educationEntry.id === educationEntryBullet.educationEntryId) {
-          return {
-            ...educationEntry,
-            bullets: educationEntry.bullets.map((b) => {
-              if (b.id === educationEntryBullet.id) {
-                return educationEntryBullet;
-              } else {
-                return b;
-              }
-            }),
-          };
-        } else {
-          return educationEntry;
-        }
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        educationEntries: fullResume.educationEntries.map((educationEntry) => {
+          if (educationEntry.id === educationEntryBullet.educationEntryId) {
+            return {
+              ...educationEntry,
+              bullets: educationEntry.bullets.map((b) => {
+                if (b.id === educationEntryBullet.id) {
+                  return educationEntryBullet;
+                } else {
+                  return b;
+                }
+              }),
+            };
+          } else {
+            return educationEntry;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/resumeEducationEntryBullets/${educationEntryBullet.pid}`,
       {
@@ -701,34 +743,37 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteEducationEntryBullet = async (
     educationEntryBullet: ResumeEducationEntryBullet
   ) => {
-    setFullResume({
-      ...fullResume,
-      educationEntries: fullResume.educationEntries.map((educationEntry) => {
-        if (educationEntry.id === educationEntryBullet.educationEntryId) {
-          return {
-            ...educationEntry,
-            bullets: educationEntry.bullets.filter(
-              (b) => b.id !== educationEntryBullet.id
-            ),
-          };
-        } else {
-          return educationEntry;
-        }
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        educationEntries: fullResume.educationEntries.map((educationEntry) => {
+          if (educationEntry.id === educationEntryBullet.educationEntryId) {
+            return {
+              ...educationEntry,
+              bullets: educationEntry.bullets.filter(
+                (b) => b.id !== educationEntryBullet.id
+              ),
+            };
+          } else {
+            return educationEntry;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/resumeEducationEntryBullets/${educationEntryBullet.pid}`,
       { method: "DELETE" }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -752,15 +797,18 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       bullets.push(bullets.shift()!);
     }
-    setFullResume({
-      ...fullResume,
-      educationEntries: fullResume.educationEntries.map((e) => {
-        if (e.id === educationEntry.id) {
-          return { ...e, bullets };
-        }
-        return e;
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        educationEntries: fullResume.educationEntries.map((e) => {
+          if (e.id === educationEntry.id) {
+            return { ...e, bullets };
+          }
+          return e;
+        }),
+      },
+      { revalidate: false }
+    );
     const orderedPids = bullets.map((item) => item.pid);
     const response = await fetch(
       `/api/resumeEducationEntries/${educationEntry.pid}/bullets/order`,
@@ -773,7 +821,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -797,15 +845,18 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       bullets.unshift(bullets.pop()!);
     }
-    setFullResume({
-      ...fullResume,
-      educationEntries: fullResume.educationEntries.map((e) => {
-        if (e.id === educationEntry.id) {
-          return { ...e, bullets };
-        }
-        return e;
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        educationEntries: fullResume.educationEntries.map((e) => {
+          if (e.id === educationEntry.id) {
+            return { ...e, bullets };
+          }
+          return e;
+        }),
+      },
+      { revalidate: false }
+    );
     const orderedPids = bullets.map((item) => item.pid);
     const response = await fetch(
       `/api/resumeEducationEntries/${educationEntry.pid}/bullets/order`,
@@ -818,7 +869,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -830,23 +881,29 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     const certification: ResumeCertification = await response.json();
-    setFullResume({
-      ...fullResume,
-      certifications: [...fullResume.certifications, certification],
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        certifications: [...fullResume.certifications, certification],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateCertification = async (certification: ResumeCertification) => {
-    setFullResume({
-      ...fullResume,
-      certifications: fullResume.certifications.map((c) => {
-        if (c.id === certification.id) {
-          return { ...c, ...certification };
-        } else {
-          return c;
-        }
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        certifications: fullResume.certifications.map((c) => {
+          if (c.id === certification.id) {
+            return { ...c, ...certification };
+          } else {
+            return c;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/resumeCertifications/${certification.pid}`,
       {
@@ -858,17 +915,20 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteCertification = async (certification: ResumeCertification) => {
-    setFullResume({
-      ...fullResume,
-      certifications: fullResume.certifications.filter(
-        (c) => c.id !== certification.id
-      ),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        certifications: fullResume.certifications.filter(
+          (c) => c.id !== certification.id
+        ),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/resumeCertifications/${certification.pid}`,
       {
@@ -876,7 +936,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -894,7 +954,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       certifications.push(certifications.shift()!);
     }
-    setFullResume({ ...fullResume, certifications });
+    mutateResume({ ...fullResume, certifications }, { revalidate: false });
     const orderedPids = certifications.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/certifications/order`,
@@ -907,7 +967,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -925,7 +985,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       certifications.unshift(certifications.pop()!);
     }
-    setFullResume({ ...fullResume, certifications });
+    mutateResume({ ...fullResume, certifications }, { revalidate: false });
     const orderedPids = certifications.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/certifications/order`,
@@ -938,7 +998,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -950,29 +1010,35 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     const skillCategory: ResumeSkillCategory = await response.json();
-    setFullResume({
-      ...fullResume,
-      skillCategories: [
-        ...fullResume.skillCategories,
-        {
-          ...skillCategory,
-          skills: [],
-        },
-      ],
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        skillCategories: [
+          ...fullResume.skillCategories,
+          {
+            ...skillCategory,
+            skills: [],
+          },
+        ],
+      },
+      { revalidate: false }
+    );
   };
 
   const updateSkillCategory = async (skillCategory: ResumeSkillCategory) => {
-    setFullResume({
-      ...fullResume,
-      skillCategories: fullResume.skillCategories.map((s) => {
-        if (s.id === skillCategory.id) {
-          return { ...s, ...skillCategory };
-        } else {
-          return s;
-        }
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        skillCategories: fullResume.skillCategories.map((s) => {
+          if (s.id === skillCategory.id) {
+            return { ...s, ...skillCategory };
+          } else {
+            return s;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/resumeSkillCategories/${skillCategory.pid}`,
       {
@@ -984,17 +1050,20 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteSkillCategory = async (skillCategory: ResumeSkillCategory) => {
-    setFullResume({
-      ...fullResume,
-      skillCategories: fullResume.skillCategories.filter(
-        (s) => s.id !== skillCategory.id
-      ),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        skillCategories: fullResume.skillCategories.filter(
+          (s) => s.id !== skillCategory.id
+        ),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(
       `/api/resumeSkillCategories/${skillCategory.pid}`,
       {
@@ -1002,7 +1071,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -1020,7 +1089,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       skillCategories.push(skillCategories.shift()!);
     }
-    setFullResume({ ...fullResume, skillCategories });
+    mutateResume({ ...fullResume, skillCategories }, { revalidate: false });
     const orderedPids = skillCategories.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/skillCategories/order`,
@@ -1033,7 +1102,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -1051,7 +1120,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       skillCategories.unshift(skillCategories.pop()!);
     }
-    setFullResume({ ...fullResume, skillCategories });
+    mutateResume({ ...fullResume, skillCategories }, { revalidate: false });
     const orderedPids = skillCategories.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/skillCategories/order`,
@@ -1064,7 +1133,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -1076,43 +1145,49 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     const skill: ResumeSkill = await response.json();
-    setFullResume({
-      ...fullResume,
-      skillCategories: [
-        ...fullResume.skillCategories.map((skillCategory) => {
-          if (skillCategory.pid === skillCategoryPid) {
+    mutateResume(
+      {
+        ...fullResume,
+        skillCategories: [
+          ...fullResume.skillCategories.map((skillCategory) => {
+            if (skillCategory.pid === skillCategoryPid) {
+              return {
+                ...skillCategory,
+                skills: [...skillCategory.skills, skill],
+              };
+            } else {
+              return skillCategory;
+            }
+          }),
+        ],
+      },
+      { revalidate: false }
+    );
+  };
+
+  const updateSkill = async (skill: ResumeSkill) => {
+    mutateResume(
+      {
+        ...fullResume,
+        skillCategories: fullResume.skillCategories.map((skillCategory) => {
+          if (skillCategory.id === skill.skillCategoryId) {
             return {
               ...skillCategory,
-              skills: [...skillCategory.skills, skill],
+              skills: skillCategory.skills.map((s) => {
+                if (s.id === skill.id) {
+                  return skill;
+                } else {
+                  return s;
+                }
+              }),
             };
           } else {
             return skillCategory;
           }
         }),
-      ],
-    });
-  };
-
-  const updateSkill = async (skill: ResumeSkill) => {
-    setFullResume({
-      ...fullResume,
-      skillCategories: fullResume.skillCategories.map((skillCategory) => {
-        if (skillCategory.id === skill.skillCategoryId) {
-          return {
-            ...skillCategory,
-            skills: skillCategory.skills.map((s) => {
-              if (s.id === skill.id) {
-                return skill;
-              } else {
-                return s;
-              }
-            }),
-          };
-        } else {
-          return skillCategory;
-        }
-      }),
-    });
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/resumeSkills/${skill.pid}`, {
       method: "PUT",
       headers: {
@@ -1121,29 +1196,32 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       body: JSON.stringify(skill),
     });
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteSkill = async (skill: ResumeSkill) => {
-    setFullResume({
-      ...fullResume,
-      skillCategories: fullResume.skillCategories.map((skillCategory) => {
-        if (skillCategory.id === skill.skillCategoryId) {
-          return {
-            ...skillCategory,
-            skills: skillCategory.skills.filter((s) => s.id !== skill.id),
-          };
-        } else {
-          return skillCategory;
-        }
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        skillCategories: fullResume.skillCategories.map((skillCategory) => {
+          if (skillCategory.id === skill.skillCategoryId) {
+            return {
+              ...skillCategory,
+              skills: skillCategory.skills.filter((s) => s.id !== skill.id),
+            };
+          } else {
+            return skillCategory;
+          }
+        }),
+      },
+      { revalidate: false }
+    );
     const response = await fetch(`/api/resumeSkills/${skill.pid}`, {
       method: "DELETE",
     });
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -1160,15 +1238,18 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       skills.push(skills.shift()!);
     }
-    setFullResume({
-      ...fullResume,
-      skillCategories: fullResume.skillCategories.map((s) => {
-        if (s.id === skillCategory.id) {
-          return { ...s, skills };
-        }
-        return s;
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        skillCategories: fullResume.skillCategories.map((s) => {
+          if (s.id === skillCategory.id) {
+            return { ...s, skills };
+          }
+          return s;
+        }),
+      },
+      { revalidate: false }
+    );
     const orderedPids = skills.map((item) => item.pid);
     const response = await fetch(
       `/api/resumeSkillCategories/${skillCategory.pid}/skills/order`,
@@ -1181,7 +1262,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
@@ -1198,15 +1279,18 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
     } else {
       skills.unshift(skills.pop()!);
     }
-    setFullResume({
-      ...fullResume,
-      skillCategories: fullResume.skillCategories.map((s) => {
-        if (s.id === skillCategory.id) {
-          return { ...s, skills };
-        }
-        return s;
-      }),
-    });
+    mutateResume(
+      {
+        ...fullResume,
+        skillCategories: fullResume.skillCategories.map((s) => {
+          if (s.id === skillCategory.id) {
+            return { ...s, skills };
+          }
+          return s;
+        }),
+      },
+      { revalidate: false }
+    );
     const orderedPids = skills.map((item) => item.pid);
     const response = await fetch(
       `/api/resumeSkillCategories/${skillCategory.pid}/skills/order`,
@@ -1219,7 +1303,7 @@ export function MainContent({ fullResume, setFullResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      setFullResume(fullResume, true);
+      mutateResume(fullResume, { revalidate: true });
     }
   };
 
