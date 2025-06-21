@@ -20,11 +20,6 @@ export function JobsPage() {
     }
   );
 
-  const setJobsWithLinks = (
-    jobsWithLinks: JobWithLinks[],
-    revalidate = false
-  ) => mutateJobsWithLinks(jobsWithLinks, revalidate);
-
   return (
     <>
       <MetaNoIndex />
@@ -35,7 +30,7 @@ export function JobsPage() {
       {jobsWithLinks && (
         <MainContent
           jobsWithLinks={jobsWithLinks}
-          setJobsWithLinks={setJobsWithLinks}
+          mutateJobsWithLinks={mutateJobsWithLinks}
         />
       )}
     </>

@@ -4,33 +4,36 @@ import { Job, Link } from "@/generated/prisma";
 import { t } from "@/translate";
 import NextLink from "next/link";
 import React, { FormEvent, ReactNode } from "react";
+import { KeyedMutator } from "swr";
 
 type JobWithLinks = Job & { links: Link[] };
 
 type Props = {
   jobsWithLinks: JobWithLinks[];
-  setJobsWithLinks: (
-    jobsWithLinks: JobWithLinks[],
-    revalidate?: boolean
-  ) => void;
+  mutateJobsWithLinks: KeyedMutator<JobWithLinks[]>;
 };
 
-export function MainContent({ jobsWithLinks, setJobsWithLinks }: Props) {
+export function MainContent({ jobsWithLinks, mutateJobsWithLinks }: Props) {
   const createJob = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const response = await fetch("/api/jobs", {
       method: "POST",
     });
     const job: Job = await response.json();
-    setJobsWithLinks([{ ...job, links: [] }, ...jobsWithLinks]);
+    mutateJobsWithLinks([{ ...job, links: [] }, ...jobsWithLinks], {
+      revalidate: false,
+    });
   };
 
   const deleteJob = async (job: Job) => {
     // TODO: Show confirmation modal.
-    setJobsWithLinks(jobsWithLinks.filter((j) => j.id !== job.id));
+    mutateJobsWithLinks(
+      jobsWithLinks.filter((j) => j.id !== job.id),
+      { revalidate: false }
+    );
     const response = await fetch(`/api/jobs/${job.pid}`, { method: "DELETE" });
     if (!response.ok) {
-      setJobsWithLinks(jobsWithLinks, true);
+      mutateJobsWithLinks(jobsWithLinks, { revalidate: true });
     }
   };
 
