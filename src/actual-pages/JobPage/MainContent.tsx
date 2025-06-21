@@ -1,4 +1,4 @@
-import { Job, Profile, Resume } from "@/generated/prisma";
+import { Profile, Resume } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
 import { JobEditor } from "./JobEditor";
 import { ApplicationQuestionEditor } from "./ApplicationQuestionEditor";
@@ -11,6 +11,7 @@ import { useFullJobContext } from "./FullJobContext";
 import { useLinkMutations } from "./useLinkMutations";
 import { useApplicationQuestionMutations } from "./useApplicationQuestionMutations";
 import { useContactMutations } from "./useContactMutations";
+import { useJobMutations } from "./useJobMutations";
 
 type Props = {
   profiles: Profile[];
@@ -20,6 +21,7 @@ export function MainContent({ profiles }: Props) {
   const { fullJob, mutateFullJob } = useFullJobContext();
   const [profilePid, setProfilePid] = useState<string>(profiles[0]?.pid ?? "");
 
+  const { updateJob } = useJobMutations();
   const { createLink, updateLink, deleteLink, moveLinkUp, moveLinkDown } =
     useLinkMutations();
   const {
@@ -38,22 +40,12 @@ export function MainContent({ profiles }: Props) {
     moveContactDown,
   } = useContactMutations();
 
-  const updateJob = async (job: Job) => {
-    mutateFullJob({ ...fullJob, ...job }, { revalidate: false });
-    const response = await fetch(`/api/jobs/${job.pid}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(job),
-    });
-    if (!response.ok) {
-      mutateFullJob(fullJob, { revalidate: true });
-    }
+  const handleCreateResume = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await createResume(profilePid);
   };
 
-  const createResume = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const createResume = async (profilePid: string) => {
     const response = await fetch("/api/resumes", {
       method: "POST",
       headers: {
@@ -123,7 +115,7 @@ export function MainContent({ profiles }: Props) {
             ))}
           </div>
         )}
-        <form onSubmit={createResume}>
+        <form onSubmit={handleCreateResume}>
           <label>
             Profile:
             <select
