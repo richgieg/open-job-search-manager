@@ -51,7 +51,7 @@ export function ResumePage() {
     setResumePid(router.query.resumePid as string);
   }, [router]);
 
-  const { data: fullResume, mutate: mutateResume } = useSWR(
+  const { data: fullResume, mutate: mutateFullResume } = useSWR(
     user && resumePid ? `/api/resumes/${resumePid}/full` : null,
     async (url) => {
       const response = await fetch(url);
@@ -89,7 +89,7 @@ export function ResumePage() {
       {fullResume && fullJob && (
         <MainContent
           fullResume={fullResume}
-          mutateResume={mutateResume}
+          mutateFullResume={mutateFullResume}
           fullJob={fullJob}
         />
       )}

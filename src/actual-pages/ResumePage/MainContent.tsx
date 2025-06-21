@@ -46,11 +46,11 @@ type FullJob = Job & {
 
 type Props = {
   fullResume: FullResume;
-  mutateResume: KeyedMutator<FullResume>;
+  mutateFullResume: KeyedMutator<FullResume>;
   fullJob: FullJob;
 };
 
-export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
+export function MainContent({ fullResume, mutateFullResume, fullJob }: Props) {
   const [selectedContactPid, setSelectedContactPid] = useState<string>(
     fullJob.contacts[0]?.pid ?? ""
   );
@@ -214,7 +214,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
   };
 
   const updateResume = async (resume: Resume) => {
-    mutateResume({ ...fullResume, ...resume }, { revalidate: false });
+    mutateFullResume({ ...fullResume, ...resume }, { revalidate: false });
     const response = await fetch(`/api/resumes/${resume.pid}`, {
       method: "PUT",
       headers: {
@@ -223,7 +223,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       body: JSON.stringify(resume),
     });
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -232,7 +232,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       method: "POST",
     });
     const workEntry: ResumeWorkEntry = await response.json();
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         workEntries: [
@@ -248,7 +248,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
   };
 
   const updateWorkEntry = async (workEntry: ResumeWorkEntry) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         workEntries: fullResume.workEntries.map((w) => {
@@ -269,12 +269,12 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       body: JSON.stringify(workEntry),
     });
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteWorkEntry = async (workEntry: ResumeWorkEntry) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         workEntries: fullResume.workEntries.filter(
@@ -287,7 +287,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       method: "DELETE",
     });
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -303,7 +303,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       workEntries.push(workEntries.shift()!);
     }
-    mutateResume({ ...fullResume, workEntries }, { revalidate: false });
+    mutateFullResume({ ...fullResume, workEntries }, { revalidate: false });
     const orderedPids = workEntries.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/workEntries/order`,
@@ -316,7 +316,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -332,7 +332,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       workEntries.unshift(workEntries.pop()!);
     }
-    mutateResume({ ...fullResume, workEntries }, { revalidate: false });
+    mutateFullResume({ ...fullResume, workEntries }, { revalidate: false });
     const orderedPids = workEntries.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/workEntries/order`,
@@ -345,7 +345,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -357,7 +357,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     const workEntryBullet: ResumeWorkEntryBullet = await response.json();
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         workEntries: [
@@ -380,7 +380,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
   const updateWorkEntryBullet = async (
     workEntryBullet: ResumeWorkEntryBullet
   ) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         workEntries: fullResume.workEntries.map((workEntry) => {
@@ -413,14 +413,14 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteWorkEntryBullet = async (
     workEntryBullet: ResumeWorkEntryBullet
   ) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         workEntries: fullResume.workEntries.map((workEntry) => {
@@ -445,7 +445,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -467,7 +467,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       bullets.push(bullets.shift()!);
     }
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         workEntries: fullResume.workEntries.map((w) => {
@@ -491,7 +491,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -513,7 +513,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       bullets.unshift(bullets.pop()!);
     }
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         workEntries: fullResume.workEntries.map((w) => {
@@ -537,7 +537,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -549,7 +549,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     const educationEntry: ResumeEducationEntry = await response.json();
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         educationEntries: [
@@ -565,7 +565,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
   };
 
   const updateEducationEntry = async (educationEntry: ResumeEducationEntry) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         educationEntries: fullResume.educationEntries.map((e) => {
@@ -589,12 +589,12 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteEducationEntry = async (educationEntry: ResumeEducationEntry) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         educationEntries: fullResume.educationEntries.filter(
@@ -610,7 +610,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -628,7 +628,10 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       educationEntries.push(educationEntries.shift()!);
     }
-    mutateResume({ ...fullResume, educationEntries }, { revalidate: false });
+    mutateFullResume(
+      { ...fullResume, educationEntries },
+      { revalidate: false }
+    );
     const orderedPids = educationEntries.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/educationEntries/order`,
@@ -641,7 +644,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -661,7 +664,10 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       educationEntries.unshift(educationEntries.pop()!);
     }
-    mutateResume({ ...fullResume, educationEntries }, { revalidate: false });
+    mutateFullResume(
+      { ...fullResume, educationEntries },
+      { revalidate: false }
+    );
     const orderedPids = educationEntries.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/educationEntries/order`,
@@ -674,7 +680,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -687,7 +693,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     );
     const educationEntryBullet: ResumeEducationEntryBullet =
       await response.json();
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         educationEntries: [
@@ -710,7 +716,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
   const updateEducationEntryBullet = async (
     educationEntryBullet: ResumeEducationEntryBullet
   ) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         educationEntries: fullResume.educationEntries.map((educationEntry) => {
@@ -743,14 +749,14 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteEducationEntryBullet = async (
     educationEntryBullet: ResumeEducationEntryBullet
   ) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         educationEntries: fullResume.educationEntries.map((educationEntry) => {
@@ -773,7 +779,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       { method: "DELETE" }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -797,7 +803,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       bullets.push(bullets.shift()!);
     }
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         educationEntries: fullResume.educationEntries.map((e) => {
@@ -821,7 +827,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -845,7 +851,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       bullets.unshift(bullets.pop()!);
     }
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         educationEntries: fullResume.educationEntries.map((e) => {
@@ -869,7 +875,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -881,7 +887,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     const certification: ResumeCertification = await response.json();
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         certifications: [...fullResume.certifications, certification],
@@ -891,7 +897,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
   };
 
   const updateCertification = async (certification: ResumeCertification) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         certifications: fullResume.certifications.map((c) => {
@@ -915,12 +921,12 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteCertification = async (certification: ResumeCertification) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         certifications: fullResume.certifications.filter(
@@ -936,7 +942,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -954,7 +960,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       certifications.push(certifications.shift()!);
     }
-    mutateResume({ ...fullResume, certifications }, { revalidate: false });
+    mutateFullResume({ ...fullResume, certifications }, { revalidate: false });
     const orderedPids = certifications.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/certifications/order`,
@@ -967,7 +973,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -985,7 +991,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       certifications.unshift(certifications.pop()!);
     }
-    mutateResume({ ...fullResume, certifications }, { revalidate: false });
+    mutateFullResume({ ...fullResume, certifications }, { revalidate: false });
     const orderedPids = certifications.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/certifications/order`,
@@ -998,7 +1004,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -1010,7 +1016,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     const skillCategory: ResumeSkillCategory = await response.json();
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         skillCategories: [
@@ -1026,7 +1032,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
   };
 
   const updateSkillCategory = async (skillCategory: ResumeSkillCategory) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         skillCategories: fullResume.skillCategories.map((s) => {
@@ -1050,12 +1056,12 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteSkillCategory = async (skillCategory: ResumeSkillCategory) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         skillCategories: fullResume.skillCategories.filter(
@@ -1071,7 +1077,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -1089,7 +1095,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       skillCategories.push(skillCategories.shift()!);
     }
-    mutateResume({ ...fullResume, skillCategories }, { revalidate: false });
+    mutateFullResume({ ...fullResume, skillCategories }, { revalidate: false });
     const orderedPids = skillCategories.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/skillCategories/order`,
@@ -1102,7 +1108,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -1120,7 +1126,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       skillCategories.unshift(skillCategories.pop()!);
     }
-    mutateResume({ ...fullResume, skillCategories }, { revalidate: false });
+    mutateFullResume({ ...fullResume, skillCategories }, { revalidate: false });
     const orderedPids = skillCategories.map((item) => item.pid);
     const response = await fetch(
       `/api/resumes/${fullResume.pid}/skillCategories/order`,
@@ -1133,7 +1139,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -1145,7 +1151,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     const skill: ResumeSkill = await response.json();
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         skillCategories: [
@@ -1166,7 +1172,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
   };
 
   const updateSkill = async (skill: ResumeSkill) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         skillCategories: fullResume.skillCategories.map((skillCategory) => {
@@ -1196,12 +1202,12 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       body: JSON.stringify(skill),
     });
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
   const deleteSkill = async (skill: ResumeSkill) => {
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         skillCategories: fullResume.skillCategories.map((skillCategory) => {
@@ -1221,7 +1227,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       method: "DELETE",
     });
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -1238,7 +1244,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       skills.push(skills.shift()!);
     }
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         skillCategories: fullResume.skillCategories.map((s) => {
@@ -1262,7 +1268,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
@@ -1279,7 +1285,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
     } else {
       skills.unshift(skills.pop()!);
     }
-    mutateResume(
+    mutateFullResume(
       {
         ...fullResume,
         skillCategories: fullResume.skillCategories.map((s) => {
@@ -1303,7 +1309,7 @@ export function MainContent({ fullResume, mutateResume, fullJob }: Props) {
       }
     );
     if (!response.ok) {
-      mutateResume(fullResume, { revalidate: true });
+      mutateFullResume(fullResume, { revalidate: true });
     }
   };
 
