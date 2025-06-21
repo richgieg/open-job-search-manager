@@ -5,7 +5,7 @@ import { MoveUpButton } from "@/components/MoveUpButton";
 import { SaveButton } from "@/components/SaveButton";
 import { WorkEntryBullet } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useWorkEntryBulletMutations } from "../useWorkEntryBulletMutations";
+import { useWorkEntryBulletMutations } from "../mutations";
 
 type Props = {
   workEntryBullet: WorkEntryBullet;

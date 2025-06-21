@@ -3,8 +3,8 @@ import { SaveButton } from "@/components/SaveButton";
 import { TextEditor } from "@/components/TextEditor";
 import { Profile } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useProfileMutations } from "../useProfileMutations";
 import { usePromptGenerators } from "../usePromptGenerators";
+import { useProfileMutations } from "../mutations";
 
 type Props = {
   profile: Profile;

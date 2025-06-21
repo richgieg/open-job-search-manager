@@ -5,7 +5,7 @@ import { MoveUpButton } from "@/components/MoveUpButton";
 import { SaveButton } from "@/components/SaveButton";
 import { EducationEntryBullet } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useEducationEntryBulletMutations } from "../useEducationEntryBulletMutations";
+import { useEducationEntryBulletMutations } from "../mutations";
 
 type Props = {
   educationEntryBullet: EducationEntryBullet;

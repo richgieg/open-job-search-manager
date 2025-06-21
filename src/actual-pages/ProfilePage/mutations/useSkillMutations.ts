@@ -1,5 +1,5 @@
 import { Skill } from "@/generated/prisma";
-import { useFullProfileContext } from "./FullProfileContext";
+import { useFullProfileContext } from "../FullProfileContext";
 
 export function useSkillMutations() {
   const { fullProfile, mutateFullProfile } = useFullProfileContext();

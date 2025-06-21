@@ -1,5 +1,5 @@
 import { EducationEntry } from "@/generated/prisma";
-import { useFullProfileContext } from "./FullProfileContext";
+import { useFullProfileContext } from "../FullProfileContext";
 
 export function useEducationEntryMutations() {
   const { fullProfile, mutateFullProfile } = useFullProfileContext();

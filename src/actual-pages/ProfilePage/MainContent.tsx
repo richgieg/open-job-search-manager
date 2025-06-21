@@ -5,13 +5,6 @@ import { SectionHeading } from "@/components/SectionHeading";
 import Link from "next/link";
 import { ResumeTemplate } from "@/generated/prisma";
 import { useFullProfileContext } from "./FullProfileContext";
-import { useWorkEntryMutations } from "./useWorkEntryMutations";
-import { useWorkEntryBulletMutations } from "./useWorkEntryBulletMutations";
-import { useEducationEntryMutations } from "./useEducationEntryMutations";
-import { useEducationEntryBulletMutations } from "./useEducationEntryBulletMutations";
-import { useCertificationMutations } from "./useCertificationMutations";
-import { useSkillCategoryMutations } from "./useSkillCategoryMutations";
-import { useSkillMutations } from "./useSkillMutations";
 import {
   CertificationEditor,
   EducationEntryBulletEditor,
@@ -22,6 +15,15 @@ import {
   WorkEntryBulletEditor,
   WorkEntryEditor,
 } from "./editors";
+import {
+  useCertificationMutations,
+  useEducationEntryBulletMutations,
+  useEducationEntryMutations,
+  useSkillCategoryMutations,
+  useSkillMutations,
+  useWorkEntryBulletMutations,
+  useWorkEntryMutations,
+} from "./mutations";
 
 export function MainContent() {
   const [previewTemplate, setPreviewTemplate] =

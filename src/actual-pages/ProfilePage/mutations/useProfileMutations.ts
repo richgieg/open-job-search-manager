@@ -1,5 +1,5 @@
 import { Profile } from "@/generated/prisma";
-import { useFullProfileContext } from "./FullProfileContext";
+import { useFullProfileContext } from "../FullProfileContext";
 
 export function useProfileMutations() {
   const { fullProfile, mutateFullProfile } = useFullProfileContext();

@@ -1,5 +1,5 @@
 import { Certification } from "@/generated/prisma";
-import { useFullProfileContext } from "./FullProfileContext";
+import { useFullProfileContext } from "../FullProfileContext";
 
 export function useCertificationMutations() {
   const { fullProfile, mutateFullProfile } = useFullProfileContext();

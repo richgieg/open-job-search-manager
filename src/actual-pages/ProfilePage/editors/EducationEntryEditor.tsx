@@ -6,7 +6,7 @@ import { SaveButton } from "@/components/SaveButton";
 import { TextEditor } from "@/components/TextEditor";
 import { EducationEntry } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useEducationEntryMutations } from "../useEducationEntryMutations";
+import { useEducationEntryMutations } from "../mutations";
 
 type Props = {
   educationEntry: EducationEntry;

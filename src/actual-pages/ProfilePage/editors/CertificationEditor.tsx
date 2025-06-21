@@ -6,7 +6,7 @@ import { SaveButton } from "@/components/SaveButton";
 import { TextEditor } from "@/components/TextEditor";
 import { Certification } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { useCertificationMutations } from "../useCertificationMutations";
+import { useCertificationMutations } from "../mutations";
 
 type Props = {
   certification: Certification;

@@ -1,5 +1,5 @@
 import { WorkEntryBullet } from "@/generated/prisma";
-import { useFullProfileContext } from "./FullProfileContext";
+import { useFullProfileContext } from "../FullProfileContext";
 
 export function useWorkEntryBulletMutations() {
   const { fullProfile, mutateFullProfile } = useFullProfileContext();
