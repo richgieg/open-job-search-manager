@@ -1,12 +1,14 @@
-import { DeleteButton } from "@/components/DeleteButton";
-import { DuplicateButton } from "@/components/DuplicateButton";
-import { MoveDownButton } from "@/components/MoveDownButton";
-import { MoveUpButton } from "@/components/MoveUpButton";
-import { SaveButton } from "@/components/SaveButton";
-import { TextEditor } from "@/components/TextEditor";
 import { Contact } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
 import { useContactMutations } from "../mutations";
+import {
+  DeleteButton,
+  DuplicateButton,
+  MoveDownButton,
+  MoveUpButton,
+  SaveButton,
+  TextEditor,
+} from "@/components";
 
 type Props = {
   contact: Contact;

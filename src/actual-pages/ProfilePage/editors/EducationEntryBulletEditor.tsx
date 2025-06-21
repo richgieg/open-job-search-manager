@@ -1,11 +1,13 @@
-import { DeleteButton } from "@/components/DeleteButton";
-import { LongTextEditor } from "@/components/LongTextEditor";
-import { MoveDownButton } from "@/components/MoveDownButton";
-import { MoveUpButton } from "@/components/MoveUpButton";
-import { SaveButton } from "@/components/SaveButton";
 import { EducationEntryBullet } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
 import { useEducationEntryBulletMutations } from "../mutations";
+import {
+  DeleteButton,
+  LongTextEditor,
+  MoveDownButton,
+  MoveUpButton,
+  SaveButton,
+} from "@/components";
 
 type Props = {
   educationEntryBullet: EducationEntryBullet;

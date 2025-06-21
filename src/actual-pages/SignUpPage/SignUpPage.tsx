@@ -1,6 +1,4 @@
-import { Header } from "@/components/Header";
-import { SectionHeading } from "@/components/SectionHeading";
-import { TextInput } from "@/components/TextInput";
+import { Header, SectionHeading, TextInput } from "@/components";
 import { useUser } from "@/contexts/UserContext";
 import { createClient } from "@/lib/supabase/component";
 import Head from "next/head";

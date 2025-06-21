@@ -1,13 +1,15 @@
-import { DateEditor } from "@/components/DateEditor";
-import { DropdownEditor } from "@/components/DropdownEditor";
-import { LongTextEditor } from "@/components/LongTextEditor";
-import { SaveButton } from "@/components/SaveButton";
-import { TextEditor } from "@/components/TextEditor";
 import { JOB_ARRANGEMENTS, JOB_STATUSES, JOB_TYPES } from "@/constants";
 import { Job } from "@/generated/prisma";
 import { t } from "@/translate";
 import { FormEvent, useState } from "react";
 import { useJobMutations } from "../mutations";
+import {
+  DateEditor,
+  DropdownEditor,
+  LongTextEditor,
+  SaveButton,
+  TextEditor,
+} from "@/components";
 
 type Props = {
   job: Job;

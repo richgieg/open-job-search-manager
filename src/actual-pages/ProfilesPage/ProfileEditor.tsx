@@ -1,5 +1,4 @@
-import { DeleteButton } from "@/components/DeleteButton";
-import { DuplicateButton } from "@/components/DuplicateButton";
+import { DeleteButton, DuplicateButton } from "@/components";
 import { Profile } from "@/generated/prisma";
 import { t } from "@/translate";
 import Link from "next/link";

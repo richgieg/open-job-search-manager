@@ -1,6 +1,6 @@
 import { FormEvent } from "react";
 import { ProfileEditor } from "./ProfileEditor";
-import { SectionHeading } from "@/components/SectionHeading";
+import { SectionHeading } from "@/components";
 import { useProfilesContext } from "./ProfilesContext";
 import { useProfileMutations } from "./useProfileMutations";
 

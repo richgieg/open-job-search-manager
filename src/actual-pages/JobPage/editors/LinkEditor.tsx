@@ -1,11 +1,13 @@
-import { DeleteButton } from "@/components/DeleteButton";
-import { MoveDownButton } from "@/components/MoveDownButton";
-import { MoveUpButton } from "@/components/MoveUpButton";
-import { SaveButton } from "@/components/SaveButton";
-import { TextEditor } from "@/components/TextEditor";
 import { Link } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
 import { useLinkMutations } from "../mutations";
+import {
+  DeleteButton,
+  MoveDownButton,
+  MoveUpButton,
+  SaveButton,
+  TextEditor,
+} from "@/components";
 
 type Props = {
   link: Link;

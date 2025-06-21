@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { Header } from "@/components/Header";
 import { MainContent } from "./MainContent";
 import {
   Job,
@@ -16,9 +15,9 @@ import {
 } from "@/generated/prisma";
 import Head from "next/head";
 import { t } from "@/translate";
-import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
+import { Header, MetaNoIndex } from "@/components";
 
 type FullResume = Resume & {
   workEntries: (ResumeWorkEntry & { bullets: ResumeWorkEntryBullet[] })[];

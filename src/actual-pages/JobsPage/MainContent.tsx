@@ -1,10 +1,9 @@
-import { DeleteButton } from "@/components/DeleteButton";
-import { SectionHeading } from "@/components/SectionHeading";
 import { t } from "@/translate";
 import NextLink from "next/link";
 import React, { FormEvent, ReactNode } from "react";
 import { useJobMutations } from "./useJobMutations";
 import { useJobsWithLinksContext } from "./JobsWithLinksContext";
+import { DeleteButton, SectionHeading } from "@/components";
 
 export function MainContent() {
   const { jobsWithLinks } = useJobsWithLinksContext();

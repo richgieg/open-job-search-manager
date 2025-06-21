@@ -1,11 +1,13 @@
-import { DeleteButton } from "@/components/DeleteButton";
-import { MoveDownButton } from "@/components/MoveDownButton";
-import { MoveUpButton } from "@/components/MoveUpButton";
-import { SaveButton } from "@/components/SaveButton";
-import { TextEditor } from "@/components/TextEditor";
 import { SkillCategory } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
 import { useSkillCategoryMutations } from "../mutations";
+import {
+  DeleteButton,
+  MoveDownButton,
+  MoveUpButton,
+  SaveButton,
+  TextEditor,
+} from "@/components";
 
 type Props = {
   skillCategory: SkillCategory;

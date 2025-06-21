@@ -1,6 +1,6 @@
 import { Profile } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
-import { SectionHeading } from "@/components/SectionHeading";
+import { SectionHeading } from "@/components";
 import { t } from "@/translate";
 import { useFullJobContext } from "./FullJobContext";
 import {

@@ -1,7 +1,7 @@
 import { RESUME_TEMPLATES } from "@/constants";
 import { t } from "@/translate";
 import React, { useState } from "react";
-import { SectionHeading } from "@/components/SectionHeading";
+import { SectionHeading } from "@/components";
 import Link from "next/link";
 import { ResumeTemplate } from "@/generated/prisma";
 import { useFullProfileContext } from "./FullProfileContext";

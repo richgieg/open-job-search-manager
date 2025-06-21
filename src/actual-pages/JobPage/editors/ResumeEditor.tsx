@@ -1,9 +1,8 @@
-import { DeleteButton } from "@/components/DeleteButton";
-import { DuplicateButton } from "@/components/DuplicateButton";
 import { Resume } from "@/generated/prisma";
 import { t } from "@/translate";
 import Link from "next/link";
 import { useResumeMutations } from "../mutations";
+import { DeleteButton, DuplicateButton } from "@/components";
 
 type Props = {
   resume: Resume;

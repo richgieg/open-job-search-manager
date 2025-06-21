@@ -1,10 +1,8 @@
-import { LongTextEditor } from "@/components/LongTextEditor";
-import { SaveButton } from "@/components/SaveButton";
-import { TextEditor } from "@/components/TextEditor";
 import { Profile } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
 import { usePromptGenerators } from "../usePromptGenerators";
 import { useProfileMutations } from "../mutations";
+import { LongTextEditor, SaveButton, TextEditor } from "@/components";
 
 type Props = {
   profile: Profile;

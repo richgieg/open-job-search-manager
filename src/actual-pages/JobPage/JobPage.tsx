@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { Header } from "@/components/Header";
 import { MainContent } from "./MainContent";
 import {
   ApplicationQuestion,
@@ -12,10 +11,10 @@ import {
 } from "@/generated/prisma";
 import Head from "next/head";
 import { t } from "@/translate";
-import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
 import { FullJobProvider } from "./FullJobContext";
+import { Header, MetaNoIndex } from "@/components";
 
 type FullJob = Job & {
   resumes: Resume[];

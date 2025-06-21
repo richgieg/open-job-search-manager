@@ -7,7 +7,7 @@ import { EducationEntryBulletEditor } from "./EducationEntryBulletEditor";
 import { CertificationEditor } from "./CertificationEditor";
 import { SkillCategoryEditor } from "./SkillCategoryEditor";
 import { SkillEditor } from "./SkillEditor";
-import { SectionHeading } from "@/components/SectionHeading";
+import { SectionHeading } from "@/components";
 import NextLink from "next/link";
 import {
   ApplicationQuestion,

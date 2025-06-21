@@ -1,6 +1,6 @@
 import Head from "next/head";
 
-export default function MetaNoIndex() {
+export function MetaNoIndex() {
   return (
     <Head>
       <meta name="robots" content="noindex, nofollow" />

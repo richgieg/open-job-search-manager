@@ -1,12 +1,14 @@
-import { DateEditor } from "@/components/DateEditor";
-import { DeleteButton } from "@/components/DeleteButton";
-import { MoveDownButton } from "@/components/MoveDownButton";
-import { MoveUpButton } from "@/components/MoveUpButton";
-import { SaveButton } from "@/components/SaveButton";
-import { TextEditor } from "@/components/TextEditor";
 import { Certification } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
 import { useCertificationMutations } from "../mutations";
+import {
+  DateEditor,
+  DeleteButton,
+  MoveDownButton,
+  MoveUpButton,
+  SaveButton,
+  TextEditor,
+} from "@/components";
 
 type Props = {
   certification: Certification;

@@ -1,10 +1,12 @@
-import { DateEditor } from "@/components/DateEditor";
-import { DeleteButton } from "@/components/DeleteButton";
-import { DropdownEditor } from "@/components/DropdownEditor";
-import { MoveDownButton } from "@/components/MoveDownButton";
-import { MoveUpButton } from "@/components/MoveUpButton";
-import { SaveButton } from "@/components/SaveButton";
-import { TextEditor } from "@/components/TextEditor";
+import {
+  DateEditor,
+  DeleteButton,
+  DropdownEditor,
+  MoveDownButton,
+  MoveUpButton,
+  SaveButton,
+  TextEditor,
+} from "@/components";
 import { JOB_ARRANGEMENTS, JOB_TYPES } from "@/constants";
 import { ResumeWorkEntry } from "@/generated/prisma";
 import { t } from "@/translate";

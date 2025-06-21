@@ -1,7 +1,9 @@
-import { DropdownEditor } from "@/components/DropdownEditor";
-import { LongTextEditor } from "@/components/LongTextEditor";
-import { SaveButton } from "@/components/SaveButton";
-import { TextEditor } from "@/components/TextEditor";
+import {
+  DropdownEditor,
+  LongTextEditor,
+  SaveButton,
+  TextEditor,
+} from "@/components";
 import { RESUME_TEMPLATES } from "@/constants";
 import { Profile, Resume } from "@/generated/prisma";
 import { t } from "@/translate";

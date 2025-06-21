@@ -1,15 +1,17 @@
-import { DateEditor } from "@/components/DateEditor";
-import { DeleteButton } from "@/components/DeleteButton";
-import { DropdownEditor } from "@/components/DropdownEditor";
-import { MoveDownButton } from "@/components/MoveDownButton";
-import { MoveUpButton } from "@/components/MoveUpButton";
-import { SaveButton } from "@/components/SaveButton";
-import { TextEditor } from "@/components/TextEditor";
 import { JOB_ARRANGEMENTS, JOB_TYPES } from "@/constants";
 import { WorkEntry } from "@/generated/prisma";
 import { t } from "@/translate";
 import { FormEvent, useState } from "react";
 import { useWorkEntryMutations } from "../mutations";
+import {
+  DateEditor,
+  DeleteButton,
+  DropdownEditor,
+  MoveDownButton,
+  MoveUpButton,
+  SaveButton,
+  TextEditor,
+} from "@/components";
 
 type Props = {
   workEntry: WorkEntry;
