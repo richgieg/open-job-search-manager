@@ -8,24 +8,13 @@ import {
 } from "@/components";
 import { ResumeEducationEntry } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
+import { useEducationEntryMutations } from "./mutations";
 
 type Props = {
   educationEntry: ResumeEducationEntry;
-  updateEducationEntry: (educationEntry: ResumeEducationEntry) => Promise<void>;
-  deleteEducationEntry: (educationEntry: ResumeEducationEntry) => Promise<void>;
-  moveEducationEntryUp: (educationEntry: ResumeEducationEntry) => Promise<void>;
-  moveEducationEntryDown: (
-    educationEntry: ResumeEducationEntry
-  ) => Promise<void>;
 };
 
-export function EducationEntryEditor({
-  educationEntry,
-  updateEducationEntry,
-  deleteEducationEntry,
-  moveEducationEntryUp,
-  moveEducationEntryDown,
-}: Props) {
+export function EducationEntryEditor({ educationEntry }: Props) {
   const [schoolName, setSchoolName] = useState(educationEntry.schoolName);
   const [schoolLocation, setSchoolLocation] = useState(
     educationEntry.schoolLocation
@@ -34,6 +23,12 @@ export function EducationEntryEditor({
   const [graduationDate, setGraduationDate] = useState(
     educationEntry.graduationDate
   );
+  const {
+    updateEducationEntry,
+    deleteEducationEntry,
+    moveEducationEntryUp,
+    moveEducationEntryDown,
+  } = useEducationEntryMutations();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

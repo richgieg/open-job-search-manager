@@ -17,12 +17,10 @@ import {
   Resume,
 } from "@/generated/prisma";
 import { useFullResumeContext } from "./FullResumeContext";
-import { usePromptGenerators } from "./usePromptGenerators";
 import {
   useCertificationMutations,
   useEducationEntryBulletMutations,
   useEducationEntryMutations,
-  useResumeMutations,
   useSkillCategoryMutations,
   useWorkEntryBulletMutations,
   useWorkEntryMutations,
@@ -46,53 +44,13 @@ export function MainContent({ fullJob }: Props) {
   );
 
   const { fullResume } = useFullResumeContext();
-  const { generateSummaryPrompt, generateCoverLetterPrompt } =
-    usePromptGenerators(fullJob);
-  const { updateResume } = useResumeMutations();
-  const {
-    createWorkEntry,
-    updateWorkEntry,
-    deleteWorkEntry,
-    moveWorkEntryUp,
-    moveWorkEntryDown,
-  } = useWorkEntryMutations();
-  const {
-    createWorkEntryBullet,
-    updateWorkEntryBullet,
-    deleteWorkEntryBullet,
-    moveWorkEntryBulletUp,
-    moveWorkEntryBulletDown,
-  } = useWorkEntryBulletMutations();
-  const {
-    createEducationEntry,
-    updateEducationEntry,
-    deleteEducationEntry,
-    moveEducationEntryUp,
-    moveEducationEntryDown,
-  } = useEducationEntryMutations();
-  const {
-    createEducationEntryBullet,
-    updateEducationEntryBullet,
-    deleteEducationEntryBullet,
-    moveEducationEntryBulletUp,
-    moveEducationEntryBulletDown,
-  } = useEducationEntryBulletMutations();
-  const {
-    createCertification,
-    updateCertification,
-    deleteCertification,
-    moveCertificationUp,
-    moveCertificationDown,
-  } = useCertificationMutations();
-  const {
-    createSkillCategory,
-    updateSkillCategory,
-    deleteSkillCategory,
-    moveSkillCategoryUp,
-    moveSkillCategoryDown,
-  } = useSkillCategoryMutations();
-  const { createSkill, updateSkill, deleteSkill, moveSkillUp, moveSkillDown } =
-    useSkillMutations();
+  const { createWorkEntry } = useWorkEntryMutations();
+  const { createWorkEntryBullet } = useWorkEntryBulletMutations();
+  const { createEducationEntry } = useEducationEntryMutations();
+  const { createEducationEntryBullet } = useEducationEntryBulletMutations();
+  const { createCertification } = useCertificationMutations();
+  const { createSkillCategory } = useSkillCategoryMutations();
+  const { createSkill } = useSkillMutations();
 
   return (
     <div className="px-8 pb-28">
@@ -139,23 +97,12 @@ export function MainContent({ fullJob }: Props) {
         APPLICATION
       </NextLink>
       <SectionHeading text="Basic Info" />
-      <ResumeEditor
-        resume={fullResume}
-        updateResume={updateResume}
-        generateSummaryPrompt={generateSummaryPrompt}
-        generateCoverLetterPrompt={generateCoverLetterPrompt}
-      />
+      <ResumeEditor resume={fullResume} fullJob={fullJob} />
       <SectionHeading text="Skills" />
       <div className="mt-6 flex flex-col gap-12">
         {fullResume.skillCategories.map((skillCategory) => (
           <div key={skillCategory.id} className="flex flex-col gap-6">
-            <SkillCategoryEditor
-              skillCategory={skillCategory}
-              updateSkillCategory={updateSkillCategory}
-              deleteSkillCategory={deleteSkillCategory}
-              moveSkillCategoryUp={moveSkillCategoryUp}
-              moveSkillCategoryDown={moveSkillCategoryDown}
-            />
+            <SkillCategoryEditor skillCategory={skillCategory} />
             {skillCategory.skills.length > 0 && (
               <div className="flex flex-wrap gap-4">
                 {skillCategory.skills.map((s) => (
@@ -163,10 +110,6 @@ export function MainContent({ fullJob }: Props) {
                     key={s.id}
                     skill={s}
                     skillCategoryEnabled={skillCategory.enabled}
-                    updateSkill={updateSkill}
-                    deleteSkill={deleteSkill}
-                    moveSkillUp={moveSkillUp}
-                    moveSkillDown={moveSkillDown}
                   />
                 ))}
               </div>
@@ -184,13 +127,7 @@ export function MainContent({ fullJob }: Props) {
       <div className="mt-6 flex flex-col gap-12">
         {fullResume.workEntries.map((workEntry) => (
           <div key={workEntry.id} className="flex flex-col gap-6">
-            <WorkEntryEditor
-              workEntry={workEntry}
-              updateWorkEntry={updateWorkEntry}
-              deleteWorkEntry={deleteWorkEntry}
-              moveWorkEntryUp={moveWorkEntryUp}
-              moveWorkEntryDown={moveWorkEntryDown}
-            />
+            <WorkEntryEditor workEntry={workEntry} />
             {workEntry.bullets.length > 0 && (
               <div className="flex flex-wrap gap-4">
                 {workEntry.bullets.map((b) => (
@@ -198,10 +135,6 @@ export function MainContent({ fullJob }: Props) {
                     key={b.id}
                     workEntryBullet={b}
                     workEntryEnabled={workEntry.enabled}
-                    updateWorkEntryBullet={updateWorkEntryBullet}
-                    deleteWorkEntryBullet={deleteWorkEntryBullet}
-                    moveWorkEntryBulletUp={moveWorkEntryBulletUp}
-                    moveWorkEntryBulletDown={moveWorkEntryBulletDown}
                   />
                 ))}
               </div>
@@ -219,13 +152,7 @@ export function MainContent({ fullJob }: Props) {
       <div className="mt-6 flex flex-col gap-12">
         {fullResume.educationEntries.map((educationEntry) => (
           <div key={educationEntry.id} className="flex flex-col gap-6">
-            <EducationEntryEditor
-              educationEntry={educationEntry}
-              updateEducationEntry={updateEducationEntry}
-              deleteEducationEntry={deleteEducationEntry}
-              moveEducationEntryUp={moveEducationEntryUp}
-              moveEducationEntryDown={moveEducationEntryDown}
-            />
+            <EducationEntryEditor educationEntry={educationEntry} />
             {educationEntry.bullets.length > 0 && (
               <div className="flex flex-wrap gap-4">
                 {educationEntry.bullets.map((b) => (
@@ -233,10 +160,6 @@ export function MainContent({ fullJob }: Props) {
                     key={b.id}
                     educationEntryBullet={b}
                     educationEntryEnabled={educationEntry.enabled}
-                    updateEducationEntryBullet={updateEducationEntryBullet}
-                    deleteEducationEntryBullet={deleteEducationEntryBullet}
-                    moveEducationEntryBulletUp={moveEducationEntryBulletUp}
-                    moveEducationEntryBulletDown={moveEducationEntryBulletDown}
                   />
                 ))}
               </div>
@@ -260,10 +183,6 @@ export function MainContent({ fullJob }: Props) {
               <CertificationEditor
                 key={certification.id}
                 certification={certification}
-                updateCertification={updateCertification}
-                deleteCertification={deleteCertification}
-                moveCertificationUp={moveCertificationUp}
-                moveCertificationDown={moveCertificationDown}
               />
             ))}
           </div>

@@ -7,33 +7,24 @@ import {
 } from "@/components";
 import { ResumeEducationEntryBullet } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
+import { useEducationEntryBulletMutations } from "./mutations";
 
 type Props = {
   educationEntryBullet: ResumeEducationEntryBullet;
   educationEntryEnabled: boolean;
-  updateEducationEntryBullet: (
-    educationEntryBullet: ResumeEducationEntryBullet
-  ) => Promise<void>;
-  deleteEducationEntryBullet: (
-    educationEntryBullet: ResumeEducationEntryBullet
-  ) => Promise<void>;
-  moveEducationEntryBulletUp: (
-    educationEntryBullet: ResumeEducationEntryBullet
-  ) => Promise<void>;
-  moveEducationEntryBulletDown: (
-    educationEntryBullet: ResumeEducationEntryBullet
-  ) => Promise<void>;
 };
 
 export function EducationEntryBulletEditor({
   educationEntryBullet,
   educationEntryEnabled,
-  updateEducationEntryBullet,
-  deleteEducationEntryBullet,
-  moveEducationEntryBulletUp,
-  moveEducationEntryBulletDown,
 }: Props) {
   const [text, setText] = useState(educationEntryBullet.text);
+  const {
+    updateEducationEntryBullet,
+    deleteEducationEntryBullet,
+    moveEducationEntryBulletUp,
+    moveEducationEntryBulletDown,
+  } = useEducationEntryBulletMutations();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -11,22 +11,13 @@ import { JOB_ARRANGEMENTS, JOB_TYPES } from "@/constants";
 import { ResumeWorkEntry } from "@/generated/prisma";
 import { t } from "@/translate";
 import { FormEvent, useState } from "react";
+import { useWorkEntryMutations } from "./mutations";
 
 type Props = {
   workEntry: ResumeWorkEntry;
-  updateWorkEntry: (workEntry: ResumeWorkEntry) => Promise<void>;
-  deleteWorkEntry: (workEntry: ResumeWorkEntry) => Promise<void>;
-  moveWorkEntryUp: (workEntry: ResumeWorkEntry) => Promise<void>;
-  moveWorkEntryDown: (workEntry: ResumeWorkEntry) => Promise<void>;
 };
 
-export function WorkEntryEditor({
-  workEntry,
-  updateWorkEntry,
-  deleteWorkEntry,
-  moveWorkEntryUp,
-  moveWorkEntryDown,
-}: Props) {
+export function WorkEntryEditor({ workEntry }: Props) {
   const [companyName, setCompanyName] = useState(workEntry.companyName);
   const [companyLocation, setCompanyLocation] = useState(
     workEntry.companyLocation
@@ -36,6 +27,12 @@ export function WorkEntryEditor({
   const [arrangement, setArrangement] = useState(workEntry.arrangement);
   const [startDate, setStartDate] = useState(workEntry.startDate);
   const [endDate, setEndDate] = useState(workEntry.endDate);
+  const {
+    updateWorkEntry,
+    deleteWorkEntry,
+    moveWorkEntryUp,
+    moveWorkEntryDown,
+  } = useWorkEntryMutations();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

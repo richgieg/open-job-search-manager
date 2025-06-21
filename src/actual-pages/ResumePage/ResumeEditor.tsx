@@ -5,28 +5,37 @@ import {
   TextEditor,
 } from "@/components";
 import { RESUME_TEMPLATES } from "@/constants";
-import { Profile, Resume } from "@/generated/prisma";
+import {
+  ApplicationQuestion,
+  Contact,
+  Job,
+  Link,
+  Profile,
+  Resume,
+} from "@/generated/prisma";
 import { t } from "@/translate";
-import Link from "next/link";
+import NextLink from "next/link";
 import { FormEvent, useState } from "react";
+import { useResumeMutations } from "./mutations";
+import { usePromptGenerators } from "./usePromptGenerators";
 
 type ResumeWithProfile = Resume & {
   profile: Profile | null;
 };
 
-type Props = {
-  resume: ResumeWithProfile;
-  updateResume: (resume: Resume) => Promise<void>;
-  generateSummaryPrompt: () => Promise<void>;
-  generateCoverLetterPrompt: () => Promise<void>;
+type FullJob = Job & {
+  resumes: Resume[];
+  links: Link[];
+  contacts: Contact[];
+  applicationQuestions: ApplicationQuestion[];
 };
 
-export function ResumeEditor({
-  resume,
-  updateResume,
-  generateSummaryPrompt,
-  generateCoverLetterPrompt,
-}: Props) {
+type Props = {
+  resume: ResumeWithProfile;
+  fullJob: FullJob;
+};
+
+export function ResumeEditor({ resume, fullJob }: Props) {
   const [resumeName, setResumeName] = useState(resume.resumeName);
   const [name, setName] = useState(resume.name);
   const [location, setLocation] = useState(resume.location);
@@ -40,6 +49,9 @@ export function ResumeEditor({
     resume.allowPageBreaks
   );
   const [template, setTemplate] = useState(resume.template);
+  const { updateResume } = useResumeMutations();
+  const { generateSummaryPrompt, generateCoverLetterPrompt } =
+    usePromptGenerators(fullJob);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -67,9 +79,9 @@ export function ResumeEditor({
       <div className="w-full">
         Profile:{" "}
         {resume.profile ? (
-          <Link href={`/profiles/${resume.profile.pid}`}>
+          <NextLink href={`/profiles/${resume.profile.pid}`}>
             {resume.profile.pid}
-          </Link>
+          </NextLink>
         ) : (
           "(deleted)"
         )}

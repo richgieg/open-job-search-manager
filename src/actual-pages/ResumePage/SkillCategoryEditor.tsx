@@ -7,23 +7,20 @@ import {
 } from "@/components";
 import { ResumeSkillCategory } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
+import { useSkillCategoryMutations } from "./mutations";
 
 type Props = {
   skillCategory: ResumeSkillCategory;
-  updateSkillCategory: (skillCategory: ResumeSkillCategory) => Promise<void>;
-  deleteSkillCategory: (skillCategory: ResumeSkillCategory) => Promise<void>;
-  moveSkillCategoryUp: (skillCategory: ResumeSkillCategory) => Promise<void>;
-  moveSkillCategoryDown: (skillCategory: ResumeSkillCategory) => Promise<void>;
 };
 
-export function SkillCategoryEditor({
-  skillCategory,
-  updateSkillCategory,
-  deleteSkillCategory,
-  moveSkillCategoryUp,
-  moveSkillCategoryDown,
-}: Props) {
+export function SkillCategoryEditor({ skillCategory }: Props) {
   const [name, setName] = useState(skillCategory.name);
+  const {
+    updateSkillCategory,
+    deleteSkillCategory,
+    moveSkillCategoryUp,
+    moveSkillCategoryDown,
+  } = useSkillCategoryMutations();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
