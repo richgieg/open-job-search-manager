@@ -1,5 +1,5 @@
 import { FormEvent } from "react";
-import { ProfileOverview } from "./ProfileOverview";
+import { ProfileEditor } from "./ProfileEditor";
 import { SectionHeading } from "@/components/SectionHeading";
 import { useProfilesContext } from "./ProfilesContext";
 import { useProfileMutations } from "./useProfileMutations";
@@ -21,7 +21,7 @@ export function MainContent() {
         {profiles.length > 0 && (
           <div className="flex flex-col gap-4">
             {profiles.map((p) => (
-              <ProfileOverview
+              <ProfileEditor
                 key={p.id}
                 profile={p}
                 deleteProfile={deleteProfile}

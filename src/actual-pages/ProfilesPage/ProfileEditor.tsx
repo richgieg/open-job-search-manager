@@ -10,7 +10,7 @@ type Props = {
   duplicateProfile: (profile: Profile) => Promise<void>;
 };
 
-export function ProfileOverview({
+export function ProfileEditor({
   profile,
   deleteProfile,
   duplicateProfile,
