@@ -22,10 +22,10 @@ import {
   useEducationEntryBulletMutations,
   useEducationEntryMutations,
   useSkillCategoryMutations,
+  useSkillMutations,
   useWorkEntryBulletMutations,
   useWorkEntryMutations,
 } from "./mutations";
-import { useSkillMutations } from "./mutations/useSkillMutations";
 
 type FullJob = Job & {
   resumes: Resume[];
