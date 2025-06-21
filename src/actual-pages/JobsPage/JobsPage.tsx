@@ -5,6 +5,7 @@ import Head from "next/head";
 import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
+import { JobsWithLinksProvider } from "./JobsWithLinksContext";
 
 type JobWithLinks = Job & { links: Link[] };
 
@@ -28,10 +29,12 @@ export function JobsPage() {
       </Head>
       <Header />
       {jobsWithLinks && (
-        <MainContent
+        <JobsWithLinksProvider
           jobsWithLinks={jobsWithLinks}
           mutateJobsWithLinks={mutateJobsWithLinks}
-        />
+        >
+          <MainContent />
+        </JobsWithLinksProvider>
       )}
     </>
   );
