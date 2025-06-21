@@ -1,4 +1,4 @@
-import { Profile, Resume } from "@/generated/prisma";
+import { Profile } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
 import { JobEditor } from "./JobEditor";
 import { ApplicationQuestionEditor } from "./ApplicationQuestionEditor";
@@ -12,16 +12,17 @@ import { useLinkMutations } from "./useLinkMutations";
 import { useApplicationQuestionMutations } from "./useApplicationQuestionMutations";
 import { useContactMutations } from "./useContactMutations";
 import { useJobMutations } from "./useJobMutations";
+import { useResumeMutations } from "./useResumeMutations";
 
 type Props = {
   profiles: Profile[];
 };
 
 export function MainContent({ profiles }: Props) {
-  const { fullJob, mutateFullJob } = useFullJobContext();
+  const { fullJob } = useFullJobContext();
   const [profilePid, setProfilePid] = useState<string>(profiles[0]?.pid ?? "");
-
   const { updateJob } = useJobMutations();
+  const { createResume, duplicateResume, deleteResume } = useResumeMutations();
   const { createLink, updateLink, deleteLink, moveLinkUp, moveLinkDown } =
     useLinkMutations();
   const {
@@ -43,58 +44,6 @@ export function MainContent({ profiles }: Props) {
   const handleCreateResume = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await createResume(profilePid);
-  };
-
-  const createResume = async (profilePid: string) => {
-    const response = await fetch("/api/resumes", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        jobPid: fullJob.pid,
-        profilePid,
-      }),
-    });
-    const resume: Resume = await response.json();
-    mutateFullJob(
-      {
-        ...fullJob,
-        resumes: [...fullJob.resumes, resume],
-      },
-      { revalidate: false }
-    );
-  };
-
-  const duplicateResume = async (resume: Resume) => {
-    const response = await fetch(`/api/resumes/${resume.pid}/duplicate`, {
-      method: "POST",
-    });
-    const duplicatedResume: Resume = await response.json();
-    mutateFullJob(
-      {
-        ...fullJob,
-        resumes: [...fullJob.resumes, duplicatedResume],
-      },
-      { revalidate: false }
-    );
-  };
-
-  const deleteResume = async (resume: Resume) => {
-    // TODO: Show confirmation modal.
-    mutateFullJob(
-      {
-        ...fullJob,
-        resumes: fullJob.resumes.filter((r) => r.id !== resume.id),
-      },
-      { revalidate: false }
-    );
-    const response = await fetch(`/api/resumes/${resume.pid}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) {
-      mutateFullJob(fullJob, { revalidate: true });
-    }
   };
 
   return (
