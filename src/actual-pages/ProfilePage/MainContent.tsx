@@ -22,23 +22,13 @@ import {
   WorkEntry,
   WorkEntryBullet,
 } from "@/generated/prisma";
-import { KeyedMutator } from "swr";
+import { useFullProfileContext } from "./FullProfileContext";
 
-type FullProfile = Profile & {
-  workEntries: (WorkEntry & { bullets: WorkEntryBullet[] })[];
-  educationEntries: (EducationEntry & { bullets: EducationEntryBullet[] })[];
-  certifications: Certification[];
-  skillCategories: (SkillCategory & { skills: Skill[] })[];
-};
-
-type Props = {
-  fullProfile: FullProfile;
-  mutateFullProfile: KeyedMutator<FullProfile>;
-};
-
-export function MainContent({ fullProfile, mutateFullProfile }: Props) {
+export function MainContent() {
   const [previewTemplate, setPreviewTemplate] =
     useState<ResumeTemplate>("template01");
+
+  const { fullProfile, mutateFullProfile } = useFullProfileContext();
 
   const generateSummaryPrompt = async () => {
     const lines = [];

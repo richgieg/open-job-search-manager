@@ -17,6 +17,7 @@ import { t } from "@/translate";
 import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
+import { FullProfileProvider } from "./FullProfileContext";
 
 type FullProfile = Profile & {
   workEntries: (WorkEntry & { bullets: WorkEntryBullet[] })[];
@@ -60,10 +61,12 @@ export function ProfilePage() {
       </Head>
       <Header />
       {fullProfile && (
-        <MainContent
+        <FullProfileProvider
           fullProfile={fullProfile}
           mutateFullProfile={mutateFullProfile}
-        />
+        >
+          <MainContent />
+        </FullProfileProvider>
       )}
     </>
   );
