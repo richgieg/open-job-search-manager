@@ -14,22 +14,14 @@ import { LinkEditor } from "./LinkEditor";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ResumeOverview } from "./ResumeOverview";
 import { t } from "@/translate";
-import { KeyedMutator } from "swr";
-
-type FullJob = Job & {
-  resumes: Resume[];
-  links: Link[];
-  contacts: Contact[];
-  applicationQuestions: ApplicationQuestion[];
-};
+import { useFullJobContext } from "./FullJobContext";
 
 type Props = {
-  fullJob: FullJob;
-  mutateFullJob: KeyedMutator<FullJob>;
   profiles: Profile[];
 };
 
-export function MainContent({ fullJob, mutateFullJob, profiles }: Props) {
+export function MainContent({ profiles }: Props) {
+  const { fullJob, mutateFullJob } = useFullJobContext();
   const [profilePid, setProfilePid] = useState<string>(profiles[0]?.pid ?? "");
 
   const updateJob = async (job: Job) => {

@@ -15,6 +15,7 @@ import { t } from "@/translate";
 import MetaNoIndex from "@/components/MetaNoIndex";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 import useSWR from "swr";
+import { FullJobProvider } from "./FullJobContext";
 
 type FullJob = Job & {
   resumes: Resume[];
@@ -66,11 +67,9 @@ export function JobPage() {
       </Head>
       <Header />
       {fullJob && profiles && (
-        <MainContent
-          fullJob={fullJob}
-          mutateFullJob={mutateFullJob}
-          profiles={profiles}
-        />
+        <FullJobProvider fullJob={fullJob} mutateFullJob={mutateFullJob}>
+          <MainContent profiles={profiles} />
+        </FullJobProvider>
       )}
     </>
   );
