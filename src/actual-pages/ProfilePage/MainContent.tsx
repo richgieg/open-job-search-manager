@@ -13,8 +13,6 @@ import { SectionHeading } from "@/components/SectionHeading";
 import Link from "next/link";
 import { ResumeTemplate } from "@/generated/prisma";
 import { useFullProfileContext } from "./FullProfileContext";
-import { usePromptGenerators } from "./usePromptGenerators";
-import { useProfileMutations } from "./useProfileMutations";
 import { useWorkEntryMutations } from "./useWorkEntryMutations";
 import { useWorkEntryBulletMutations } from "./useWorkEntryBulletMutations";
 import { useEducationEntryMutations } from "./useEducationEntryMutations";
@@ -28,53 +26,13 @@ export function MainContent() {
     useState<ResumeTemplate>("template01");
 
   const { fullProfile } = useFullProfileContext();
-  const { generateSummaryPrompt, generateCoverLetterPrompt } =
-    usePromptGenerators();
-  const { updateProfile } = useProfileMutations();
-  const {
-    createWorkEntry,
-    updateWorkEntry,
-    deleteWorkEntry,
-    moveWorkEntryUp,
-    moveWorkEntryDown,
-  } = useWorkEntryMutations();
-  const {
-    createWorkEntryBullet,
-    updateWorkEntryBullet,
-    deleteWorkEntryBullet,
-    moveWorkEntryBulletUp,
-    moveWorkEntryBulletDown,
-  } = useWorkEntryBulletMutations();
-  const {
-    createEducationEntry,
-    updateEducationEntry,
-    deleteEducationEntry,
-    moveEducationEntryUp,
-    moveEducationEntryDown,
-  } = useEducationEntryMutations();
-  const {
-    createEducationEntryBullet,
-    updateEducationEntryBullet,
-    deleteEducationEntryBullet,
-    moveEducationEntryBulletUp,
-    moveEducationEntryBulletDown,
-  } = useEducationEntryBulletMutations();
-  const {
-    createCertification,
-    updateCertification,
-    deleteCertification,
-    moveCertificationUp,
-    moveCertificationDown,
-  } = useCertificationMutations();
-  const {
-    createSkillCategory,
-    updateSkillCategory,
-    deleteSkillCategory,
-    moveSkillCategoryUp,
-    moveSkillCategoryDown,
-  } = useSkillCategoryMutations();
-  const { createSkill, updateSkill, deleteSkill, moveSkillUp, moveSkillDown } =
-    useSkillMutations();
+  const { createWorkEntry } = useWorkEntryMutations();
+  const { createWorkEntryBullet } = useWorkEntryBulletMutations();
+  const { createEducationEntry } = useEducationEntryMutations();
+  const { createEducationEntryBullet } = useEducationEntryBulletMutations();
+  const { createCertification } = useCertificationMutations();
+  const { createSkillCategory } = useSkillCategoryMutations();
+  const { createSkill } = useSkillMutations();
 
   return (
     <div className="px-8 pb-28">
@@ -104,23 +62,12 @@ export function MainContent() {
         PREVIEW COVER LETTER
       </Link>
       <SectionHeading text="Basic Info" />
-      <ProfileEditor
-        profile={fullProfile}
-        updateProfile={updateProfile}
-        generateSummaryPrompt={generateSummaryPrompt}
-        generateCoverLetterPrompt={generateCoverLetterPrompt}
-      />
+      <ProfileEditor profile={fullProfile} />
       <SectionHeading text="Skills" />
       <div className="mt-6 flex flex-col gap-12">
         {fullProfile.skillCategories.map((skillCategory) => (
           <div key={skillCategory.id} className="flex flex-col gap-6">
-            <SkillCategoryEditor
-              skillCategory={skillCategory}
-              updateSkillCategory={updateSkillCategory}
-              deleteSkillCategory={deleteSkillCategory}
-              moveSkillCategoryUp={moveSkillCategoryUp}
-              moveSkillCategoryDown={moveSkillCategoryDown}
-            />
+            <SkillCategoryEditor skillCategory={skillCategory} />
             {skillCategory.skills.length > 0 && (
               <div className="flex flex-wrap gap-4">
                 {skillCategory.skills.map((s) => (
@@ -128,10 +75,6 @@ export function MainContent() {
                     key={s.id}
                     skill={s}
                     skillCategoryEnabled={skillCategory.enabled}
-                    updateSkill={updateSkill}
-                    deleteSkill={deleteSkill}
-                    moveSkillUp={moveSkillUp}
-                    moveSkillDown={moveSkillDown}
                   />
                 ))}
               </div>
@@ -149,13 +92,7 @@ export function MainContent() {
       <div className="mt-6 flex flex-col gap-12">
         {fullProfile.workEntries.map((workEntry) => (
           <div key={workEntry.id} className="flex flex-col gap-6">
-            <WorkEntryEditor
-              workEntry={workEntry}
-              updateWorkEntry={updateWorkEntry}
-              deleteWorkEntry={deleteWorkEntry}
-              moveWorkEntryUp={moveWorkEntryUp}
-              moveWorkEntryDown={moveWorkEntryDown}
-            />
+            <WorkEntryEditor workEntry={workEntry} />
             {workEntry.bullets.length > 0 && (
               <div className="flex flex-wrap gap-4">
                 {workEntry.bullets.map((b) => (
@@ -163,10 +100,6 @@ export function MainContent() {
                     key={b.id}
                     workEntryBullet={b}
                     workEntryEnabled={workEntry.enabled}
-                    updateWorkEntryBullet={updateWorkEntryBullet}
-                    deleteWorkEntryBullet={deleteWorkEntryBullet}
-                    moveWorkEntryBulletUp={moveWorkEntryBulletUp}
-                    moveWorkEntryBulletDown={moveWorkEntryBulletDown}
                   />
                 ))}
               </div>
@@ -184,13 +117,7 @@ export function MainContent() {
       <div className="mt-6 flex flex-col gap-12">
         {fullProfile.educationEntries.map((educationEntry) => (
           <div key={educationEntry.id} className="flex flex-col gap-6">
-            <EducationEntryEditor
-              educationEntry={educationEntry}
-              updateEducationEntry={updateEducationEntry}
-              deleteEducationEntry={deleteEducationEntry}
-              moveEducationEntryUp={moveEducationEntryUp}
-              moveEducationEntryDown={moveEducationEntryDown}
-            />
+            <EducationEntryEditor educationEntry={educationEntry} />
             {educationEntry.bullets.length > 0 && (
               <div className="flex flex-wrap gap-4">
                 {educationEntry.bullets.map((b) => (
@@ -198,10 +125,6 @@ export function MainContent() {
                     key={b.id}
                     educationEntryBullet={b}
                     educationEntryEnabled={educationEntry.enabled}
-                    updateEducationEntryBullet={updateEducationEntryBullet}
-                    deleteEducationEntryBullet={deleteEducationEntryBullet}
-                    moveEducationEntryBulletUp={moveEducationEntryBulletUp}
-                    moveEducationEntryBulletDown={moveEducationEntryBulletDown}
                   />
                 ))}
               </div>
@@ -225,10 +148,6 @@ export function MainContent() {
               <CertificationEditor
                 key={certification.id}
                 certification={certification}
-                updateCertification={updateCertification}
-                deleteCertification={deleteCertification}
-                moveCertificationUp={moveCertificationUp}
-                moveCertificationDown={moveCertificationDown}
               />
             ))}
           </div>

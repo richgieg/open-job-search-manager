@@ -3,20 +3,14 @@ import { SaveButton } from "@/components/SaveButton";
 import { TextEditor } from "@/components/TextEditor";
 import { Profile } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
+import { useProfileMutations } from "./useProfileMutations";
+import { usePromptGenerators } from "./usePromptGenerators";
 
 type Props = {
   profile: Profile;
-  updateProfile: (profile: Profile) => Promise<void>;
-  generateSummaryPrompt: () => Promise<void>;
-  generateCoverLetterPrompt: () => Promise<void>;
 };
 
-export function ProfileEditor({
-  profile,
-  updateProfile,
-  generateSummaryPrompt,
-  generateCoverLetterPrompt,
-}: Props) {
+export function ProfileEditor({ profile }: Props) {
   const [profileName, setProfileName] = useState(profile.profileName);
   const [jobTitle, setJobTitle] = useState(profile.jobTitle);
   const [name, setName] = useState(profile.name);
@@ -27,6 +21,9 @@ export function ProfileEditor({
   const [websiteLink, setWebsiteLink] = useState(profile.websiteLink);
   const [summary, setSummary] = useState(profile.summary);
   const [coverLetter, setCoverLetter] = useState(profile.coverLetter);
+  const { updateProfile } = useProfileMutations();
+  const { generateSummaryPrompt, generateCoverLetterPrompt } =
+    usePromptGenerators();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

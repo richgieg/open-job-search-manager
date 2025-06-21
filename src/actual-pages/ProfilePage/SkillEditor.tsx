@@ -5,25 +5,17 @@ import { SaveButton } from "@/components/SaveButton";
 import { TextEditor } from "@/components/TextEditor";
 import { Skill } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
+import { useSkillMutations } from "./useSkillMutations";
 
 type Props = {
   skill: Skill;
   skillCategoryEnabled: boolean;
-  updateSkill: (skill: Skill) => Promise<void>;
-  deleteSkill: (skill: Skill) => Promise<void>;
-  moveSkillUp: (skill: Skill) => Promise<void>;
-  moveSkillDown: (skill: Skill) => Promise<void>;
 };
 
-export function SkillEditor({
-  skill,
-  skillCategoryEnabled,
-  updateSkill,
-  deleteSkill,
-  moveSkillUp,
-  moveSkillDown,
-}: Props) {
+export function SkillEditor({ skill, skillCategoryEnabled }: Props) {
   const [text, setText] = useState(skill.text);
+  const { updateSkill, deleteSkill, moveSkillUp, moveSkillDown } =
+    useSkillMutations();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

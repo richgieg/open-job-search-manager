@@ -5,25 +5,24 @@ import { MoveUpButton } from "@/components/MoveUpButton";
 import { SaveButton } from "@/components/SaveButton";
 import { WorkEntryBullet } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
+import { useWorkEntryBulletMutations } from "./useWorkEntryBulletMutations";
 
 type Props = {
   workEntryBullet: WorkEntryBullet;
   workEntryEnabled: boolean;
-  updateWorkEntryBullet: (workEntryBullet: WorkEntryBullet) => Promise<void>;
-  deleteWorkEntryBullet: (workEntryBullet: WorkEntryBullet) => Promise<void>;
-  moveWorkEntryBulletUp: (workEntryBullet: WorkEntryBullet) => Promise<void>;
-  moveWorkEntryBulletDown: (workEntryBullet: WorkEntryBullet) => Promise<void>;
 };
 
 export function WorkEntryBulletEditor({
   workEntryBullet,
   workEntryEnabled,
-  updateWorkEntryBullet,
-  deleteWorkEntryBullet,
-  moveWorkEntryBulletUp,
-  moveWorkEntryBulletDown,
 }: Props) {
   const [text, setText] = useState(workEntryBullet.text);
+  const {
+    updateWorkEntryBullet,
+    deleteWorkEntryBullet,
+    moveWorkEntryBulletUp,
+    moveWorkEntryBulletDown,
+  } = useWorkEntryBulletMutations();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

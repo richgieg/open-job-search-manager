@@ -6,25 +6,22 @@ import { SaveButton } from "@/components/SaveButton";
 import { TextEditor } from "@/components/TextEditor";
 import { Certification } from "@/generated/prisma";
 import { FormEvent, useState } from "react";
+import { useCertificationMutations } from "./useCertificationMutations";
 
 type Props = {
   certification: Certification;
-  updateCertification: (certification: Certification) => Promise<void>;
-  deleteCertification: (certification: Certification) => Promise<void>;
-  moveCertificationUp: (certification: Certification) => Promise<void>;
-  moveCertificationDown: (certification: Certification) => Promise<void>;
 };
 
-export function CertificationEditor({
-  certification,
-  updateCertification,
-  deleteCertification,
-  moveCertificationUp,
-  moveCertificationDown,
-}: Props) {
+export function CertificationEditor({ certification }: Props) {
   const [title, setTitle] = useState(certification.title);
   const [issuer, setIssuer] = useState(certification.issuer);
   const [issueDate, setIssueDate] = useState(certification.issueDate);
+  const {
+    updateCertification,
+    deleteCertification,
+    moveCertificationUp,
+    moveCertificationDown,
+  } = useCertificationMutations();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
